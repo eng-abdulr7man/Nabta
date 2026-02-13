@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sprout, LogIn, Search } from "lucide-react";
+import { Menu, X, Sprout, LogIn, Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { label: "الرئيسية", path: "/" },
@@ -14,6 +15,7 @@ const navLinks = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   return (
     <nav className="fixed top-0 right-0 left-0 z-50 glass-card border-b border-border/50 backdrop-blur-xl bg-background/80">
@@ -51,17 +53,38 @@ const Navbar = () => {
             <Button variant="ghost" size="icon" className="text-muted-foreground">
               <Search className="w-4 h-4" />
             </Button>
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                <LogIn className="w-4 h-4 ml-1" />
-                دخول
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                إنشاء حساب
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/profile">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                    <User className="w-4 h-4" />
+                    {profile?.full_name || "حسابي"}
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
+                    <LogIn className="w-4 h-4 ml-1" />
+                    دخول
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    إنشاء حساب
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -99,12 +122,29 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="flex gap-2 pt-2">
-                <Link to="/login" className="flex-1" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full border-border text-foreground">دخول</Button>
-                </Link>
-                <Link to="/register" className="flex-1" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full bg-primary text-primary-foreground">إنشاء حساب</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link to="/profile" className="flex-1" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" className="w-full border-border text-foreground">حسابي</Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      className="border-border text-foreground"
+                      onClick={() => { signOut(); setIsOpen(false); }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="flex-1" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" className="w-full border-border text-foreground">دخول</Button>
+                    </Link>
+                    <Link to="/register" className="flex-1" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-primary text-primary-foreground">إنشاء حساب</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
