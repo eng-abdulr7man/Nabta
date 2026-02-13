@@ -1,13 +1,31 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, Sprout, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      toast({ title: "خطأ في تسجيل الدخول", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "تم تسجيل الدخول بنجاح" });
+      navigate("/");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -18,7 +36,6 @@ const LoginPage = () => {
         className="w-full max-w-md"
       >
         <div className="glass-card p-8 space-y-6">
-          {/* Logo */}
           <div className="text-center">
             <Link to="/" className="inline-flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -32,7 +49,7 @@ const LoginPage = () => {
             <p className="text-sm text-muted-foreground mt-1">أهلاً بك مجدداً في المنصة</p>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">البريد الإلكتروني</label>
               <div className="relative">
@@ -44,6 +61,7 @@ const LoginPage = () => {
                   placeholder="example@email.com"
                   className="w-full pr-10 pl-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   dir="ltr"
+                  required
                 />
               </div>
             </div>
@@ -59,6 +77,7 @@ const LoginPage = () => {
                   placeholder="••••••••"
                   className="w-full pr-10 pl-10 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   dir="ltr"
+                  required
                 />
                 <button
                   type="button"
@@ -80,8 +99,13 @@ const LoginPage = () => {
               </Link>
             </div>
 
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
-              تسجيل الدخول
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              size="lg"
+            >
+              {loading ? "جاري التسجيل..." : "تسجيل الدخول"}
             </Button>
           </form>
 
