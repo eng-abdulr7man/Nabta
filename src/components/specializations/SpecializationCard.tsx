@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getSpecIcon } from "@/lib/icons";
 
 interface SpecializationCardProps {
   id: string;
   name: string;
-  icon: React.ElementType;
+  icon: string;
   color: string;
   coursesCount?: number;
   index?: number;
@@ -13,11 +14,13 @@ interface SpecializationCardProps {
 const SpecializationCard = ({
   id,
   name,
-  icon: Icon,
+  icon,
   color,
   coursesCount = 0,
   index = 0,
 }: SpecializationCardProps) => {
+  const Icon = getSpecIcon(icon);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -25,7 +28,7 @@ const SpecializationCard = ({
       transition={{ delay: index * 0.08, duration: 0.4 }}
       viewport={{ once: true }}
     >
-      <Link to={`/specializations/${id}`}>
+      <Link to={`/courses?spec=${id}`}>
         <div className="glass-card hover-lift p-6 text-center group cursor-pointer">
           <div
             className="w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center transition-transform group-hover:scale-110"
