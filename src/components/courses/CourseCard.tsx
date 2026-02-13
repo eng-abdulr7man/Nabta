@@ -1,17 +1,19 @@
 import { Star, Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { specializations } from "@/data/mockData";
+import { getSpecIcon } from "@/lib/icons";
+import { useSpecializations } from "@/hooks/useCourses";
 
 interface CourseCardProps {
   id: string;
   title: string;
   description: string;
   instructor: string;
-  specialization: string;
-  lessonsCount: number;
-  enrolledCount: number;
-  rating: number;
+  specialization_id: string | null;
+  thumbnail_url?: string;
+  lessonsCount?: number;
+  enrolledCount?: number;
+  rating?: number;
   index?: number;
 }
 
@@ -20,13 +22,16 @@ const CourseCard = ({
   title,
   description,
   instructor,
-  specialization,
-  lessonsCount,
-  enrolledCount,
-  rating,
+  specialization_id,
+  thumbnail_url,
+  lessonsCount = 0,
+  enrolledCount = 0,
+  rating = 0,
   index = 0,
 }: CourseCardProps) => {
-  const spec = specializations.find((s) => s.id === specialization);
+  const { data: specs } = useSpecializations();
+  const spec = specs?.find((s) => s.id === specialization_id);
+  const Icon = spec ? getSpecIcon(spec.icon) : BookOpen;
 
   return (
     <motion.div
@@ -37,21 +42,23 @@ const CourseCard = ({
     >
       <Link to={`/courses/${id}`}>
         <div className="glass-card hover-lift overflow-hidden group cursor-pointer">
-          {/* Thumbnail placeholder */}
           <div className="h-44 bg-gradient-to-br from-primary/20 to-accent/10 relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              {spec && <spec.icon className="w-16 h-16 text-primary/30" />}
-            </div>
-            <div className="absolute top-3 left-3">
-              <span
-                className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur-sm text-foreground"
-              >
-                {spec?.name}
-              </span>
-            </div>
+            {thumbnail_url ? (
+              <img src={thumbnail_url} alt={title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Icon className="w-16 h-16 text-primary/30" />
+              </div>
+            )}
+            {spec && (
+              <div className="absolute top-3 left-3">
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur-sm text-foreground">
+                  {spec.name}
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Content */}
           <div className="p-5 space-y-3">
             <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
               {title}
@@ -68,10 +75,12 @@ const CourseCard = ({
                 <Users className="w-3.5 h-3.5" />
                 <span>{enrolledCount}</span>
               </div>
-              <div className="flex items-center gap-1 text-xs text-yellow-500">
-                <Star className="w-3.5 h-3.5 fill-current" />
-                <span>{rating}</span>
-              </div>
+              {rating > 0 && (
+                <div className="flex items-center gap-1 text-xs text-yellow-500">
+                  <Star className="w-3.5 h-3.5 fill-current" />
+                  <span>{rating}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

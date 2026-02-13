@@ -2,10 +2,13 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import SpecializationCard from "@/components/specializations/SpecializationCard";
-import { specializations, mockCourses } from "@/data/mockData";
+import { useSpecializations, useCoursesCount } from "@/hooks/useCourses";
 import { motion } from "framer-motion";
 
 const SpecializationsPage = () => {
+  const { data: specializations, isLoading } = useSpecializations();
+  const { data: counts } = useCoursesCount();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -20,16 +23,24 @@ const SpecializationsPage = () => {
             <p className="text-muted-foreground">اكتشف التخصصات المختلفة واختر مسارك المهني</p>
           </motion.div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            {specializations.map((spec, i) => (
-              <SpecializationCard
-                key={spec.id}
-                {...spec}
-                coursesCount={mockCourses.filter((c) => c.specialization === spec.id).length}
-                index={i}
-              />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="glass-card p-6 h-32 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              {(specializations || []).map((spec, i) => (
+                <SpecializationCard
+                  key={spec.id}
+                  {...spec}
+                  coursesCount={counts?.[spec.id] || 0}
+                  index={i}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
       <Footer />

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sprout, LogIn, Search, User, LogOut } from "lucide-react";
+import { Menu, X, Sprout, LogIn, Search, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -15,7 +15,7 @@ const navLinks = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, isAdmin } = useAuth();
 
   return (
     <nav className="fixed top-0 right-0 left-0 z-50 glass-card border-b border-border/50 backdrop-blur-xl bg-background/80">
@@ -55,6 +55,14 @@ const Navbar = () => {
             </Button>
             {user ? (
               <>
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                      <LayoutDashboard className="w-4 h-4" />
+                      لوحة التحكم
+                    </Button>
+                  </Link>
+                )}
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
                     <User className="w-4 h-4" />

@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CourseCard from "@/components/courses/CourseCard";
-import { mockCourses } from "@/data/mockData";
+import { useCourses } from "@/hooks/useCourses";
 
 const FeaturedCourses = () => {
+  const { data: courses, isLoading } = useCourses();
+
   return (
     <section className="py-16 bg-card/30">
       <div className="container mx-auto px-4">
@@ -27,11 +29,27 @@ const FeaturedCourses = () => {
           </Link>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockCourses.slice(0, 6).map((course, i) => (
-            <CourseCard key={course.id} {...course} index={i} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="glass-card h-80 animate-pulse" />
+            ))}
+          </div>
+        ) : (courses || []).length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            <p>لا توجد كورسات حالياً. أضف كورسات من لوحة التحكم.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(courses || []).slice(0, 6).map((course, i) => (
+              <CourseCard
+                key={course.id}
+                {...course}
+                index={i}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

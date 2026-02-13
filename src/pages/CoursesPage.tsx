@@ -2,19 +2,22 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import CourseCard from "@/components/courses/CourseCard";
-import { mockCourses, specializations } from "@/data/mockData";
+import { useCourses, useSpecializations } from "@/hooks/useCourses";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
 const CoursesPage = () => {
+  const [searchParams] = useSearchParams();
+  const initialSpec = searchParams.get("spec");
   const [search, setSearch] = useState("");
-  const [selectedSpec, setSelectedSpec] = useState<string | null>(null);
+  const [selectedSpec, setSelectedSpec] = useState<string | null>(initialSpec);
+  const { data: courses, isLoading } = useCourses(selectedSpec);
+  const { data: specializations } = useSpecializations();
 
-  const filtered = mockCourses.filter((c) => {
-    const matchSearch = c.title.includes(search) || c.description.includes(search);
-    const matchSpec = !selectedSpec || c.specialization === selectedSpec;
-    return matchSearch && matchSpec;
+  const filtered = (courses || []).filter((c) => {
+    return c.title.includes(search) || c.description.includes(search);
   });
 
   return (
@@ -31,7 +34,6 @@ const CoursesPage = () => {
             <p className="text-muted-foreground">تصفح واختر الكورس المناسب لك</p>
           </motion.div>
 
-          {/* Search & Filter */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="relative flex-1">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -52,7 +54,7 @@ const CoursesPage = () => {
               >
                 الكل
               </button>
-              {specializations.map((s) => (
+              {(specializations || []).map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setSelectedSpec(s.id)}
@@ -66,14 +68,21 @@ const CoursesPage = () => {
             </div>
           </div>
 
-          {/* Course Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((course, i) => (
-              <CourseCard key={course.id} {...course} index={i} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="glass-card h-80 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((course, i) => (
+                <CourseCard key={course.id} {...course} index={i} />
+              ))}
+            </div>
+          )}
 
-          {filtered.length === 0 && (
+          {!isLoading && filtered.length === 0 && (
             <div className="text-center py-16 text-muted-foreground">
               <p className="text-lg">لا توجد نتائج مطابقة</p>
             </div>
