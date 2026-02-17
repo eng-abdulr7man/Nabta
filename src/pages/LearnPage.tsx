@@ -239,8 +239,8 @@ const LearnPage = () => {
             )}
           </div>
 
-          <div className="p-4 bg-card border-t border-border shrink-0">
-            <div className="flex items-center justify-between">
+          <div className="p-4 bg-card border-t border-border shrink-0 overflow-y-auto max-h-[40vh]">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-foreground">{currentLesson?.title}</h2>
               <div className="flex gap-2">
                 {currentLessonId && !isLessonCompleted(currentLessonId) && (
@@ -252,6 +252,28 @@ const LearnPage = () => {
                 <Button size="sm" variant="outline" onClick={goToNextLesson}>الدرس التالي</Button>
               </div>
             </div>
+
+            {/* Lesson file */}
+            {currentLesson && (currentLesson as any).file_url && (
+              <div className="mb-3 flex items-center gap-2 p-2.5 rounded-lg bg-primary/5 border border-primary/20">
+                <Award className="w-4 h-4 text-primary shrink-0" />
+                <a
+                  href={(currentLesson as any).file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline truncate"
+                >
+                  📎 تحميل ملف الدرس
+                </a>
+              </div>
+            )}
+
+            {/* Lesson content text */}
+            {currentLesson && (currentLesson as any).content && (
+              <div className="prose prose-sm prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-wrap text-sm">
+                {(currentLesson as any).content}
+              </div>
+            )}
           </div>
         </div>
 

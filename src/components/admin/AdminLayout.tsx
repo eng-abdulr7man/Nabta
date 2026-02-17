@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard, BookOpen, Users, MessageSquare, Settings, LogOut, Sprout, ChevronRight, GraduationCap, Menu, X
+  LayoutDashboard, BookOpen, Users, MessageSquare, Settings, LogOut, Sprout, ChevronRight, GraduationCap, Menu, X, Activity
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ const sidebarLinks = [
   { label: "التخصصات", path: "/admin/specializations", icon: GraduationCap },
   { label: "المستخدمين", path: "/admin/users", icon: Users },
   { label: "الرسائل", path: "/admin/messages", icon: MessageSquare },
+  { label: "سجل النشاطات", path: "/admin/activity", icon: Activity },
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {

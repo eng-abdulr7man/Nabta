@@ -3,12 +3,12 @@ import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, LogIn } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ContactPage = () => {
   const [type, setType] = useState("inquiry");
@@ -17,7 +17,6 @@ const ContactPage = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const types = [
     { value: "inquiry", label: "استفسار" },
@@ -27,18 +26,13 @@ const ContactPage = () => {
   ];
 
   const handleSubmit = async () => {
-    if (!user) {
-      toast({ title: "يجب تسجيل الدخول أولاً", variant: "destructive" });
-      navigate("/login");
-      return;
-    }
     if (!subject.trim() || !message.trim()) {
       toast({ title: "يرجى ملء جميع الحقول", variant: "destructive" });
       return;
     }
     setLoading(true);
     const { error } = await supabase.from("contact_messages").insert({
-      user_id: user.id,
+      user_id: user!.id,
       type,
       subject,
       message,
@@ -64,58 +58,74 @@ const ContactPage = () => {
               <p className="text-muted-foreground">نحن هنا لمساعدتك، أرسل لنا رسالتك</p>
             </div>
 
-            <div className="glass-card p-6 space-y-5">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">نوع الرسالة</label>
-                <div className="flex flex-wrap gap-2">
-                  {types.map((t) => (
-                    <button
-                      key={t.value}
-                      onClick={() => setType(t.value)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        type === t.value
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+            {!user ? (
+              <div className="glass-card p-8 text-center space-y-4">
+                <LogIn className="w-12 h-12 text-muted-foreground/30 mx-auto" />
+                <p className="text-lg text-foreground font-bold">يجب تسجيل الدخول أولاً</p>
+                <p className="text-sm text-muted-foreground">قم بتسجيل الدخول لإرسال رسالتك</p>
+                <div className="flex gap-3 justify-center">
+                  <Link to="/login">
+                    <Button className="bg-primary text-primary-foreground">تسجيل الدخول</Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button variant="outline" className="border-border text-foreground">إنشاء حساب</Button>
+                  </Link>
                 </div>
               </div>
+            ) : (
+              <div className="glass-card p-6 space-y-5">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">نوع الرسالة</label>
+                  <div className="flex flex-wrap gap-2">
+                    {types.map((t) => (
+                      <button
+                        key={t.value}
+                        onClick={() => setType(t.value)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          type === t.value
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">الموضوع</label>
-                <input
-                  type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="عنوان الرسالة"
-                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">الموضوع</label>
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="عنوان الرسالة"
+                    className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">الرسالة</label>
+                  <textarea
+                    rows={5}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="اكتب رسالتك هنا..."
+                    className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
+                  size="lg"
+                >
+                  <Send className="w-4 h-4" />
+                  {loading ? "جاري الإرسال..." : "إرسال الرسالة"}
+                </Button>
               </div>
-
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">الرسالة</label>
-                <textarea
-                  rows={5}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="اكتب رسالتك هنا..."
-                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                />
-              </div>
-
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
-                size="lg"
-              >
-                <Send className="w-4 h-4" />
-                {loading ? "جاري الإرسال..." : "إرسال الرسالة"}
-              </Button>
-            </div>
+            )}
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <a href="https://wa.me/201234567890" target="_blank" rel="noopener noreferrer" className="flex-1 glass-card p-4 flex items-center gap-3 hover-lift cursor-pointer">

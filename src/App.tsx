@@ -30,6 +30,7 @@ const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
 const AdminSpecializations = lazy(() => import("./pages/admin/AdminSpecializations"));
 const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
+const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
               <Route path="/admin/specializations" element={<ProtectedRoute adminOnly><AdminSpecializations /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/messages" element={<ProtectedRoute adminOnly><AdminMessages /></ProtectedRoute>} />
+              <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
