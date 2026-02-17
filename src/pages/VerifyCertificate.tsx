@@ -2,7 +2,9 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { CheckCircle, XCircle, Award } from "lucide-react";
+import { CheckCircle, XCircle, Award, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 
 const VerifyCertificate = () => {
   const { certificateId } = useParams();
@@ -12,7 +14,7 @@ const VerifyCertificate = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("certificates")
-        .select("*, courses(title), profiles:user_id(full_name)")
+        .select("*, courses(title, instructor), profiles:user_id(full_name)")
         .eq("certificate_number", certificateId!)
         .maybeSingle();
       if (error) throw error;
@@ -20,6 +22,17 @@ const VerifyCertificate = () => {
     },
     enabled: !!certificateId,
   });
+
+  const handleDownload = () => {
+    if (!data) return;
+    downloadCertificatePDF({
+      learnerName: (data as any).profiles?.full_name || "",
+      courseName: (data as any).courses?.title || "",
+      certificateNumber: data.certificate_number,
+      issuedAt: data.issued_at,
+      instructor: (data as any).courses?.instructor,
+    });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -42,6 +55,10 @@ const VerifyCertificate = () => {
                 <p className="text-muted-foreground">رقم الشهادة: <span className="text-foreground font-bold" dir="ltr">{data.certificate_number}</span></p>
                 <p className="text-muted-foreground">تاريخ الإصدار: <span className="text-foreground">{new Date(data.issued_at).toLocaleDateString("ar")}</span></p>
               </div>
+              <Button onClick={handleDownload} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 mt-4">
+                <Download className="w-4 h-4" />
+                تحميل الشهادة PDF
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">

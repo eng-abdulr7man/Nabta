@@ -3,15 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Clock, CheckCircle, PlayCircle } from "lucide-react";
+import { BookOpen, CheckCircle, PlayCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
+import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 
 const MyCoursesPage = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   const { data: enrollments, isLoading } = useQuery({
     queryKey: ["my-enrollments", user?.id],
@@ -27,7 +28,6 @@ const MyCoursesPage = () => {
     enabled: !!user,
   });
 
-  // Get progress for all enrolled courses
   const { data: progressData } = useQuery({
     queryKey: ["my-progress", user?.id],
     queryFn: async () => {
@@ -41,7 +41,6 @@ const MyCoursesPage = () => {
     enabled: !!user,
   });
 
-  // Get lesson counts per course
   const courseIds = (enrollments || []).map((e: any) => e.course_id);
   const { data: lessonCounts } = useQuery({
     queryKey: ["lesson-counts", courseIds],
@@ -56,17 +55,13 @@ const MyCoursesPage = () => {
         .from("lessons")
         .select("id, section_id")
         .in("section_id", sectionIds);
-      
-      // Map lesson_id -> course_id
-      const lessonToCourse: Record<string, string> = {};
+
       const courseLessonCount: Record<string, { total: number; lessonIds: string[] }> = {};
-      
       for (const s of sections) {
         if (!courseLessonCount[s.course_id]) {
           courseLessonCount[s.course_id] = { total: 0, lessonIds: [] };
         }
       }
-      
       for (const l of (lessons || [])) {
         const section = sections.find((s: any) => s.id === l.section_id);
         if (section) {
@@ -74,7 +69,6 @@ const MyCoursesPage = () => {
           courseLessonCount[section.course_id].lessonIds.push(l.id);
         }
       }
-      
       return courseLessonCount;
     },
     enabled: courseIds.length > 0,
@@ -89,13 +83,12 @@ const MyCoursesPage = () => {
     return Math.round((completed / info.total) * 100);
   };
 
-  // Get certificates
   const { data: certificates } = useQuery({
     queryKey: ["my-certificates", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("certificates")
-        .select("*")
+        .select("*, courses(title, instructor)")
         .eq("user_id", user!.id);
       if (error) throw error;
       return data;
@@ -103,8 +96,18 @@ const MyCoursesPage = () => {
     enabled: !!user,
   });
 
-  const hasCertificate = (courseId: string) => {
-    return certificates?.some((c: any) => c.course_id === courseId);
+  const getCertificate = (courseId: string) => {
+    return certificates?.find((c: any) => c.course_id === courseId);
+  };
+
+  const handleDownloadCert = (cert: any) => {
+    downloadCertificatePDF({
+      learnerName: profile?.full_name || user?.email || "",
+      courseName: cert.courses?.title || "",
+      certificateNumber: cert.certificate_number,
+      issuedAt: cert.issued_at,
+      instructor: cert.courses?.instructor,
+    });
   };
 
   return (
@@ -137,7 +140,7 @@ const MyCoursesPage = () => {
                 const course = enrollment.courses;
                 if (!course) return null;
                 const progress = getProgress(course.id);
-                const certified = hasCertificate(course.id);
+                const cert = getCertificate(course.id);
 
                 return (
                   <motion.div
@@ -165,10 +168,19 @@ const MyCoursesPage = () => {
                           <Progress value={progress} className="flex-1 h-2" />
                           <span className="text-xs font-medium text-muted-foreground shrink-0">{progress}%</span>
                         </div>
-                        {certified && (
-                          <div className="flex items-center gap-1 mt-2 text-xs text-primary">
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            <span>تم الحصول على الشهادة</span>
+                        {cert && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center gap-1 text-xs text-primary">
+                              <CheckCircle className="w-3.5 h-3.5" />
+                              <span>تم الحصول على الشهادة</span>
+                            </div>
+                            <button
+                              onClick={() => handleDownloadCert(cert)}
+                              className="flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              تحميل PDF
+                            </button>
                           </div>
                         )}
                       </div>
