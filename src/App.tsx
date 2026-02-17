@@ -20,6 +20,8 @@ const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const LearnPage = lazy(() => import("./pages/LearnPage"));
 const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
+const MyCoursesPage = lazy(() => import("./pages/MyCoursesPage"));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 
 // Admin
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -27,6 +29,7 @@ const AdminCourses = lazy(() => import("./pages/admin/AdminCourses"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
 const AdminSpecializations = lazy(() => import("./pages/admin/AdminSpecializations"));
+const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
 
 const queryClient = new QueryClient();
 
@@ -57,10 +60,13 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
+              <Route path="/my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
               
               {/* Admin */}
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />
+              <Route path="/admin/courses/:id" element={<ProtectedRoute adminOnly><AdminCourseDetail /></ProtectedRoute>} />
               <Route path="/admin/specializations" element={<ProtectedRoute adminOnly><AdminSpecializations /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/messages" element={<ProtectedRoute adminOnly><AdminMessages /></ProtectedRoute>} />
