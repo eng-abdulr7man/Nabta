@@ -32,6 +32,13 @@ const AdminSpecializations = lazy(() => import("./pages/admin/AdminSpecializatio
 const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
 const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
 
+// Support pages
+const FAQPage = lazy(() => import("./pages/FAQPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const HelpPage = lazy(() => import("./pages/HelpPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+
 const queryClient = new QueryClient();
 
 const Loading = () => (
@@ -63,7 +70,11 @@ const App = () => (
               <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
               <Route path="/my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
               <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
-              
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/help" element={<HelpPage />} />
+              <Route path="/about" element={<AboutPage />} />
               {/* Admin */}
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />

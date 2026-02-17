@@ -2,7 +2,7 @@ import { Star, Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getSpecIcon } from "@/lib/icons";
-import { useSpecializations } from "@/hooks/useCourses";
+import { useSpecializations, useEnrollmentsCount, useLessonsCount, useCourseRating } from "@/hooks/useCourses";
 
 interface CourseCardProps {
   id: string;
@@ -11,9 +11,6 @@ interface CourseCardProps {
   instructor: string;
   specialization_id: string | null;
   thumbnail_url?: string;
-  lessonsCount?: number;
-  enrolledCount?: number;
-  rating?: number;
   index?: number;
 }
 
@@ -24,12 +21,12 @@ const CourseCard = ({
   instructor,
   specialization_id,
   thumbnail_url,
-  lessonsCount = 0,
-  enrolledCount = 0,
-  rating = 0,
   index = 0,
 }: CourseCardProps) => {
   const { data: specs } = useSpecializations();
+  const { data: enrolledCount } = useEnrollmentsCount(id);
+  const { data: lessonsCount } = useLessonsCount(id);
+  const { data: ratingData } = useCourseRating(id);
   const spec = specs?.find((s) => s.id === specialization_id);
   const Icon = spec ? getSpecIcon(spec.icon) : BookOpen;
 
@@ -44,7 +41,7 @@ const CourseCard = ({
         <div className="glass-card hover-lift overflow-hidden group cursor-pointer">
           <div className="h-44 bg-gradient-to-br from-primary/20 to-accent/10 relative overflow-hidden">
             {thumbnail_url ? (
-              <img src={thumbnail_url} alt={title} className="w-full h-full object-cover" />
+              <img src={thumbnail_url} alt={`صورة كورس ${title}`} className="w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Icon className="w-16 h-16 text-primary/30" />
@@ -69,16 +66,16 @@ const CourseCard = ({
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{lessonsCount} درس</span>
+                <span>{lessonsCount ?? 0} درس</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Users className="w-3.5 h-3.5" />
-                <span>{enrolledCount}</span>
+                <span>{enrolledCount ?? 0} طالب</span>
               </div>
-              {rating > 0 && (
+              {ratingData && ratingData.avg > 0 && (
                 <div className="flex items-center gap-1 text-xs text-yellow-500">
                   <Star className="w-3.5 h-3.5 fill-current" />
-                  <span>{rating}</span>
+                  <span>{ratingData.avg}</span>
                 </div>
               )}
             </div>
