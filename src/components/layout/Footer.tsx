@@ -32,10 +32,7 @@ const Footer = () => {
                 { label: "تواصل معنا", path: "/contact" },
               ].map((link) => (
                 <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
+                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -47,15 +44,18 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-foreground mb-4">الدعم</h4>
             <ul className="space-y-2">
-              {["الأسئلة الشائعة", "سياسة الخصوصية", "شروط الاستخدام", "المساعدة"].map(
-                (item) => (
-                  <li key={item}>
-                    <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-                      {item}
-                    </span>
-                  </li>
-                )
-              )}
+              {[
+                { label: "الأسئلة الشائعة", path: "/faq" },
+                { label: "سياسة الخصوصية", path: "/privacy" },
+                { label: "شروط الاستخدام", path: "/terms" },
+                { label: "المساعدة", path: "/help" },
+              ].map((link) => (
+                <li key={link.path}>
+                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
