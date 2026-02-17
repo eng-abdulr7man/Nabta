@@ -9,14 +9,14 @@ import { motion } from "framer-motion";
 import { CheckCircle, Circle, ChevronDown, ChevronUp, Award, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import CertificateModal from "@/components/courses/CertificateModal";
 
 const LearnPage = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
   const saveIntervalRef = useRef<NodeJS.Timeout>();
 
@@ -27,6 +27,8 @@ const LearnPage = () => {
 
   const [currentLessonId, setCurrentLessonId] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [certData, setCertData] = useState<any>(null);
 
   // Get progress
   const { data: progress } = useQuery({
@@ -64,7 +66,6 @@ const LearnPage = () => {
     if (lessons && lessons.length > 0 && !currentLessonId) {
       const lastLesson = enrollment?.last_lesson_id;
       setCurrentLessonId(lastLesson || lessons[0].id);
-      // Expand all sections initially
       setExpandedSections(new Set(sectionIds));
     }
   }, [lessons, enrollment]);
@@ -77,20 +78,16 @@ const LearnPage = () => {
   // YouTube player
   useEffect(() => {
     if (!currentLesson?.video_url) return;
-
     const videoId = extractYouTubeId(currentLesson.video_url);
     if (!videoId) return;
 
     const loadPlayer = () => {
-      if (ytPlayerRef.current) {
-        ytPlayerRef.current.destroy();
-      }
+      if (ytPlayerRef.current) ytPlayerRef.current.destroy();
       ytPlayerRef.current = new (window as any).YT.Player("yt-player", {
         videoId,
         playerVars: { rel: 0, modestbranding: 1, hl: "ar" },
         events: {
           onReady: (e: any) => {
-            // Restore position
             const savedProgress = (progress || []).find((p: any) => p.lesson_id === currentLessonId);
             if (savedProgress && savedProgress.video_position > 0) {
               e.target.seekTo(savedProgress.video_position, true);
@@ -149,7 +146,6 @@ const LearnPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lesson-progress", id] });
-      // Check if all complete
       const newCompleted = completedCount + 1;
       if (newCompleted >= totalLessons && totalLessons > 0) {
         issueCertificate();
@@ -161,18 +157,36 @@ const LearnPage = () => {
     try {
       const { data: existing } = await supabase
         .from("certificates")
-        .select("id")
+        .select("*")
         .eq("user_id", user!.id)
         .eq("course_id", id!)
         .maybeSingle();
-      if (existing) return;
-      const { error } = await supabase.from("certificates").insert({
+      if (existing) {
+        // Already has certificate, just show modal
+        setCertData({
+          learnerName: profile?.full_name || user!.email || "",
+          courseName: course?.title || "",
+          certificateNumber: existing.certificate_number,
+          issuedAt: existing.issued_at,
+          instructor: course?.instructor,
+        });
+        setShowCertModal(true);
+        return;
+      }
+      const { data: newCert, error } = await supabase.from("certificates").insert({
         user_id: user!.id,
         course_id: id!,
-        certificate_number: "", // trigger will fill this
-      });
-      if (!error) {
-        toast({ title: "🎉 مبارك! حصلت على شهادة إتمام الكورس" });
+        certificate_number: "",
+      }).select().single();
+      if (!error && newCert) {
+        setCertData({
+          learnerName: profile?.full_name || user!.email || "",
+          courseName: course?.title || "",
+          certificateNumber: newCert.certificate_number,
+          issuedAt: newCert.issued_at,
+          instructor: course?.instructor,
+        });
+        setShowCertModal(true);
       }
     } catch {}
   };
@@ -202,7 +216,6 @@ const LearnPage = () => {
       <div className="flex flex-col lg:flex-row h-screen">
         {/* Video area */}
         <div className="flex-1 flex flex-col">
-          {/* Header */}
           <div className="h-14 border-b border-border flex items-center justify-between px-4 bg-card shrink-0">
             <div className="flex items-center gap-3">
               <button onClick={() => navigate(`/courses/${id}`)} className="text-muted-foreground hover:text-foreground">
@@ -216,7 +229,6 @@ const LearnPage = () => {
             </div>
           </div>
 
-          {/* Player */}
           <div className="flex-1 bg-black flex items-center justify-center">
             {currentLesson?.video_url ? (
               <div className="w-full aspect-video max-h-full">
@@ -227,7 +239,6 @@ const LearnPage = () => {
             )}
           </div>
 
-          {/* Lesson info */}
           <div className="p-4 bg-card border-t border-border shrink-0">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-foreground">{currentLesson?.title}</h2>
@@ -244,7 +255,7 @@ const LearnPage = () => {
           </div>
         </div>
 
-        {/* Sidebar - lessons list */}
+        {/* Sidebar */}
         <div className="w-full lg:w-80 border-r border-border bg-card overflow-y-auto shrink-0 max-h-[40vh] lg:max-h-full">
           <div className="p-3 border-b border-border">
             <p className="text-xs text-muted-foreground">التقدم: {completedCount}/{totalLessons} درس</p>
@@ -290,6 +301,15 @@ const LearnPage = () => {
           })}
         </div>
       </div>
+
+      {/* Certificate Modal */}
+      {certData && (
+        <CertificateModal
+          open={showCertModal}
+          onClose={() => setShowCertModal(false)}
+          {...certData}
+        />
+      )}
     </div>
   );
 };

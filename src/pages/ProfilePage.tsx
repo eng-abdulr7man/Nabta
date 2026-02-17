@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Camera, Save, LogOut } from "lucide-react";
+import { Camera, Save, LogOut, Award, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
+import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 
 const ProfilePage = () => {
   const { user, profile, signOut, refreshProfile } = useAuth();
@@ -25,6 +27,20 @@ const ProfilePage = () => {
       setPhone(profile.phone || "");
     }
   }, [profile]);
+
+  const { data: certificates } = useQuery({
+    queryKey: ["profile-certificates", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("certificates")
+        .select("*, courses(title, instructor)")
+        .eq("user_id", user!.id)
+        .order("issued_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   if (!user) {
     navigate("/login");
@@ -67,6 +83,16 @@ const ProfilePage = () => {
   const handleLogout = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleDownloadCert = (cert: any) => {
+    downloadCertificatePDF({
+      learnerName: profile?.full_name || user.email || "",
+      courseName: cert.courses?.title || "",
+      certificateNumber: cert.certificate_number,
+      issuedAt: cert.issued_at,
+      instructor: cert.courses?.instructor,
+    });
   };
 
   return (
@@ -123,6 +149,35 @@ const ProfilePage = () => {
                 {loading ? "جاري الحفظ..." : "حفظ التغييرات"}
               </Button>
             </div>
+
+            {/* Certificates */}
+            {certificates && certificates.length > 0 && (
+              <div className="glass-card p-6 space-y-4">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Award className="w-5 h-5 text-primary" />
+                  شهاداتي
+                </h2>
+                <div className="space-y-3">
+                  {certificates.map((cert: any) => (
+                    <div key={cert.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{cert.courses?.title}</p>
+                        <p className="text-xs text-muted-foreground" dir="ltr">{cert.certificate_number}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-primary gap-1"
+                        onClick={() => handleDownloadCert(cert)}
+                      >
+                        <Download className="w-4 h-4" />
+                        PDF
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <Button onClick={handleLogout} variant="outline" className="w-full border-destructive text-destructive hover:bg-destructive/10 gap-2">
               <LogOut className="w-4 h-4" />
