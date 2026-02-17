@@ -252,8 +252,10 @@ export type Database = {
       }
       lessons: {
         Row: {
+          content: string | null
           created_at: string
           duration_minutes: number | null
+          file_url: string | null
           id: string
           section_id: string
           sort_order: number
@@ -261,8 +263,10 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          content?: string | null
           created_at?: string
           duration_minutes?: number | null
+          file_url?: string | null
           id?: string
           section_id: string
           sort_order?: number
@@ -270,8 +274,10 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          content?: string | null
           created_at?: string
           duration_minutes?: number | null
+          file_url?: string | null
           id?: string
           section_id?: string
           sort_order?: number
