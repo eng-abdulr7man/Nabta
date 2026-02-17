@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sprout, LogIn, Search, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Sprout, LogIn, Search, User, LogOut, LayoutDashboard, BookOpen, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -63,6 +63,18 @@ const Navbar = () => {
                     </Button>
                   </Link>
                 )}
+                <Link to="/my-courses">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                    <BookOpen className="w-4 h-4" />
+                    كورساتي
+                  </Button>
+                </Link>
+                <Link to="/favorites">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                    <Heart className="w-4 h-4" />
+                    المفضلة
+                  </Button>
+                </Link>
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
                     <User className="w-4 h-4" />

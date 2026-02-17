@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { BookOpen, Users, Star, Clock, Award, CheckCircle, Heart } from "lucide-react";
+import RatingSection from "@/components/courses/RatingSection";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -219,6 +220,10 @@ const CourseDetailPage = () => {
                 })}
               </div>
             )}
+            {/* Ratings */}
+            <div className="mt-8">
+              <RatingSection courseId={id!} />
+            </div>
           </div>
         </div>
       </main>
