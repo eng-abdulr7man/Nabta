@@ -8,23 +8,38 @@ import { useState } from "react";
 const AdminActivityLog = () => {
   const [filter, setFilter] = useState("");
 
-  const { data: logs, isLoading } = useQuery({
+  const { data: logs, isLoading, error } = useQuery({
     queryKey: ["activity-logs"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: rawLogs, error: logsErr } = await supabase
         .from("activity_log")
-        .select("*, profiles:user_id(full_name, email)")
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(200);
-      if (error) throw error;
-      return data;
+      if (logsErr) throw logsErr;
+
+      // Fetch profiles separately since there's no FK
+      const userIds = [...new Set((rawLogs || []).map((l: any) => l.user_id).filter(Boolean))];
+      let profilesMap: Record<string, any> = {};
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, email")
+          .in("user_id", userIds);
+        (profiles || []).forEach((p: any) => { profilesMap[p.user_id] = p; });
+      }
+
+      return (rawLogs || []).map((log: any) => ({
+        ...log,
+        profile: profilesMap[log.user_id] || null,
+      }));
     },
   });
 
   const filtered = filter
     ? (logs || []).filter((log: any) =>
         log.action.includes(filter) ||
-        (log.profiles as any)?.full_name?.includes(filter) ||
+        log.profile?.full_name?.includes(filter) ||
         JSON.stringify(log.details).includes(filter)
       )
     : logs || [];
@@ -47,7 +62,6 @@ const AdminActivityLog = () => {
           <p className="text-sm text-muted-foreground mt-1">تتبع جميع التغييرات والإجراءات في المنصة</p>
         </div>
 
-        {/* Filter */}
         <div className="glass-card p-3 flex items-center gap-2">
           <Filter className="w-4 h-4 text-muted-foreground" />
           <input
@@ -57,6 +71,12 @@ const AdminActivityLog = () => {
             className="flex-1 bg-transparent text-foreground text-sm focus:outline-none placeholder:text-muted-foreground"
           />
         </div>
+
+        {error && (
+          <div className="glass-card p-4 text-destructive text-sm">
+            خطأ في تحميل البيانات: {(error as any).message}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="space-y-3">
@@ -90,7 +110,7 @@ const AdminActivityLog = () => {
                       </span>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <User className="w-3 h-3" />
-                        <span>{(log.profiles as any)?.full_name || "مجهول"}</span>
+                        <span>{log.profile?.full_name || "مجهول"}</span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />

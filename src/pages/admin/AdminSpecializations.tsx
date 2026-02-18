@@ -3,8 +3,31 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Image, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const iconOptions = [
+  { value: "Wheat", label: "قمح" },
+  { value: "Sprout", label: "نبتة" },
+  { value: "Bug", label: "حشرة" },
+  { value: "Droplets", label: "ماء" },
+  { value: "Cpu", label: "تقنية" },
+  { value: "Factory", label: "مصنع" },
+  { value: "FlaskConical", label: "مختبر" },
+  { value: "TrendingUp", label: "تطوير" },
+  { value: "Leaf", label: "ورقة" },
+  { value: "Sun", label: "شمس" },
+  { value: "TreePine", label: "شجرة" },
+  { value: "Flower2", label: "زهرة" },
+  { value: "Mountain", label: "جبل" },
+  { value: "Fish", label: "سمكة" },
+  { value: "Egg", label: "بيضة" },
+  { value: "Milk", label: "حليب" },
+  { value: "Apple", label: "تفاحة" },
+  { value: "Grape", label: "عنب" },
+  { value: "Carrot", label: "جزرة" },
+  { value: "Tractor", label: "جرار" },
+];
 
 const AdminSpecializations = () => {
   const { toast } = useToast();
@@ -58,6 +81,8 @@ const AdminSpecializations = () => {
     setForm({ id: "", name: "", icon: "Wheat", color: "142 60% 45%", sort_order: 0 });
   };
 
+  const getIconLabel = (value: string) => iconOptions.find((i) => i.value === value)?.label || value;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -77,12 +102,20 @@ const AdminSpecializations = () => {
               )}
               <input placeholder="الاسم" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
-              <select value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                className="px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
-                {["Wheat", "Sprout", "Bug", "Droplets", "Cpu", "Factory", "FlaskConical", "TrendingUp"].map((i) => (
-                  <option key={i} value={i}>{i}</option>
-                ))}
-              </select>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">الرمز</label>
+                <select value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+                  {iconOptions.map((i) => (
+                    <option key={i.value} value={i.value}>{i.label} ({i.value})</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">اللون (HSL)</label>
+                <input placeholder="142 60% 45%" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" dir="ltr" />
+              </div>
               <input placeholder="الترتيب" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })}
                 className="px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
             </div>
@@ -105,7 +138,7 @@ const AdminSpecializations = () => {
                   </div>
                   <div>
                     <p className="font-bold text-sm text-foreground">{spec.name}</p>
-                    <p className="text-xs text-muted-foreground">{spec.id}</p>
+                    <p className="text-xs text-muted-foreground">{spec.id} • {getIconLabel(spec.icon)}</p>
                   </div>
                 </div>
                 <div className="flex gap-1">

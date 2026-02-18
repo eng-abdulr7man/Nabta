@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ListTree } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ListTree, Upload, X, Image } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useSpecializations } from "@/hooks/useCourses";
@@ -15,7 +15,8 @@ const AdminCourses = () => {
   const { data: specs } = useSpecializations();
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ title: "", description: "", instructor: "", specialization_id: "", published: false });
+  const [form, setForm] = useState({ title: "", description: "", instructor: "", specialization_id: "", published: false, thumbnail_url: "" });
+  const [uploading, setUploading] = useState(false);
 
   const { data: courses, isLoading } = useQuery({
     queryKey: ["admin-courses"],
@@ -25,6 +26,23 @@ const AdminCourses = () => {
       return data;
     },
   });
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const filePath = `courses/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("thumbnails").upload(filePath, file);
+    if (uploadError) {
+      toast({ title: "خطأ في رفع الصورة", description: uploadError.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("thumbnails").getPublicUrl(filePath);
+    setForm((prev) => ({ ...prev, thumbnail_url: urlData.publicUrl }));
+    setUploading(false);
+    toast({ title: "تم رفع الصورة بنجاح" });
+  };
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -66,7 +84,7 @@ const AdminCourses = () => {
   const resetForm = () => {
     setShowForm(false);
     setEditId(null);
-    setForm({ title: "", description: "", instructor: "", specialization_id: "", published: false });
+    setForm({ title: "", description: "", instructor: "", specialization_id: "", published: false, thumbnail_url: "" });
   };
 
   const handleEdit = (course: any) => {
@@ -77,6 +95,7 @@ const AdminCourses = () => {
       instructor: course.instructor,
       specialization_id: course.specialization_id || "",
       published: course.published,
+      thumbnail_url: course.thumbnail_url || "",
     });
     setShowForm(true);
   };
@@ -122,6 +141,29 @@ const AdminCourses = () => {
                 منشور
               </label>
             </div>
+
+            {/* Thumbnail upload */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">صورة الكورس المصغرة</label>
+              {form.thumbnail_url ? (
+                <div className="relative w-40 h-24 rounded-lg overflow-hidden border border-border">
+                  <img src={form.thumbnail_url} alt="صورة الكورس المصغرة" className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => setForm({ ...form, thumbnail_url: "" })}
+                    className="absolute top-1 left-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 px-4 py-3 rounded-lg bg-secondary border border-dashed border-border text-muted-foreground text-sm cursor-pointer hover:border-primary/50 transition-colors w-fit">
+                  <Image className="w-4 h-4" />
+                  <span>{uploading ? "جاري الرفع..." : "اختر صورة"}</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={uploading} />
+                </label>
+              )}
+            </div>
+
             <textarea
               placeholder="وصف الكورس"
               value={form.description}
@@ -148,9 +190,18 @@ const AdminCourses = () => {
               const spec = specs?.find((s) => s.id === course.specialization_id);
               return (
                 <div key={course.id} className="glass-card p-4 flex items-center justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-foreground text-sm truncate">{course.title}</h3>
-                    <p className="text-xs text-muted-foreground">{course.instructor} • {spec?.name || "بدون تخصص"}</p>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {course.thumbnail_url ? (
+                      <img src={course.thumbnail_url} alt={`صورة كورس ${course.title}`} className="w-12 h-12 rounded-lg object-cover shrink-0" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <Image className="w-5 h-5 text-primary" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-foreground text-sm truncate">{course.title}</h3>
+                      <p className="text-xs text-muted-foreground">{course.instructor} • {spec?.name || "بدون تخصص"}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => togglePublish.mutate({ id: course.id, published: course.published })}>
