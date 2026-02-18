@@ -9,28 +9,33 @@ import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 const VerifyCertificate = () => {
   const { certificateId } = useParams();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["verify-cert", certificateId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("certificates")
-        .select("*, courses(title, instructor), profiles:user_id(full_name)")
-        .eq("certificate_number", certificateId!)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!certificateId,
-  });
+ const { data, isLoading } = useQuery({
+  queryKey: ["verify-cert", certificateId],
+  queryFn: async () => {
+    if (!certificateId) return null;
+
+    const { data, error } = await supabase
+      .rpc("verify_certificate", {
+        cert_num: certificateId,
+      });
+
+    if (error) throw error;
+
+    // لأن الـ RPC بيرجع array
+    return data?.[0] ?? null;
+  },
+  enabled: !!certificateId,
+});
+
 
   const handleDownload = () => {
     if (!data) return;
     downloadCertificatePDF({
-      learnerName: (data as any).profiles?.full_name || "",
-      courseName: (data as any).courses?.title || "",
+      learnerName: data?.full_name || "",
+      courseName: data?.course_title || "",
       certificateNumber: data.certificate_number,
       issuedAt: data.issued_at,
-      instructor: (data as any).courses?.instructor,
+      instructor: data?.instructor,
     });
   };
 
@@ -50,8 +55,8 @@ const VerifyCertificate = () => {
               </div>
               <p className="text-primary font-bold">شهادة صالحة ✓</p>
               <div className="space-y-2 text-sm">
-                <p className="text-muted-foreground">الاسم: <span className="text-foreground font-bold">{(data as any).profiles?.full_name}</span></p>
-                <p className="text-muted-foreground">الكورس: <span className="text-foreground font-bold">{(data as any).courses?.title}</span></p>
+                <p className="text-muted-foreground">الاسم: <span className="text-foreground font-bold">{data?.full_name}</span></p>
+                <p className="text-muted-foreground">الكورس: <span className="text-foreground font-bold">{data?.course_title}</span></p>
                 <p className="text-muted-foreground">رقم الشهادة: <span className="text-foreground font-bold" dir="ltr">{data.certificate_number}</span></p>
                 <p className="text-muted-foreground">تاريخ الإصدار: <span className="text-foreground">{new Date(data.issued_at).toLocaleDateString("ar")}</span></p>
               </div>
