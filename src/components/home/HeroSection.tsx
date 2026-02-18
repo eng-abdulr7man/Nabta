@@ -2,9 +2,12 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowLeft, BookOpen, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
+  const { user } = useAuth();
+
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
       {/* Background */}
@@ -58,11 +61,13 @@ const HeroSection = () => {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <Link to="/register">
-              <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-secondary px-8">
-                إنشاء حساب مجاني
-              </Button>
-            </Link>
+            {!user && (
+              <Link to="/register">
+                <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-secondary px-8">
+                  إنشاء حساب مجاني
+                </Button>
+              </Link>
+            )}
           </motion.div>
 
           {/* Stats */}

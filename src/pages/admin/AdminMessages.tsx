@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, MailOpen, Trash2, User, Clock, Phone, ArrowRight, X, Reply, ExternalLink } from "lucide-react";
+import { Mail, MailOpen, Trash2, User, Clock, Phone, ArrowRight, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -19,15 +19,30 @@ const AdminMessages = () => {
   const queryClient = useQueryClient();
   const [selectedMsg, setSelectedMsg] = useState<any>(null);
 
-  const { data: messages, isLoading } = useQuery({
+  const { data: messages, isLoading, error } = useQuery({
     queryKey: ["admin-messages"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: rawMsgs, error: msgsErr } = await supabase
         .from("contact_messages")
-        .select("*, profiles:user_id(full_name, email, phone, avatar_url)")
+        .select("*")
         .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      if (msgsErr) throw msgsErr;
+
+      // Fetch profiles separately since no FK
+      const userIds = [...new Set((rawMsgs || []).map((m: any) => m.user_id).filter(Boolean))];
+      let profilesMap: Record<string, any> = {};
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, email, phone, avatar_url")
+          .in("user_id", userIds);
+        (profiles || []).forEach((p: any) => { profilesMap[p.user_id] = p; });
+      }
+
+      return (rawMsgs || []).map((msg: any) => ({
+        ...msg,
+        profile: profilesMap[msg.user_id] || null,
+      }));
     },
   });
 
@@ -66,6 +81,12 @@ const AdminMessages = () => {
           الرسائل
         </h1>
 
+        {error && (
+          <div className="glass-card p-4 text-destructive text-sm">
+            خطأ في تحميل الرسائل: {(error as any).message}
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {selectedMsg ? (
             <motion.div
@@ -84,22 +105,22 @@ const AdminMessages = () => {
                 {/* Sender Info */}
                 <div className="flex items-start gap-4 pb-4 border-b border-border">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    {selectedMsg.profiles?.avatar_url ? (
-                      <img src={selectedMsg.profiles.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                    {selectedMsg.profile?.avatar_url ? (
+                      <img src={selectedMsg.profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
                     ) : (
                       <User className="w-6 h-6 text-primary" />
                     )}
                   </div>
                   <div className="flex-1 space-y-1">
-                    <h3 className="font-bold text-foreground">{selectedMsg.profiles?.full_name || "مستخدم مجهول"}</h3>
+                    <h3 className="font-bold text-foreground">{selectedMsg.profile?.full_name || "مستخدم مجهول"}</h3>
                     <p className="text-sm text-muted-foreground flex items-center gap-1">
                       <Mail className="w-3.5 h-3.5" />
-                      {selectedMsg.profiles?.email || "لا يوجد بريد"}
+                      {selectedMsg.profile?.email || "لا يوجد بريد"}
                     </p>
-                    {selectedMsg.profiles?.phone && (
+                    {selectedMsg.profile?.phone && (
                       <p className="text-sm text-muted-foreground flex items-center gap-1">
                         <Phone className="w-3.5 h-3.5" />
-                        {selectedMsg.profiles.phone}
+                        {selectedMsg.profile.phone}
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-1">
@@ -124,16 +145,16 @@ const AdminMessages = () => {
                 <div className="pt-4 border-t border-border space-y-3">
                   <p className="text-sm font-bold text-foreground">طرق الرد:</p>
                   <div className="flex flex-wrap gap-2">
-                    {selectedMsg.profiles?.email && (
-                      <a href={`mailto:${selectedMsg.profiles.email}?subject=رد: ${selectedMsg.subject}`}>
+                    {selectedMsg.profile?.email && (
+                      <a href={`mailto:${selectedMsg.profile.email}?subject=رد: ${selectedMsg.subject}`}>
                         <Button variant="outline" size="sm" className="gap-1.5">
                           <Mail className="w-3.5 h-3.5" />
                           رد بالبريد الإلكتروني
                         </Button>
                       </a>
                     )}
-                    {selectedMsg.profiles?.phone && (
-                      <a href={`https://wa.me/${selectedMsg.profiles.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
+                    {selectedMsg.profile?.phone && (
+                      <a href={`https://wa.me/${selectedMsg.profile.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
                         <Button variant="outline" size="sm" className="gap-1.5">
                           <ExternalLink className="w-3.5 h-3.5" />
                           رد عبر واتساب
@@ -143,7 +164,6 @@ const AdminMessages = () => {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-2 pt-2">
                   <Button
                     variant="destructive"
@@ -185,7 +205,7 @@ const AdminMessages = () => {
                             {typeLabels[msg.type] || msg.type}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {msg.profiles?.full_name || "مستخدم"} • {new Date(msg.created_at).toLocaleDateString("ar")}
+                            {msg.profile?.full_name || "مستخدم"} • {new Date(msg.created_at).toLocaleDateString("ar")}
                           </span>
                         </div>
                         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>

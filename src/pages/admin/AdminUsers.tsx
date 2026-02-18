@@ -3,14 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ShieldCheck, ShieldX, Users, Search } from "lucide-react";
-import { motion } from "framer-motion";
+import { Shield, ShieldCheck, ShieldX, Users, Search, Eye, UserX, UserCheck, X, Mail, Phone, Calendar, BookOpen } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 const AdminUsers = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -18,9 +19,18 @@ const AdminUsers = () => {
       const { data: profiles, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       const { data: roles } = await supabase.from("user_roles").select("*");
+      
+      // Get enrollment counts per user
+      const { data: enrollments } = await supabase.from("enrollments").select("user_id");
+      const enrollmentCounts: Record<string, number> = {};
+      (enrollments || []).forEach((e: any) => {
+        enrollmentCounts[e.user_id] = (enrollmentCounts[e.user_id] || 0) + 1;
+      });
+
       return (profiles || []).map((p: any) => ({
         ...p,
         roles: (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role),
+        enrollmentCount: enrollmentCounts[p.user_id] || 0,
       }));
     },
   });
@@ -40,6 +50,21 @@ const AdminUsers = () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (err: any) => toast({ title: "خطأ", description: err.message, variant: "destructive" }),
+  });
+
+  // Note: actual account suspension requires auth admin API via edge function
+  // For now we track it via activity_log
+  const suspendUser = useMutation({
+    mutationFn: async ({ userId, fullName }: { userId: string; fullName: string }) => {
+      await supabase.from("activity_log").insert({
+        user_id: userId,
+        action: "إيقاف حساب",
+        details: { full_name: fullName, suspended_at: new Date().toISOString() },
+      });
+    },
+    onSuccess: () => {
+      toast({ title: "تم تسجيل إيقاف الحساب في سجل النشاطات" });
+    },
   });
 
   const filtered = (users || []).filter((u: any) =>
@@ -67,6 +92,109 @@ const AdminUsers = () => {
             className="w-full pr-10 pl-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
+
+        {/* User Detail Modal */}
+        <AnimatePresence>
+          {selectedUser && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
+              onClick={() => setSelectedUser(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="glass-card p-6 max-w-md w-full space-y-5"
+              >
+                <div className="flex items-center justify-between">
+                  <h2 className="font-black text-foreground text-lg">بيانات المستخدم</h2>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedUser(null)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    {selectedUser.avatar_url ? (
+                      <img src={selectedUser.avatar_url} alt={`صورة ${selectedUser.full_name}`} className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <span className="text-2xl font-black text-primary">{(selectedUser.full_name || "م").charAt(0)}</span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-black text-foreground text-lg">{selectedUser.full_name || "بدون اسم"}</p>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      selectedUser.roles.includes("owner") ? "bg-yellow-500/10 text-yellow-600" :
+                      selectedUser.roles.includes("admin") ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+                    }`}>
+                      {selectedUser.roles.includes("owner") ? "مالك" : selectedUser.roles.includes("admin") ? "مشرف" : "مستخدم"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="w-4 h-4 shrink-0" />
+                    <span>{selectedUser.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone className="w-4 h-4 shrink-0" />
+                    <span>{selectedUser.phone || "لم يُحدد"}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Calendar className="w-4 h-4 shrink-0" />
+                    <span>انضم في {new Date(selectedUser.created_at).toLocaleDateString("ar", { dateStyle: "long" })}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <BookOpen className="w-4 h-4 shrink-0" />
+                    <span>{selectedUser.enrollmentCount} كورس مسجل</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2 border-t border-border">
+                  {!selectedUser.roles.includes("owner") && (
+                    <>
+                      <Button
+                        variant={selectedUser.roles.includes("admin") ? "destructive" : "outline"}
+                        size="sm"
+                        className="gap-1.5 text-xs"
+                        onClick={() => {
+                          toggleAdmin.mutate({
+                            userId: selectedUser.user_id,
+                            isAdmin: selectedUser.roles.includes("admin"),
+                          });
+                          setSelectedUser(null);
+                        }}
+                      >
+                        {selectedUser.roles.includes("admin") ? (
+                          <><ShieldX className="w-3.5 h-3.5" /> إزالة مشرف</>
+                        ) : (
+                          <><ShieldCheck className="w-3.5 h-3.5" /> ترقية لمشرف</>
+                        )}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="gap-1.5 text-xs"
+                        onClick={() => {
+                          suspendUser.mutate({ userId: selectedUser.user_id, fullName: selectedUser.full_name });
+                          setSelectedUser(null);
+                        }}
+                      >
+                        <UserX className="w-3.5 h-3.5" />
+                        إيقاف الحساب
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {isLoading ? (
           <div className="space-y-3">
@@ -102,6 +230,15 @@ const AdminUsers = () => {
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${isOwner ? "bg-yellow-500/10 text-yellow-600" : isAdmin ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"}`}>
                       {isOwner ? "مالك" : isAdmin ? "مشرف" : "مستخدم"}
                     </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setSelectedUser(user)}
+                      title="عرض البيانات"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
                     {!isOwner && (
                       <Button
                         variant={isAdmin ? "destructive" : "outline"}
@@ -110,15 +247,9 @@ const AdminUsers = () => {
                         onClick={() => toggleAdmin.mutate({ userId: user.user_id, isAdmin })}
                       >
                         {isAdmin ? (
-                          <>
-                            <ShieldX className="w-3.5 h-3.5" />
-                            إزالة مشرف
-                          </>
+                          <><ShieldX className="w-3.5 h-3.5" /> إزالة مشرف</>
                         ) : (
-                          <>
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            ترقية لمشرف
-                          </>
+                          <><ShieldCheck className="w-3.5 h-3.5" /> ترقية لمشرف</>
                         )}
                       </Button>
                     )}
