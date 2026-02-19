@@ -146,7 +146,7 @@ interface CertificateData {
   instructor?: string;
 }
 
-export const generatePremiumCertificatePDF = (data: CertificateData) => {
+export const generateCertificatePDF  = (data: CertificateData) => {
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -290,8 +290,8 @@ export const generatePremiumCertificatePDF = (data: CertificateData) => {
   return doc;
 };
 
-export const downloadPremiumCertificate = (data: CertificateData) => {
-  const doc = generatePremiumCertificatePDF(data);
+export const generateCertificatePDF  = (data: CertificateData) => {
+  const doc = generateCertificatePDF(data);
   doc.save(`certificate-${data.certificateNumber}.pdf`);
 };
 
