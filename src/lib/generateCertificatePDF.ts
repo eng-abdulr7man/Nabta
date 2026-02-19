@@ -146,7 +146,7 @@ interface CertificateData {
   instructor?: string;
 }
 
-export const generateCertificatePDF = (data: CertificateData) => {
+export const generatePremiumCertificatePDF = (data: CertificateData) => {
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -156,76 +156,106 @@ export const generateCertificatePDF = (data: CertificateData) => {
   const w = doc.internal.pageSize.getWidth();
   const h = doc.internal.pageSize.getHeight();
 
-  /* Background */
-  doc.setFillColor(10, 20, 18);
+  /* ======================
+     Premium Background
+  ====================== */
+  doc.setFillColor(248, 245, 235); // soft cream
   doc.rect(0, 0, w, h, "F");
 
-  /* Outer Border */
-  doc.setDrawColor(100, 200, 140);
+  /* ======================
+     Gold Border
+  ====================== */
+  doc.setDrawColor(212, 175, 55); // gold
   doc.setLineWidth(2);
-  doc.roundedRect(8, 8, w - 16, h - 16, 6, 6, "S");
+  doc.rect(12, 12, w - 24, h - 24);
 
-  doc.setLineWidth(0.5);
-  doc.roundedRect(14, 14, w - 28, h - 28, 4, 4, "S");
+  doc.setLineWidth(0.6);
+  doc.rect(18, 18, w - 36, h - 36);
 
-  /* Academy Name */
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.setTextColor(100, 200, 140);
-  doc.text("AgriSmart Academy", w / 2, 35, { align: "center" });
-
-  /* Title */
-  doc.setFontSize(30);
-  doc.setTextColor(255, 255, 255);
-  doc.text("CERTIFICATE OF COMPLETION", w / 2, 55, { align: "center" });
-
-  doc.setDrawColor(100, 200, 140);
-  doc.setLineWidth(0.5);
-  doc.line(w / 2 - 50, 60, w / 2 + 50, 60);
-
-  /* Body */
+  /* ======================
+     Academy Name
+  ====================== */
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-  doc.setTextColor(180, 200, 190);
-  doc.text("This certificate is proudly presented to", w / 2, 75, {
+  doc.setFontSize(16);
+  doc.setTextColor(120, 100, 40);
+  doc.text("AgriSmart Academy", w / 2, 40, { align: "center" });
+
+  /* ======================
+     Main Title
+  ====================== */
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(32);
+  doc.setTextColor(60, 50, 20);
+  doc.text("CERTIFICATE OF COMPLETION", w / 2, 60, {
     align: "center",
   });
 
-  /* Learner Name */
+  /* Gold Divider */
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(0.8);
+  doc.line(w / 2 - 55, 65, w / 2 + 55, 65);
+
+  /* ======================
+     Subtitle
+  ====================== */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(13);
+  doc.setTextColor(90, 80, 50);
+  doc.text("This certificate is proudly presented to", w / 2, 85, {
+    align: "center",
+  });
+
+  /* ======================
+     Learner Name
+  ====================== */
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(28);
-  doc.setTextColor(255, 255, 255);
-  doc.text(data.learnerName, w / 2, 95, { align: "center" });
+  doc.setFontSize(34);
+  doc.setTextColor(40, 35, 20);
+  doc.text(data.learnerName, w / 2, 105, {
+    align: "center",
+  });
 
   const nameWidth = doc.getTextWidth(data.learnerName);
-  doc.setLineWidth(0.8);
-  doc.setDrawColor(100, 200, 140);
+  doc.setLineWidth(1);
   doc.line(
-    w / 2 - nameWidth / 2 - 5,
-    100,
-    w / 2 + nameWidth / 2 + 5,
-    100
+    w / 2 - nameWidth / 2 - 6,
+    110,
+    w / 2 + nameWidth / 2 + 6,
+    110
   );
 
-  /* Course */
+  /* ======================
+     Course
+  ====================== */
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-  doc.setTextColor(180, 200, 190);
-  doc.text("For successfully completing the course", w / 2, 115, {
+  doc.setFontSize(13);
+  doc.setTextColor(90, 80, 50);
+  doc.text("For successfully completing the course", w / 2, 125, {
     align: "center",
   });
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.setTextColor(100, 200, 140);
-  doc.text(data.courseName, w / 2, 130, { align: "center" });
+  doc.setTextColor(120, 100, 40);
+  doc.text(data.courseName, w / 2, 140, {
+    align: "center",
+  });
 
-  /* Bottom Line */
-  doc.setDrawColor(100, 200, 140);
-  doc.setLineWidth(0.3);
-  doc.line(40, h - 50, w - 40, h - 50);
+  /* ======================
+     Gold Seal
+  ====================== */
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(2);
+  doc.circle(w - 55, 50, 18);
 
-  /* Date & Number */
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text("OFFICIAL", w - 55, 48, { align: "center" });
+  doc.text("CERTIFICATE", w - 55, 53, { align: "center" });
+
+  /* ======================
+     Bottom Info
+  ====================== */
   const formattedDate = new Date(data.issuedAt).toLocaleDateString(
     "en-US",
     {
@@ -235,24 +265,24 @@ export const generateCertificatePDF = (data: CertificateData) => {
     }
   );
 
-  doc.setFontSize(9);
-  doc.setTextColor(160, 180, 170);
-  doc.text(`Date: ${formattedDate}`, 45, h - 35);
+  doc.setFontSize(11);
+  doc.setTextColor(80, 70, 40);
+
+  doc.text(`Date: ${formattedDate}`, 35, h - 35);
 
   doc.text(
     `Certificate No: ${data.certificateNumber}`,
-    w - 45,
+    w - 35,
     h - 35,
     { align: "right" }
   );
 
-  /* Instructor */
+  /* Instructor Signature */
   if (data.instructor) {
-    doc.setDrawColor(100, 200, 140);
-    doc.line(60, h - 30, 110, h - 30);
+    doc.line(w / 2 - 35, h - 45, w / 2 + 35, h - 45);
 
-    doc.setFontSize(10);
-    doc.text(data.instructor, 85, h - 23, {
+    doc.setFontSize(11);
+    doc.text(data.instructor, w / 2, h - 38, {
       align: "center",
     });
   }
@@ -260,8 +290,9 @@ export const generateCertificatePDF = (data: CertificateData) => {
   return doc;
 };
 
-export const downloadCertificatePDF = (data: CertificateData) => {
-  const doc = generateCertificatePDF(data);
+export const downloadPremiumCertificate = (data: CertificateData) => {
+  const doc = generatePremiumCertificatePDF(data);
   doc.save(`certificate-${data.certificateNumber}.pdf`);
 };
+
 
