@@ -317,7 +317,7 @@ export const generateCertificatePDF = async (
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(200, 168, 75);
   pdf.setFontSize(14);
-  pdf.text("AGRISMART", 30, 40, { align: "center" });
+  pdf.text("MUAGRISMART", 30, 40, { align: "center" });
 
   pdf.setFontSize(10);
   pdf.setTextColor(255, 255, 255);
