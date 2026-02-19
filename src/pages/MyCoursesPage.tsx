@@ -100,8 +100,8 @@ const MyCoursesPage = () => {
     return certificates?.find((c: any) => c.course_id === courseId);
   };
 
-  const handleDownloadCert = (cert: any) => {
-    downloadCertificatePDF({
+  const handleDownloadCert = async (cert: any) => {
+    await downloadCertificatePDF({
       learnerName: profile?.full_name || user?.email || "",
       courseName: cert.courses?.title || "",
       certificateNumber: cert.certificate_number,

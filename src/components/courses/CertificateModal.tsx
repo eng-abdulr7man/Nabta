@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, Download, X, ExternalLink } from "lucide-react";
+import { Award, Download, X, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 
@@ -22,8 +23,15 @@ const CertificateModal = ({
   issuedAt,
   instructor,
 }: CertificateModalProps) => {
-  const handleDownload = () => {
-    downloadCertificatePDF({ learnerName, courseName, certificateNumber, issuedAt, instructor });
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      await downloadCertificatePDF({ learnerName, courseName, certificateNumber, issuedAt, instructor });
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -84,9 +92,9 @@ const CertificateModal = ({
               transition={{ delay: 0.5 }}
               className="flex flex-col sm:flex-row gap-3 justify-center"
             >
-              <Button onClick={handleDownload} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
-                <Download className="w-4 h-4" />
-                تحميل الشهادة PDF
+              <Button onClick={handleDownload} disabled={downloading} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
+                {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {downloading ? "جارٍ التحضير..." : "تحميل الشهادة PDF"}
               </Button>
               <Button
                 variant="outline"

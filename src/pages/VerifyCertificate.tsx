@@ -41,9 +41,9 @@ const VerifyCertificate = () => {
     enabled: !!certificateId,
   });
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!data) return;
-    downloadCertificatePDF({
+    await downloadCertificatePDF({
       learnerName: data.full_name,
       courseName: data.course_title,
       certificateNumber: data.certificate_number,
