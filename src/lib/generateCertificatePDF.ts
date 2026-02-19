@@ -8,13 +8,6 @@ interface CertificateData {
   instructor?: string;
 }
 
-// Helper: draw text RTL-friendly (jsPDF doesn't natively support Arabic shaping,
-// so we render transliterated info in English labels + Arabic values via reversed string trick)
-// For a fully shaped Arabic PDF you'd need a custom Arabic font embedded.
-// Here we use the standard approach with reversed text for display purposes.
-
-const reverseArabic = (str: string) => str.split("").reverse().join("");
-
 export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   const doc = new jsPDF({
     orientation: "landscape",
@@ -25,136 +18,116 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   const w = doc.internal.pageSize.getWidth(); // 297
   const h = doc.internal.pageSize.getHeight(); // 210
 
-  /* ─────────────────────────────────────────
-     BACKGROUND: Deep dark green + warm cream
-  ───────────────────────────────────────── */
-  // Main dark green background
-  doc.setFillColor(10, 30, 18);
+  /* ── Background: clean white ── */
+  doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, w, h, "F");
 
-  // Decorative side bands
-  doc.setFillColor(20, 60, 35);
-  doc.rect(0, 0, 18, h, "F");
-  doc.rect(w - 18, 0, 18, h, "F");
+  /* ── Left green accent bar ── */
+  doc.setFillColor(34, 100, 60);
+  doc.rect(0, 0, 8, h, "F");
 
-  /* ─────────────────────────────────────────
-     OUTER BORDER
-  ───────────────────────────────────────── */
-  doc.setDrawColor(183, 149, 11); // gold
-  doc.setLineWidth(2.5);
-  doc.rect(22, 10, w - 44, h - 20);
+  /* ── Top thin gold line ── */
+  doc.setDrawColor(180, 145, 30);
+  doc.setLineWidth(0.8);
+  doc.line(8, 14, w - 14, 14);
 
+  /* ── Bottom thin gold line ── */
+  doc.line(8, h - 14, w - 14, h - 14);
+
+  /* ── Right thin border ── */
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.4);
+  doc.line(w - 14, 14, w - 14, h - 14);
+
+  /* ── Academy name top-right ── */
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(34, 100, 60);
+  doc.text("AGRISMART ACADEMY", w - 18, 11, { align: "right", charSpace: 2 });
+
+  /* ── CERTIFICATE OF COMPLETION ── */
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(160, 130, 20);
+  doc.text("C E R T I F I C A T E   O F   C O M P L E T I O N", 18, 36);
+
+  /* ── Arabic subtitle ── */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(120, 120, 120);
+  doc.text("شهادة إتمام الكورس", 18, 44);
+
+  /* ── Divider after heading ── */
+  doc.setDrawColor(34, 100, 60);
+  doc.setLineWidth(2);
+  doc.line(18, 48, 60, 48);
+  doc.setLineWidth(0.3);
+  doc.setDrawColor(220, 220, 220);
+  doc.line(62, 48, w - 20, 48);
+
+  /* ── "Presented to" ── */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(130, 130, 130);
+  doc.text("This certificate is awarded to", 18, 64);
+
+  /* ── Learner Name ── */
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(34);
+  doc.setTextColor(20, 20, 20);
+  doc.text(data.learnerName, 18, 84);
+
+  /* ── Name underline ── */
+  const nameW = doc.getTextWidth(data.learnerName);
+  doc.setDrawColor(34, 100, 60);
   doc.setLineWidth(0.6);
-  doc.setDrawColor(210, 180, 50);
-  doc.rect(26, 14, w - 52, h - 28);
+  doc.line(18, 87, Math.min(18 + nameW, w - 20), 87);
 
-  /* ─────────────────────────────────────────
-     TOP DECORATIVE STRIP
-  ───────────────────────────────────────── */
-  doc.setFillColor(25, 75, 45);
-  doc.rect(26, 14, w - 52, 22, "F");
+  /* ── "for completing" ── */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(130, 130, 130);
+  doc.text("for successfully completing", 18, 100);
+  doc.text("لإتمامه بنجاح كورس", 18, 108);
 
-  /* ─────────────────────────────────────────
-     ACADEMY LOGO AREA (circle seal)
-  ───────────────────────────────────────── */
-  // Outer glow ring
-  doc.setDrawColor(183, 149, 11);
-  doc.setLineWidth(1.5);
-  doc.circle(w / 2, 36, 14);
+  /* ── Course Name ── */
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(34, 100, 60);
+  const courseLines = doc.splitTextToSize(data.courseName, 160);
+  doc.text(courseLines, 18, 122);
 
-  // Inner circle fill
-  doc.setFillColor(25, 75, 45);
-  doc.circle(w / 2, 36, 12, "F");
+  /* ── Instructor ── */
+  if (data.instructor) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(120, 120, 120);
+    doc.text(`Instructor: ${data.instructor}`, 18, 138);
+  }
+
+  /* ── Right side seal area ── */
+  // Light circle seal
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.5);
+  doc.circle(w - 50, h / 2, 28);
+
+  doc.setDrawColor(34, 100, 60);
+  doc.setLineWidth(1.2);
+  doc.circle(w - 50, h / 2, 24);
 
   // "AS" monogram
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(183, 149, 11);
-  doc.text("AS", w / 2, 39, { align: "center" });
+  doc.setFontSize(22);
+  doc.setTextColor(34, 100, 60);
+  doc.text("AS", w - 50, h / 2 + 4, { align: "center" });
 
-  /* ─────────────────────────────────────────
-     ACADEMY NAME
-  ───────────────────────────────────────── */
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(183, 149, 11);
-  doc.text("AGRISMART ACADEMY", w / 2, 22, { align: "center", charSpace: 3 });
-
-  /* ─────────────────────────────────────────
-     MAIN TITLE
-  ───────────────────────────────────────── */
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(26);
-  doc.setTextColor(220, 200, 100);
-  doc.text("CERTIFICATE OF COMPLETION", w / 2, 68, { align: "center", charSpace: 1.5 });
-
-  // Arabic subtitle
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(13);
-  doc.setTextColor(160, 190, 160);
-  doc.text("شهادة إتمام الكورس", w / 2, 78, { align: "center" });
+  doc.setFontSize(6.5);
+  doc.setTextColor(34, 100, 60);
+  doc.text("AGRISMART", w - 50, h / 2 + 11, { align: "center", charSpace: 1 });
 
-  /* ─────────────────────────────────────────
-     GOLD DIVIDER
-  ───────────────────────────────────────── */
-  doc.setDrawColor(183, 149, 11);
-  doc.setLineWidth(1.2);
-  doc.line(50, 83, w - 50, 83);
-  doc.setLineWidth(0.3);
-  doc.line(50, 85.5, w - 50, 85.5);
-
-  /* ─────────────────────────────────────────
-     PRESENTED TO
-  ───────────────────────────────────────── */
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(160, 185, 160);
-  doc.text("This certificate is proudly presented to", w / 2, 97, { align: "center" });
-  doc.text("تُمنح هذه الشهادة إلى", w / 2, 105, { align: "center" });
-
-  /* ─────────────────────────────────────────
-     LEARNER NAME (large, gold)
-  ───────────────────────────────────────── */
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(30);
-  doc.setTextColor(220, 195, 80);
-  doc.text(data.learnerName, w / 2, 122, { align: "center" });
-
-  // Elegant underline
-  const nameW = doc.getTextWidth(data.learnerName);
-  doc.setDrawColor(183, 149, 11);
-  doc.setLineWidth(0.8);
-  doc.line(w / 2 - nameW / 2 - 8, 126, w / 2 + nameW / 2 + 8, 126);
-
-  /* ─────────────────────────────────────────
-     COURSE LABEL
-  ───────────────────────────────────────── */
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10.5);
-  doc.setTextColor(140, 170, 145);
-  doc.text("For successfully completing the course  •  لإتمام الكورس بنجاح", w / 2, 137, { align: "center" });
-
-  /* ─────────────────────────────────────────
-     COURSE NAME
-  ───────────────────────────────────────── */
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.setTextColor(100, 200, 130);
-  const courseLines = doc.splitTextToSize(data.courseName, 180);
-  doc.text(courseLines, w / 2, 149, { align: "center" });
-
-  /* ─────────────────────────────────────────
-     BOTTOM SECTION
-  ───────────────────────────────────────── */
-  // Bottom decorative strip
-  doc.setFillColor(25, 75, 45);
-  doc.rect(26, h - 36, w - 52, 22, "F");
-
-  doc.setDrawColor(183, 149, 11);
-  doc.setLineWidth(0.5);
-  doc.line(26, h - 36, w - 26, h - 36);
-
-  // Date (left)
+  /* ── Bottom info row ── */
+  // Date
   const dateStr = new Date(data.issuedAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -162,60 +135,29 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   });
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(140, 170, 145);
-  doc.text("Date of Issue", 40, h - 27);
+  doc.setFontSize(8);
+  doc.setTextColor(160, 160, 160);
+  doc.text("Date of Issue", 18, h - 22);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(200, 185, 100);
-  doc.text(dateStr, 40, h - 21);
+  doc.setFontSize(9);
+  doc.setTextColor(40, 40, 40);
+  doc.text(dateStr, 18, h - 17);
 
-  // Certificate No (right)
+  // Cert number
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(140, 170, 145);
-  doc.text("Certificate No.", w - 40, h - 27, { align: "right" });
+  doc.setFontSize(8);
+  doc.setTextColor(160, 160, 160);
+  doc.text("Certificate No.", 90, h - 22);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(200, 185, 100);
-  doc.text(data.certificateNumber, w - 40, h - 21, { align: "right" });
+  doc.setFontSize(9);
+  doc.setTextColor(40, 40, 40);
+  doc.text(data.certificateNumber, 90, h - 17);
 
-  // Instructor signature (center)
-  if (data.instructor) {
-    doc.setDrawColor(183, 149, 11);
-    doc.setLineWidth(0.5);
-    doc.line(w / 2 - 30, h - 24, w / 2 + 30, h - 24);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-    doc.setTextColor(160, 190, 160);
-    doc.text(data.instructor, w / 2, h - 21, { align: "center" });
-    doc.text("Instructor / المدرب", w / 2, h - 17, { align: "center" });
-  }
-
-  /* ─────────────────────────────────────────
-     CORNER ORNAMENTS (top corners)
-  ───────────────────────────────────────── */
-  const ornament = (x: number, y: number, flipX: boolean, flipY: boolean) => {
-    doc.setDrawColor(183, 149, 11);
-    doc.setLineWidth(0.8);
-    const sx = flipX ? -1 : 1;
-    const sy = flipY ? -1 : 1;
-    doc.line(x, y, x + sx * 14, y);
-    doc.line(x, y, x, y + sy * 14);
-    doc.line(x + sx * 4, y + sy * 4, x + sx * 10, y + sy * 4);
-    doc.line(x + sx * 4, y + sy * 4, x + sx * 4, y + sy * 10);
-  };
-
-  ornament(27, 15, false, false); // TL
-  ornament(w - 27, 15, true, false); // TR
-  ornament(27, h - 15, false, true); // BL
-  ornament(w - 27, h - 15, true, true); // BR
-
-  /* ─────────────────────────────────────────
-     VERIFICATION URL
-  ───────────────────────────────────────── */
+  // Verify URL
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
-  doc.setTextColor(100, 130, 105);
-  doc.text(`Verify: agrismart.app/verify/${data.certificateNumber}`, w / 2, h - 12, { align: "center" });
+  doc.setTextColor(180, 180, 180);
+  doc.text(`agrismart.app/verify/${data.certificateNumber}`, 18, h - 10);
 
   return doc;
 };
