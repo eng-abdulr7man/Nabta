@@ -54,11 +54,11 @@ const RegisterPage = () => {
                 <Sprout className="w-6 h-6 text-primary" />
               </div>
               <span className="font-tajawal font-bold text-xl">
-                Agri<span className="text-primary">Smart</span>
+                MuAgri<span className="text-primary">Smart</span>
               </span>
             </Link>
             <h1 className="text-2xl font-black text-foreground">إنشاء حساب جديد</h1>
-            <p className="text-sm text-muted-foreground mt-1">انضم إلى مجتمع AgriSmart</p>
+            <p className="text-sm text-muted-foreground mt-1">انضم إلى مجتمع MuAgriSmart</p>
           </div>
 
           <form className="space-y-4" onSubmit={handleRegister}>
