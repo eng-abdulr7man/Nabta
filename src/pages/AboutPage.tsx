@@ -20,7 +20,7 @@ const AboutPage = () => (
             <Sprout className="w-14 h-14 text-primary mx-auto mb-3" />
             <h1 className="text-3xl font-black text-foreground mb-2">عن المنصة</h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              أكاديمية AgriSmart هي منصة تعليمية إلكترونية متخصصة في العلوم الزراعية، تهدف إلى نشر المعرفة الزراعية وتطوير المهارات العملية من خلال كورسات احترافية.
+              أكاديمية MuAgriSmart هي منصة تعليمية إلكترونية متخصصة في العلوم الزراعية، تهدف إلى نشر المعرفة الزراعية وتطوير المهارات العملية من خلال كورسات احترافية.
             </p>
           </div>
 
