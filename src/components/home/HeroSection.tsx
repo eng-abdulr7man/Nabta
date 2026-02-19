@@ -41,12 +41,12 @@ const HeroSection = () => {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-lg text-muted-foreground max-w-xl mx-auto"
           >
-            أكثر من 100 كورس متخصص في 8 تخصصات زراعية مختلفة. ابدأ رحلتك التعليمية اليوم مع AgriSmart Academy
+            أكثر من 100 كورس متخصص في 8 تخصصات زراعية مختلفة. ابدأ رحلتك التعليمية اليوم مع MuAgriSmart Academy
           </motion.p>
 
           <motion.div
