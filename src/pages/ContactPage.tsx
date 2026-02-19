@@ -128,7 +128,7 @@ const ContactPage = () => {
             )}
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <a href="https://wa.me/201234567890" target="_blank" rel="noopener noreferrer" className="flex-1 glass-card p-4 flex items-center gap-3 hover-lift cursor-pointer">
+              <a href="https://wa.me/201019715490" target="_blank" rel="noopener noreferrer" className="flex-1 glass-card p-4 flex items-center gap-3 hover-lift cursor-pointer">
                 <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
                   <MessageCircle className="w-5 h-5 text-green-500" />
                 </div>
@@ -137,7 +137,7 @@ const ContactPage = () => {
                   <p className="text-xs text-muted-foreground">تواصل مباشر</p>
                 </div>
               </a>
-              <a href="https://t.me/agrismart" target="_blank" rel="noopener noreferrer" className="flex-1 glass-card p-4 flex items-center gap-3 hover-lift cursor-pointer">
+              <a href="https://t.me/eng_abdulr7man" target="_blank" rel="noopener noreferrer" className="flex-1 glass-card p-4 flex items-center gap-3 hover-lift cursor-pointer">
                 <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
                   <Send className="w-5 h-5 text-blue-500" />
                 </div>
