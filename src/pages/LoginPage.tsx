@@ -42,7 +42,7 @@ const LoginPage = () => {
                 <Sprout className="w-6 h-6 text-primary" />
               </div>
               <span className="font-tajawal font-bold text-xl">
-                Agri<span className="text-primary">Smart</span>
+                MuAgri<span className="text-primary">Smart</span>
               </span>
             </Link>
             <h1 className="text-2xl font-black text-foreground">تسجيل الدخول</h1>
