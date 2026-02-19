@@ -298,6 +298,7 @@ export const generateCertificatePDF = async (
 
   const pageWidth = 297;
   const pageHeight = 210;
+  const centerX = pageWidth / 2;
 
   // ===== Background =====
   pdf.setFillColor(255, 255, 255);
@@ -349,11 +350,11 @@ export const generateCertificatePDF = async (
   // ===== Main Title =====
   pdf.setTextColor(200, 168, 75);
   pdf.setFontSize(12);
-  pdf.text("CERTIFICATE OF COMPLETION", 170, 40, { align: "center" });
+  pdf.text("CERTIFICATE OF COMPLETION", centerX, 40, { align: "center" });
 
   pdf.setTextColor(150);
   pdf.setFontSize(10);
-  pdf.text("This certificate is proudly presented to", 170, 55, {
+  pdf.text("This certificate is proudly presented to", centerX, 55, {
     align: "center",
   });
 
@@ -361,47 +362,45 @@ export const generateCertificatePDF = async (
   pdf.setTextColor(0);
   pdf.setFontSize(30);
   pdf.setFont("helvetica", "bold");
-  pdf.text(data.learnerName, 170, 80, { align: "center" });
+  pdf.text(data.learnerName, centerX, 80, { align: "center" });
 
   // Underline
   pdf.setDrawColor(27, 94, 55);
   pdf.setLineWidth(1);
-  pdf.line(120, 88, 220, 88);
+  pdf.line(centerX - 50, 88, centerX + 50, 88);
 
   // ===== Course Name =====
   pdf.setFontSize(14);
   pdf.setTextColor(120);
   pdf.setFont("helvetica", "normal");
-  pdf.text("For successfully completing the course", 170, 105, {
+  pdf.text("For successfully completing the course", centerX, 105, {
     align: "center",
   });
 
   pdf.setFontSize(18);
   pdf.setTextColor(27, 94, 55);
   pdf.setFont("helvetica", "bold");
-  pdf.text(data.courseName, 170, 120, {
+  pdf.text(data.courseName, centerX, 120, {
     align: "center",
-    maxWidth: 140,
+    maxWidth: 160,
   });
 
-  // ===== Instructor =====
+  // ===== Instructor (Centered & Cleaner) =====
   if (data.instructor) {
-    pdf.setFontSize(10);
-    pdf.setTextColor(120);
-    pdf.text(`Instructor: ${data.instructor}`, 170, 145, {
-      align: "center",
-    });
-  }
+    pdf.setDrawColor(180);
+    pdf.setLineWidth(0.5);
+    pdf.line(centerX - 35, 150, centerX + 35, 150);
 
-  // ===== Footer =====
-  pdf.setFontSize(8);
-  pdf.setTextColor(180);
-  pdf.text(
-    `Verify at: agrismart.app/verify/${data.certificateNumber}`,
-    170,
-    190,
-    { align: "center" }
-  );
+    pdf.setFontSize(12);
+    pdf.setTextColor(0);
+    pdf.setFont("helvetica", "bold");
+    pdf.text(data.instructor, centerX, 160, { align: "center" });
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(130);
+    pdf.setFont("helvetica", "normal");
+    pdf.text("Instructor", centerX, 168, { align: "center" });
+  }
 
   pdf.save(`certificate-${data.certificateNumber}.pdf`);
 };
