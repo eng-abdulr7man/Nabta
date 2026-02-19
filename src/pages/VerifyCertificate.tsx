@@ -9,33 +9,46 @@ import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 const VerifyCertificate = () => {
   const { certificateId } = useParams();
 
- const { data, isLoading } = useQuery({
-  queryKey: ["verify-cert", certificateId],
-  queryFn: async () => {
-    if (!certificateId) return null;
+  const { data, isLoading } = useQuery({
+    queryKey: ["verify-cert", certificateId],
+    queryFn: async () => {
+      if (!certificateId) return null;
 
-    const { data, error } = await supabase
-      .rpc("verify_certificate", {
-        cert_num: certificateId,
-      });
+      const { data: certData, error } = await supabase
+        .from("certificates")
+        .select("*, courses(title, instructor)")
+        .eq("certificate_number", certificateId)
+        .maybeSingle();
 
-    if (error) throw error;
+      if (error) throw error;
+      if (!certData) return null;
 
-    // لأن الـ RPC بيرجع array
-    return data?.[0] ?? null;
-  },
-  enabled: !!certificateId,
-});
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", certData.user_id)
+        .maybeSingle();
 
+      return {
+        full_name: profileData?.full_name || "—",
+        course_title: (certData.courses as any)?.title || "—",
+        instructor: (certData.courses as any)?.instructor || "",
+        certificate_number: certData.certificate_number,
+        issued_at: certData.issued_at,
+      };
+    },
+    enabled: !!certificateId,
+  });
 
   const handleDownload = () => {
     if (!data) return;
     downloadCertificatePDF({
-      learnerName: data?.full_name || "",
-      courseName: data?.course_title || "",
+      learnerName: data.full_name,
+      courseName: data.course_title,
       certificateNumber: data.certificate_number,
       issuedAt: data.issued_at,
-      instructor: data?.instructor,
+      instructor: data.instructor,
     });
   };
 
@@ -55,8 +68,8 @@ const VerifyCertificate = () => {
               </div>
               <p className="text-primary font-bold">شهادة صالحة ✓</p>
               <div className="space-y-2 text-sm">
-                <p className="text-muted-foreground">الاسم: <span className="text-foreground font-bold">{data?.full_name}</span></p>
-                <p className="text-muted-foreground">الكورس: <span className="text-foreground font-bold">{data?.course_title}</span></p>
+                <p className="text-muted-foreground">الاسم: <span className="text-foreground font-bold">{data.full_name}</span></p>
+                <p className="text-muted-foreground">الكورس: <span className="text-foreground font-bold">{data.course_title}</span></p>
                 <p className="text-muted-foreground">رقم الشهادة: <span className="text-foreground font-bold" dir="ltr">{data.certificate_number}</span></p>
                 <p className="text-muted-foreground">تاريخ الإصدار: <span className="text-foreground">{new Date(data.issued_at).toLocaleDateString("ar")}</span></p>
               </div>
