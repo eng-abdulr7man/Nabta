@@ -13,7 +13,7 @@ const Footer = () => {
                 <Sprout className="w-5 h-5 text-primary" />
               </div>
               <span className="font-tajawal font-bold text-lg">
-                Agri<span className="text-primary">Smart</span>
+                MuAgri<span className="text-primary">Smart</span>
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -65,15 +65,15 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
-                info@agrismart.academy
+                wwwbgaro59@gmail.com
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="w-4 h-4 text-primary" />
-                +20 123 456 7890
+                +201019715490
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary" />
-                القاهرة، مصر
+                المنصورة - مصر
               </li>
             </ul>
           </div>
@@ -81,7 +81,7 @@ const Footer = () => {
 
         <div className="border-t border-border mt-8 pt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AgriSmart Academy. جميع الحقوق محفوظة.
+            © {new Date().getFullYear()} MuAgriSmart Academy. جميع الحقوق محفوظة.
           </p>
         </div>
       </div>
