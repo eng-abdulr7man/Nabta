@@ -127,12 +127,6 @@ export const generateCertificatePDF = (data: CertificateData) => {
   // Verification URL
   doc.setTextColor(76, 175, 80);
   doc.setFontSize(8);
-  doc.text(
-    `Verify at: ${window.location.origin}/verify/${data.certificateNumber}`,
-    w / 2,
-    bottomLineY + 22,
-    { align: "center" }
-  );
 
   return doc;
 };
