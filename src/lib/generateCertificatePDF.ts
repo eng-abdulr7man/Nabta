@@ -408,8 +408,15 @@
 // export const downloadCertificatePDF = generateCertificatePDF;
 
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import QRCode from "qrcode";
+import "jspdf-autotable";
+
+// إضافة دعم اللغة العربية
+declare module "jspdf" {
+  interface jsPDF {
+    getFontList(): any;
+    setR2L(value: boolean): jsPDF;
+  }
+}
 
 export interface CertificateData {
   learnerName: string;
@@ -417,188 +424,162 @@ export interface CertificateData {
   certificateNumber: string;
   issuedAt: string;
   instructor?: string;
-  verifyUrl?: string;
 }
 
-const createCertificateElement = async (
-  data: CertificateData
-): Promise<HTMLDivElement> => {
+// دالة للكشف عن النص العربي
+const containsArabic = (text: string): boolean => {
+  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  return arabicPattern.test(text);
+};
 
-  const dateAr = new Date(data.issuedAt).toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const qrData = data.verifyUrl ||
-    `${window.location.origin}/verify/${data.certificateNumber}`;
-
-  const qrImage = await QRCode.toDataURL(qrData, {
-    width: 90,
-    margin: 1,
-    color: {
-      dark: "#1b5e37",
-      light: "#ffffff",
-    },
-  });
-
-  const el = document.createElement("div");
-
-  el.style.cssText = `
-    position:fixed;
-    left:-9999px;
-    top:-9999px;
-    width:1122px;
-    height:794px;
-    background:white;
-    font-family:'Cairo',sans-serif;
-    direction:rtl;
-  `;
-
-  el.innerHTML = `
-  <div style="display:flex;width:100%;height:100%;">
-
-    <!-- Sidebar -->
-    <div style="
-      width:320px;
-      background:linear-gradient(170deg,#1b5e37,#0d3d22);
-      color:white;
-      padding:60px 30px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-      gap:26px;
-    ">
-
-      <div style="font-size:18px;font-weight:900;color:#c8a84b;">
-        AGRISMART
-      </div>
-
-      <div style="font-size:11px;color:#ddd;letter-spacing:2px;">
-        ACADEMY
-      </div>
-
-      <div style="height:1px;width:100%;background:rgba(255,255,255,0.2)"></div>
-
-      <div>
-        <div style="font-size:11px;color:#c8a84b;">رقم الشهادة</div>
-        <div style="font-size:14px;font-weight:700;word-break:break-all;">
-          ${data.certificateNumber}
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:11px;color:#c8a84b;">التاريخ</div>
-        <div style="font-size:14px;font-weight:700;">
-          ${dateAr}
-        </div>
-      </div>
-
-      ${data.instructor ? `
-      <div>
-        <div style="font-size:11px;color:#c8a84b;">المدرب</div>
-        <div style="font-size:14px;font-weight:700;">
-          ${data.instructor}
-        </div>
-      </div>
-      ` : ""}
-
-      <div style="margin-top:auto;">
-        <img src="${qrImage}" style="width:90px;height:90px;background:white;padding:6px;border-radius:10px;"/>
-        <div style="font-size:10px;margin-top:6px;">امسح للتحقق</div>
-      </div>
-
-    </div>
-
-    <!-- Main Content -->
-    <div style="
-      flex:1;
-      padding:80px 70px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      text-align:center;
-      gap:18px;
-    ">
-
-      <div style="font-size:24px;font-weight:700;color:#1b5e37;">
-        شهادة إتمام دورة
-      </div>
-
-      <div style="font-size:14px;color:#777;">
-        نشهد بأن
-      </div>
-
-      <div style="
-        font-size:52px;
-        font-weight:900;
-        color:#111;
-        line-height:1.1;
-      ">
-        ${data.learnerName}
-      </div>
-
-      <div style="
-        width:140px;
-        height:3px;
-        margin:0 auto;
-        background:linear-gradient(90deg,#1b5e37,#c8a84b);
-      "></div>
-
-      <div style="font-size:14px;color:#777;">
-        أتم بنجاح دورة
-      </div>
-
-      <div style="
-        font-size:26px;
-        font-weight:800;
-        color:#1b5e37;
-        max-width:600px;
-        margin:0 auto;
-      ">
-        ${data.courseName}
-      </div>
-
-    </div>
-
-  </div>
-  `;
-
-  return el;
+// دالة لمعالجة النص العربي
+const processArabicText = (text: string): string => {
+  if (!text) return text;
+  return text.split('').reverse().join('');
 };
 
 export const generateCertificatePDF = async (
   data: CertificateData
 ): Promise<void> => {
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: "a4",
+  });
 
-  const el = await createCertificateElement(data);
-  document.body.appendChild(el);
+  const pageWidth = 297;
+  const pageHeight = 210;
+  const centerX = pageWidth / 2;
 
-  await new Promise(r => setTimeout(r, 500));
+  // التحقق مما إذا كان النص يحتوي على عربية
+  const hasArabicName = containsArabic(data.learnerName);
+  const hasArabicCourse = containsArabic(data.courseName);
+  const hasArabicInstructor = data.instructor ? containsArabic(data.instructor) : false;
 
-  try {
-    const canvas = await html2canvas(el, {
-      scale: 3,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: "#ffffff",
-    });
+  // ===== Background =====
+  pdf.setFillColor(255, 255, 255);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
 
-    const imgData = canvas.toDataURL("image/jpeg", 0.98);
+  // ===== Green Sidebar =====
+  pdf.setFillColor(27, 94, 55);
+  pdf.rect(0, 0, 60, pageHeight, "F");
 
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4",
-    });
+  // Gold Lines
+  pdf.setFillColor(200, 168, 75);
+  pdf.rect(0, 0, 60, 2, "F");
+  pdf.rect(0, pageHeight - 2, 60, 2, "F");
 
-    pdf.addImage(imgData, "JPEG", 0, 0, 297, 210);
-    pdf.save(`certificate-${data.certificateNumber}.pdf`);
+  // ===== Academy Text =====
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(200, 168, 75);
+  pdf.setFontSize(14);
+  pdf.text("MUAGRISMART", 30, 40, { align: "center" });
 
-  } finally {
-    document.body.removeChild(el);
+  pdf.setFontSize(10);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("ACADEMY", 30, 47, { align: "center" });
+
+  // ===== Certificate Number =====
+  pdf.setFontSize(9);
+  pdf.setTextColor(200, 168, 75);
+  pdf.text("CERT NO.", 30, 80, { align: "center" });
+
+  pdf.setFontSize(10);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(data.certificateNumber, 30, 88, { align: "center" });
+
+  // ===== Date =====
+  const date = new Date(data.issuedAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  pdf.setFontSize(9);
+  pdf.setTextColor(200, 168, 75);
+  pdf.text("DATE", 30, 110, { align: "center" });
+
+  pdf.setFontSize(10);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(date, 30, 118, { align: "center" });
+
+  // ===== Main Title =====
+  pdf.setTextColor(200, 168, 75);
+  pdf.setFontSize(12);
+  pdf.text("CERTIFICATE OF COMPLETION", centerX, 40, { align: "center" });
+
+  pdf.setTextColor(150);
+  pdf.setFontSize(10);
+  pdf.text("This certificate is proudly presented to", centerX, 55, {
+    align: "center",
+  });
+
+  // ===== Learner Name (مع دعم العربية) =====
+  pdf.setTextColor(0);
+  pdf.setFontSize(30);
+  
+  if (hasArabicName) {
+    pdf.setFont("helvetica", "bold");
+    pdf.text(processArabicText(data.learnerName), centerX, 80, { align: "center" });
+  } else {
+    pdf.setFont("helvetica", "bold");
+    pdf.text(data.learnerName, centerX, 80, { align: "center" });
   }
+
+  // Underline
+  pdf.setDrawColor(27, 94, 55);
+  pdf.setLineWidth(1);
+  pdf.line(centerX - 50, 88, centerX + 50, 88);
+
+  // ===== Course Name (مع دعم العربية) =====
+  pdf.setFontSize(14);
+  pdf.setTextColor(120);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("For successfully completing the course", centerX, 105, {
+    align: "center",
+  });
+
+  pdf.setFontSize(18);
+  pdf.setTextColor(27, 94, 55);
+  
+  if (hasArabicCourse) {
+    pdf.setFont("helvetica", "bold");
+    pdf.text(processArabicText(data.courseName), centerX, 120, {
+      align: "center",
+      maxWidth: 160,
+    });
+  } else {
+    pdf.setFont("helvetica", "bold");
+    pdf.text(data.courseName, centerX, 120, {
+      align: "center",
+      maxWidth: 160,
+    });
+  }
+
+  // ===== Instructor (مع دعم العربية) =====
+  if (data.instructor) {
+    pdf.setDrawColor(180);
+    pdf.setLineWidth(0.5);
+    pdf.line(centerX - 35, 150, centerX + 35, 150);
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(0);
+    pdf.setFont("helvetica", "bold");
+    
+    if (hasArabicInstructor) {
+      pdf.text(processArabicText(data.instructor), centerX, 160, { align: "center" });
+    } else {
+      pdf.text(data.instructor, centerX, 160, { align: "center" });
+    }
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(130);
+    pdf.setFont("helvetica", "normal");
+    pdf.text("Instructor", centerX, 168, { align: "center" });
+  }
+
+  // حفظ الملف
+  pdf.save(`certificate-${data.certificateNumber}.pdf`);
 };
 
 export const downloadCertificatePDF = generateCertificatePDF;
