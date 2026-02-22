@@ -142,14 +142,17 @@ const CourseCard = ({
         <div className="group rounded-xl overflow-hidden border border-border/50 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
           {/* Image */}
-          <div className="relative h-48 bg-muted overflow-hidden">
+         <div className="relative w-full aspect-video bg-muted overflow-hidden">
             {thumbnail_url ? (
-              <img
-                src={thumbnail_url}
-                alt={title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+             <img
+              src={thumbnail_url}
+              alt={title}
+              loading="lazy"
+              onLoad={() => setImgLoaded(true)}
+              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
+                imgLoaded ? "opacity-100" : "opacity-0"
+              }`}
+            />
             ) : (
               <div className="flex items-center justify-center h-full">
                 <Icon className="w-16 h-16 text-primary/30" />
