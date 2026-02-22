@@ -87,11 +87,10 @@
 // };
 
 // export default CourseCard;
-
 import { Star, Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { getSpecIcon } from "@/lib/icons";
 import {
   useSpecializations,
@@ -124,7 +123,8 @@ const CourseCard = ({
   const { data: lessonsCount } = useLessonsCount(id);
   const { data: ratingData } = useCourseRating(id);
 
-  // Memoized specialization lookup
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   const spec = useMemo(
     () => specs?.find((s) => s.id === specialization_id),
     [specs, specialization_id]
@@ -132,7 +132,6 @@ const CourseCard = ({
 
   const Icon = spec ? getSpecIcon(spec.icon) : BookOpen;
 
-  // Memoized formatted rating
   const formattedRating = useMemo(() => {
     if (!ratingData || ratingData.avg <= 0) return null;
     return ratingData.avg.toFixed(1);
@@ -140,40 +139,43 @@ const CourseCard = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{
-        delay: index * 0.08,
-        duration: 0.45,
+        delay: index * 0.07,
+        duration: 0.5,
         ease: "easeOut",
       }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true }}
     >
       <Link to={`/courses/${id}`} className="block">
-        <div className="glass-card hover-lift overflow-hidden group cursor-pointer transition-all duration-300 border border-border/40 hover:border-primary/40">
+        <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 group">
 
           {/* Thumbnail */}
-          <div className="h-44 relative overflow-hidden bg-gradient-to-br from-primary/20 to-accent/10">
+          <div className="h-48 relative flex items-center justify-center bg-muted overflow-hidden">
+
+            {/* Skeleton */}
+            {!imageLoaded && thumbnail_url && (
+              <div className="absolute inset-0 animate-pulse bg-muted" />
+            )}
+
             {thumbnail_url ? (
-              <>
-                <img
-                  src={thumbnail_url}
-                  alt={`صورة كورس ${title}`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                {/* Premium overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </>
+              <img
+                src={thumbnail_url}
+                alt={`صورة كورس ${title}`}
+                loading="lazy"
+                onLoad={() => setImageLoaded(true)}
+                className={`max-h-full max-w-full object-contain transition-all duration-500 ${
+                  imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                }`}
+              />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Icon className="w-16 h-16 text-primary/30 group-hover:scale-110 transition-transform duration-300" />
-              </div>
+              <Icon className="w-16 h-16 text-primary/30 group-hover:scale-110 transition-transform duration-300" />
             )}
 
             {spec && (
               <div className="absolute top-3 left-3">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur-md text-foreground shadow-sm">
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur-md shadow-sm">
                   {spec.name}
                 </span>
               </div>
@@ -182,7 +184,8 @@ const CourseCard = ({
 
           {/* Content */}
           <div className="p-5 space-y-3">
-            <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+
+            <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
               {title}
             </h3>
 
@@ -191,7 +194,10 @@ const CourseCard = ({
             </p>
 
             <p className="text-xs text-muted-foreground">
-              بواسطة <span className="text-foreground font-medium">{instructor}</span>
+              بواسطة{" "}
+              <span className="text-foreground font-medium">
+                {instructor}
+              </span>
             </p>
 
             {/* Stats */}
@@ -208,13 +214,16 @@ const CourseCard = ({
               </div>
 
               {formattedRating && (
-                <div className="flex items-center gap-1 text-warning font-medium">
+                <div className="flex items-center gap-1 text-warning font-semibold">
                   <Star className="w-3.5 h-3.5 fill-warning text-warning" />
                   <span>{formattedRating}</span>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Subtle Glow */}
+          <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         </div>
       </Link>
     </motion.div>
