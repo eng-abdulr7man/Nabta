@@ -91,7 +91,7 @@
 import { Star, Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { getSpecIcon } from "@/lib/icons";
 import {
   useSpecializations,
@@ -124,6 +124,8 @@ const CourseCard = ({
   const { data: lessonsCount } = useLessonsCount(id);
   const { data: ratingData } = useCourseRating(id);
 
+  const [imgLoaded, setImgLoaded] = useState(false);
+
   const spec = useMemo(
     () => specs?.find((s) => s.id === specialization_id),
     [specs, specialization_id]
@@ -135,27 +137,37 @@ const CourseCard = ({
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, duration: 0.45 }}
+      transition={{
+        delay: index * 0.07,
+        duration: 0.45,
+        ease: "easeOut",
+      }}
       viewport={{ once: true }}
     >
-      <Link to={`/courses/${id}`} className="block">
-        <div className="group rounded-xl overflow-hidden border border-border/50 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <Link to={`/courses/${id}`} className="block group">
 
-          {/* Image */}
-         <div className="relative w-full aspect-video bg-muted overflow-hidden">
+        <div className="relative rounded-xl overflow-hidden border border-border/40 bg-card shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+          {/* Image Section */}
+          <div className="relative w-full aspect-video bg-muted overflow-hidden">
+
+            {!imgLoaded && thumbnail_url && (
+              <div className="absolute inset-0 animate-pulse bg-muted" />
+            )}
+
             {thumbnail_url ? (
-             <img
-              src={thumbnail_url}
-              alt={title}
-              loading="lazy"
-              onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
-                imgLoaded ? "opacity-100" : "opacity-0"
-              }`}
-            />
+              <img
+                src={thumbnail_url}
+                alt={title}
+                loading="lazy"
+                onLoad={() => setImgLoaded(true)}
+                className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                  imgLoaded ? "opacity-100" : "opacity-0"
+                }`}
+              />
             ) : (
-              <div className="flex items-center justify-center h-full">
-                <Icon className="w-16 h-16 text-primary/30" />
+              <div className="flex items-center justify-center w-full h-full">
+                <BookOpen className="w-16 h-16 text-primary/30" />
               </div>
             )}
           </div>
@@ -163,22 +175,19 @@ const CourseCard = ({
           {/* Content */}
           <div className="p-5 space-y-3">
 
-            {/* Title */}
             <h3 className="font-bold text-lg line-clamp-1 group-hover:text-primary transition-colors">
               {title}
             </h3>
 
-            {/* Description */}
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
               {description}
             </p>
 
-            {/* Instructor */}
             <p className="text-xs text-muted-foreground">
               بواسطة <span className="text-foreground font-medium">{instructor}</span>
             </p>
 
-            {/* Specialization Tag (Under Details) */}
+            {/* Specialization */}
             {spec && (
               <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-primary/5 text-primary">
                 <Icon className="w-3 h-3" />
@@ -200,7 +209,7 @@ const CourseCard = ({
               </div>
 
               {ratingData && ratingData.avg > 0 && (
-                <div className="flex items-center gap-1 text-yellow-500 font-medium">
+                <div className="flex items-center gap-1 text-yellow-500 font-semibold">
                   <Star className="w-3.5 h-3.5 fill-current" />
                   <span>{ratingData.avg.toFixed(1)}</span>
                 </div>
