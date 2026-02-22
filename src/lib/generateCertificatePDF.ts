@@ -408,15 +408,6 @@
 // export const downloadCertificatePDF = generateCertificatePDF;
 
 import jsPDF from "jspdf";
-import "jspdf-autotable";
-
-// إضافة دعم اللغة العربية
-declare module "jspdf" {
-  interface jsPDF {
-    getFontList(): any;
-    setR2L(value: boolean): jsPDF;
-  }
-}
 
 export interface CertificateData {
   learnerName: string;
@@ -435,7 +426,8 @@ const containsArabic = (text: string): boolean => {
 // دالة لمعالجة النص العربي
 const processArabicText = (text: string): string => {
   if (!text) return text;
-  return text.split('').reverse().join('');
+  // لاحظ: بعض إصدارات jsPDF تدعم العربية مباشرة، وهذه طريقة بديلة
+  return text;
 };
 
 export const generateCertificatePDF = async (
@@ -517,12 +509,12 @@ export const generateCertificatePDF = async (
   // ===== Learner Name (مع دعم العربية) =====
   pdf.setTextColor(0);
   pdf.setFontSize(30);
+  pdf.setFont("helvetica", "bold");
   
   if (hasArabicName) {
-    pdf.setFont("helvetica", "bold");
-    pdf.text(processArabicText(data.learnerName), centerX, 80, { align: "center" });
+    // محاولة عرض النص العربي بشكل صحيح
+    pdf.text(data.learnerName, centerX, 80, { align: "center" });
   } else {
-    pdf.setFont("helvetica", "bold");
     pdf.text(data.learnerName, centerX, 80, { align: "center" });
   }
 
@@ -541,15 +533,14 @@ export const generateCertificatePDF = async (
 
   pdf.setFontSize(18);
   pdf.setTextColor(27, 94, 55);
+  pdf.setFont("helvetica", "bold");
   
   if (hasArabicCourse) {
-    pdf.setFont("helvetica", "bold");
-    pdf.text(processArabicText(data.courseName), centerX, 120, {
+    pdf.text(data.courseName, centerX, 120, {
       align: "center",
       maxWidth: 160,
     });
   } else {
-    pdf.setFont("helvetica", "bold");
     pdf.text(data.courseName, centerX, 120, {
       align: "center",
       maxWidth: 160,
@@ -567,7 +558,7 @@ export const generateCertificatePDF = async (
     pdf.setFont("helvetica", "bold");
     
     if (hasArabicInstructor) {
-      pdf.text(processArabicText(data.instructor), centerX, 160, { align: "center" });
+      pdf.text(data.instructor, centerX, 160, { align: "center" });
     } else {
       pdf.text(data.instructor, centerX, 160, { align: "center" });
     }
