@@ -87,7 +87,8 @@
 // };
 
 // export default CourseCard;
-import { Star, Users, BookOpen } from "lucide-react";
+
+import { Star, Users, BookOpen, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
@@ -123,7 +124,7 @@ const CourseCard = ({
   const { data: lessonsCount } = useLessonsCount(id);
   const { data: ratingData } = useCourseRating(id);
 
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const spec = useMemo(
     () => specs?.find((s) => s.id === specialization_id),
@@ -132,14 +133,9 @@ const CourseCard = ({
 
   const Icon = spec ? getSpecIcon(spec.icon) : BookOpen;
 
-  const formattedRating = useMemo(() => {
-    if (!ratingData || ratingData.avg <= 0) return null;
-    return ratingData.avg.toFixed(1);
-  }, [ratingData]);
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{
         delay: index * 0.07,
@@ -148,44 +144,37 @@ const CourseCard = ({
       }}
       viewport={{ once: true }}
     >
-      <Link to={`/courses/${id}`} className="block">
-        <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 group">
+      <Link to={`/courses/${id}`} className="block group">
 
-          {/* Thumbnail */}
-          <div className="h-48 relative flex items-center justify-center bg-muted overflow-hidden">
+        <div className="relative rounded-xl overflow-hidden border border-border/40 bg-card shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
 
-            {/* Skeleton */}
-            {!imageLoaded && thumbnail_url && (
+          {/* Image Section */}
+          <div className="h-48 relative bg-muted overflow-hidden flex items-center justify-center">
+
+            {!imgLoaded && thumbnail_url && (
               <div className="absolute inset-0 animate-pulse bg-muted" />
             )}
 
             {thumbnail_url ? (
               <img
                 src={thumbnail_url}
-                alt={`صورة كورس ${title}`}
+                alt={title}
                 loading="lazy"
-                onLoad={() => setImageLoaded(true)}
-                className={`max-h-full max-w-full object-contain transition-all duration-500 ${
-                  imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                onLoad={() => setImgLoaded(true)}
+                className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
+                  imgLoaded ? "opacity-100" : "opacity-0"
                 }`}
               />
             ) : (
-              <Icon className="w-16 h-16 text-primary/30 group-hover:scale-110 transition-transform duration-300" />
+              <Icon className="w-16 h-16 text-primary/30" />
             )}
 
-            {spec && (
-              <div className="absolute top-3 left-3">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur-md shadow-sm">
-                  {spec.name}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Content */}
           <div className="p-5 space-y-3">
 
-            <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
+            <h3 className="font-bold text-lg line-clamp-1 group-hover:text-primary transition-colors">
               {title}
             </h3>
 
@@ -194,13 +183,18 @@ const CourseCard = ({
             </p>
 
             <p className="text-xs text-muted-foreground">
-              بواسطة{" "}
-              <span className="text-foreground font-medium">
-                {instructor}
-              </span>
+              بواسطة <span className="text-foreground font-medium">{instructor}</span>
             </p>
 
-            {/* Stats */}
+            {/* Specialization Tag */}
+            {spec && (
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-primary/5 text-primary">
+                <Icon className="w-3 h-3" />
+                {spec.name}
+              </div>
+            )}
+
+            {/* Stats Row */}
             <div className="flex items-center justify-between pt-3 border-t border-border/50 text-xs">
 
               <div className="flex items-center gap-1 text-muted-foreground">
@@ -213,17 +207,22 @@ const CourseCard = ({
                 <span>{enrolledCount ?? 0} طالب</span>
               </div>
 
-              {formattedRating && (
-                <div className="flex items-center gap-1 text-warning font-semibold">
-                  <Star className="w-3.5 h-3.5 fill-warning text-warning" />
-                  <span>{formattedRating}</span>
+              {ratingData && ratingData.avg > 0 && (
+                <div className="flex items-center gap-1 text-yellow-500 font-semibold">
+                  <Star className="w-3.5 h-3.5 fill-current" />
+                  <span>{ratingData.avg.toFixed(1)}</span>
                 </div>
               )}
+
             </div>
+
           </div>
 
-          {/* Subtle Glow */}
-          <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+          {/* Floating Favorite Style Accent */}
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <Heart className="w-4 h-4 text-white drop-shadow-lg" />
+          </div>
+
         </div>
       </Link>
     </motion.div>
