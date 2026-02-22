@@ -88,10 +88,10 @@
 
 // export default CourseCard;
 
-import { Star, Users, BookOpen, Heart } from "lucide-react";
+import { Star, Users, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { getSpecIcon } from "@/lib/icons";
 import {
   useSpecializations,
@@ -124,8 +124,6 @@ const CourseCard = ({
   const { data: lessonsCount } = useLessonsCount(id);
   const { data: ratingData } = useCourseRating(id);
 
-  const [imgLoaded, setImgLoaded] = useState(false);
-
   const spec = useMemo(
     () => specs?.find((s) => s.id === specialization_id),
     [specs, specialization_id]
@@ -137,56 +135,47 @@ const CourseCard = ({
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{
-        delay: index * 0.07,
-        duration: 0.5,
-        ease: "easeOut",
-      }}
+      transition={{ delay: index * 0.08, duration: 0.45 }}
       viewport={{ once: true }}
     >
-      <Link to={`/courses/${id}`} className="block group">
+      <Link to={`/courses/${id}`} className="block">
+        <div className="group rounded-xl overflow-hidden border border-border/50 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
-        <div className="relative rounded-xl overflow-hidden border border-border/40 bg-card shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-
-          {/* Image Section */}
-          <div className="h-48 relative bg-muted overflow-hidden flex items-center justify-center">
-
-            {!imgLoaded && thumbnail_url && (
-              <div className="absolute inset-0 animate-pulse bg-muted" />
-            )}
-
+          {/* Image */}
+          <div className="relative h-48 bg-muted overflow-hidden">
             {thumbnail_url ? (
               <img
                 src={thumbnail_url}
                 alt={title}
                 loading="lazy"
-                onLoad={() => setImgLoaded(true)}
-                className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
-                  imgLoaded ? "opacity-100" : "opacity-0"
-                }`}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
-              <Icon className="w-16 h-16 text-primary/30" />
+              <div className="flex items-center justify-center h-full">
+                <Icon className="w-16 h-16 text-primary/30" />
+              </div>
             )}
-
           </div>
 
           {/* Content */}
           <div className="p-5 space-y-3">
 
+            {/* Title */}
             <h3 className="font-bold text-lg line-clamp-1 group-hover:text-primary transition-colors">
               {title}
             </h3>
 
+            {/* Description */}
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
               {description}
             </p>
 
+            {/* Instructor */}
             <p className="text-xs text-muted-foreground">
               بواسطة <span className="text-foreground font-medium">{instructor}</span>
             </p>
 
-            {/* Specialization Tag */}
+            {/* Specialization Tag (Under Details) */}
             {spec && (
               <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-primary/5 text-primary">
                 <Icon className="w-3 h-3" />
@@ -194,7 +183,7 @@ const CourseCard = ({
               </div>
             )}
 
-            {/* Stats Row */}
+            {/* Stats */}
             <div className="flex items-center justify-between pt-3 border-t border-border/50 text-xs">
 
               <div className="flex items-center gap-1 text-muted-foreground">
@@ -208,21 +197,14 @@ const CourseCard = ({
               </div>
 
               {ratingData && ratingData.avg > 0 && (
-                <div className="flex items-center gap-1 text-yellow-500 font-semibold">
+                <div className="flex items-center gap-1 text-yellow-500 font-medium">
                   <Star className="w-3.5 h-3.5 fill-current" />
                   <span>{ratingData.avg.toFixed(1)}</span>
                 </div>
               )}
 
             </div>
-
           </div>
-
-          {/* Floating Favorite Style Accent */}
-          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <Heart className="w-4 h-4 text-white drop-shadow-lg" />
-          </div>
-
         </div>
       </Link>
     </motion.div>
