@@ -78,7 +78,8 @@ const Navbar = () => {
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
                     <User className="w-4 h-4" />
-                    {profile?.full_name || "حسابي"}
+                    {"حسابي"}
+                    {/* profile?.full_name || */}
                   </Button>
                 </Link>
                 <Button
@@ -98,11 +99,11 @@ const Navbar = () => {
                     دخول
                   </Button>
                 </Link>
-                <Link to="/register">
+                {/* <Link to="/register">
                   <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                     إنشاء حساب
                   </Button>
-                </Link>
+                </Link> */}
               </>
             )}
           </div>
