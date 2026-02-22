@@ -417,17 +417,47 @@ export interface CertificateData {
   instructor?: string;
 }
 
-// دالة للكشف عن النص العربي
 const containsArabic = (text: string): boolean => {
   const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   return arabicPattern.test(text);
 };
 
-// دالة لمعالجة النص العربي
-const processArabicText = (text: string): string => {
-  if (!text) return text;
-  // لاحظ: بعض إصدارات jsPDF تدعم العربية مباشرة، وهذه طريقة بديلة
-  return text;
+// تحميل خط عربي وتحويله إلى base64
+const loadFont = async (url: string): Promise<string> => {
+  const response = await fetch(url);
+  const buffer = await response.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+};
+
+let fontsLoaded = false;
+let amiriRegularBase64 = "";
+let amiriBoldBase64 = "";
+
+const ensureFontsLoaded = async (pdf: jsPDF) => {
+  if (!fontsLoaded) {
+    amiriRegularBase64 = await loadFont("/fonts/Amiri-Regular.ttf");
+    amiriBoldBase64 = await loadFont("/fonts/Amiri-Bold.ttf");
+    fontsLoaded = true;
+  }
+
+  pdf.addFileToVFS("Amiri-Regular.ttf", amiriRegularBase64);
+  pdf.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+  pdf.addFileToVFS("Amiri-Bold.ttf", amiriBoldBase64);
+  pdf.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+};
+
+// تعيين الخط المناسب بناءً على النص
+const setFontForText = (pdf: jsPDF, text: string, style: "normal" | "bold") => {
+  if (containsArabic(text)) {
+    pdf.setFont("Amiri", style);
+  } else {
+    pdf.setFont("helvetica", style);
+  }
 };
 
 export const generateCertificatePDF = async (
@@ -439,14 +469,12 @@ export const generateCertificatePDF = async (
     format: "a4",
   });
 
+  // تحميل الخطوط العربية
+  await ensureFontsLoaded(pdf);
+
   const pageWidth = 297;
   const pageHeight = 210;
   const centerX = pageWidth / 2;
-
-  // التحقق مما إذا كان النص يحتوي على عربية
-  const hasArabicName = containsArabic(data.learnerName);
-  const hasArabicCourse = containsArabic(data.courseName);
-  const hasArabicInstructor = data.instructor ? containsArabic(data.instructor) : false;
 
   // ===== Background =====
   pdf.setFillColor(255, 255, 255);
@@ -498,10 +526,12 @@ export const generateCertificatePDF = async (
   // ===== Main Title =====
   pdf.setTextColor(200, 168, 75);
   pdf.setFontSize(12);
+  pdf.setFont("helvetica", "bold");
   pdf.text("CERTIFICATE OF COMPLETION", centerX, 40, { align: "center" });
 
   pdf.setTextColor(150);
   pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
   pdf.text("This certificate is proudly presented to", centerX, 55, {
     align: "center",
   });
@@ -509,14 +539,8 @@ export const generateCertificatePDF = async (
   // ===== Learner Name (مع دعم العربية) =====
   pdf.setTextColor(0);
   pdf.setFontSize(30);
-  pdf.setFont("helvetica", "bold");
-  
-  if (hasArabicName) {
-    // محاولة عرض النص العربي بشكل صحيح
-    pdf.text(data.learnerName, centerX, 80, { align: "center" });
-  } else {
-    pdf.text(data.learnerName, centerX, 80, { align: "center" });
-  }
+  setFontForText(pdf, data.learnerName, "bold");
+  pdf.text(data.learnerName, centerX, 80, { align: "center" });
 
   // Underline
   pdf.setDrawColor(27, 94, 55);
@@ -533,19 +557,11 @@ export const generateCertificatePDF = async (
 
   pdf.setFontSize(18);
   pdf.setTextColor(27, 94, 55);
-  pdf.setFont("helvetica", "bold");
-  
-  if (hasArabicCourse) {
-    pdf.text(data.courseName, centerX, 120, {
-      align: "center",
-      maxWidth: 160,
-    });
-  } else {
-    pdf.text(data.courseName, centerX, 120, {
-      align: "center",
-      maxWidth: 160,
-    });
-  }
+  setFontForText(pdf, data.courseName, "bold");
+  pdf.text(data.courseName, centerX, 120, {
+    align: "center",
+    maxWidth: 160,
+  });
 
   // ===== Instructor (مع دعم العربية) =====
   if (data.instructor) {
@@ -555,13 +571,8 @@ export const generateCertificatePDF = async (
 
     pdf.setFontSize(12);
     pdf.setTextColor(0);
-    pdf.setFont("helvetica", "bold");
-    
-    if (hasArabicInstructor) {
-      pdf.text(data.instructor, centerX, 160, { align: "center" });
-    } else {
-      pdf.text(data.instructor, centerX, 160, { align: "center" });
-    }
+    setFontForText(pdf, data.instructor, "bold");
+    pdf.text(data.instructor, centerX, 160, { align: "center" });
 
     pdf.setFontSize(9);
     pdf.setTextColor(130);
@@ -574,3 +585,4 @@ export const generateCertificatePDF = async (
 };
 
 export const downloadCertificatePDF = generateCertificatePDF;
+
