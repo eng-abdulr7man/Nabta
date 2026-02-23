@@ -770,7 +770,7 @@ export const generateCertificatePDF = async (
   }
 
   // ===== Verification Footer =====
-  const verificationUrl = `muagrismart.vercel.app/verify/${data.certificateNumber}`;
+  const verificationUrl = `https://muagrismart.vercel.app/verify/${data.certificateNumber}`;
   const footerY = pageHeight - 14;
 
   // Rounded verification badge background
