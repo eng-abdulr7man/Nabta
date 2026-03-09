@@ -28,7 +28,9 @@ const Navbar = () => {
             </div>
             <span className="font-tajawal font-bold text-lg text-foreground">
               {/* MuAgri<span className="text-primary">Smart</span> */}
-              <span style="font-family:'Amiri',serif;font-size:32px;line-height:1.8;">نَبْتَة</span>
+             <span style={{ fontFamily: "Amiri, serif", fontSize: "32px", lineHeight: 1.8 }}>
+  نَبْتَة
+</span>
             </span>
           </Link>
 
