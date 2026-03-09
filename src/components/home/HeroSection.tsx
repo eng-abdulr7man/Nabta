@@ -643,30 +643,29 @@ const HeroDarkSection = () => {
                 </span>
               </motion.div>
 
-              <motion.h1 
+             <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-4xl lg:text-6xl font-black leading-[1.3] tracking-tight text-neutral-50"
+                className="text-4xl lg:text-6xl font-black leading-[1.4] tracking-tight text-neutral-50"
               >
                 طوّر مهاراتك في <br />
-                {/* حاوية النص المتحرك */}
-                <div className="h-[1.2em] relative overflow-hidden inline-block align-bottom min-w-[220px] lg:min-w-[300px]">
+                {/* الحاوية الجديدة باستخدام Grid لمنع قص النص */}
+                <span className="inline-grid [grid-template-areas:'text'] mt-2">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={currentSpecialty}
-                      initial={{ y: 40, opacity: 0 }}
+                      initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -40, opacity: 0 }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
-                      className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600 block"
+                      exit={{ y: -20, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      className="[grid-area:text] text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600 pb-2"
                     >
                       {specialties[currentSpecialty]}
                     </motion.span>
                   </AnimatePresence>
-                </div>
+                </span>
               </motion.h1>
-
               <motion.p 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
