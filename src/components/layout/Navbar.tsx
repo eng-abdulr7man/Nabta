@@ -27,7 +27,8 @@ const Navbar = () => {
               <Sprout className="w-5 h-5 text-primary" />
             </div>
             <span className="font-tajawal font-bold text-lg text-foreground">
-              MuAgri<span className="text-primary">Smart</span>
+              {/* MuAgri<span className="text-primary">Smart</span> */}
+              نـَــبــتـَـــة
             </span>
           </Link>
 
