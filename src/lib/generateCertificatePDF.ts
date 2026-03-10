@@ -800,6 +800,210 @@
 // export const downloadCertificatePDF = generateCertificatePDF;
 
 //v4
+// import jsPDF from "jspdf";
+
+// export interface CertificateData {
+//   learnerName: string;
+//   courseName: string;
+//   certificateNumber: string;
+//   issuedAt: string;
+//   instructor?: string;
+// }
+
+// const containsArabic = (text: string): boolean => {
+//   const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+//   return arabicPattern.test(text);
+// };
+
+// const loadFont = async (url: string): Promise<string> => {
+//   const response = await fetch(url);
+//   const buffer = await response.arrayBuffer();
+//   const bytes = new Uint8Array(buffer);
+//   let binary = "";
+//   for (let i = 0; i < bytes.length; i++) {
+//     binary += String.fromCharCode(bytes[i]);
+//   }
+//   return btoa(binary);
+// };
+
+// let fontsLoaded = false;
+// let amiriRegularBase64 = "";
+// let amiriBoldBase64 = "";
+
+// const ensureFontsLoaded = async (pdf: jsPDF) => {
+//   if (!fontsLoaded) {
+//     try {
+//       amiriRegularBase64 = await loadFont("/fonts/Amiri-Regular.ttf");
+//       amiriBoldBase64 = await loadFont("/fonts/Amiri-Bold.ttf");
+//       fontsLoaded = true;
+//     } catch (e) {
+//       console.error("Error loading fonts:", e);
+//     }
+//   }
+
+//   if (amiriRegularBase64) {
+//     pdf.addFileToVFS("Amiri-Regular.ttf", amiriRegularBase64);
+//     pdf.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+//   }
+//   if (amiriBoldBase64) {
+//     pdf.addFileToVFS("Amiri-Bold.ttf", amiriBoldBase64);
+//     pdf.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+//   }
+// };
+
+// const setFontForText = (pdf: jsPDF, text: string, style: "normal" | "bold") => {
+//   if (containsArabic(text)) {
+//     pdf.setFont("Amiri", style);
+//   } else {
+//     pdf.setFont("helvetica", style);
+//   }
+// };
+
+// export const generateCertificatePDF = async (
+//   data: CertificateData
+// ): Promise<void> => {
+//   const pdf = new jsPDF({
+//     orientation: "landscape",
+//     unit: "mm",
+//     format: "a4",
+//   });
+
+//   await ensureFontsLoaded(pdf);
+
+//   const pageWidth = 297;
+//   const pageHeight = 210;
+//   const sidebarWidth = 65;
+//   const contentStartX = sidebarWidth;
+//   const centerX = contentStartX + (pageWidth - contentStartX) / 2;
+
+//   // ===== Background =====
+//   pdf.setFillColor(255, 255, 252); // Off-white cream background
+//   pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+//   // ===== Elegant Sidebar (Dark Green) =====
+//   pdf.setFillColor(5, 46, 22); // Deep emerald green
+//   pdf.rect(0, 0, sidebarWidth, pageHeight, "F");
+
+//   // Gold Borders in Sidebar
+//   pdf.setFillColor(180, 142, 60); // Gold
+//   pdf.rect(0, 0, sidebarWidth, 4, "F");
+//   pdf.rect(0, pageHeight - 4, sidebarWidth, 4, "F");
+
+//   // ===== Academy Branding (Sidebar) =====
+//   pdf.setTextColor(180, 142, 60);
+//   pdf.setFont("Amiri", "bold");
+//   pdf.setFontSize(28);
+//   pdf.text("نـَـبْـتـَـة", sidebarWidth / 2, 45, { align: "center" });
+
+//   pdf.setFontSize(10);
+//   pdf.setTextColor(255, 255, 255);
+//   pdf.setFont("helvetica", "normal");
+//   pdf.text("NABTA ACADEMY", sidebarWidth / 2, 52, { align: "center" });
+//   pdf.text("AGRICULTURAL EDUCATION", sidebarWidth / 2, 57, { align: "center" });
+
+//   // ===== Certificate Details (Sidebar) =====
+//   // Cert Number
+//   pdf.setFontSize(9);
+//   pdf.setTextColor(180, 142, 60);
+//   pdf.text("CERTIFICATE ID", sidebarWidth / 2, 90, { align: "center" });
+//   pdf.setTextColor(255, 255, 255);
+//   pdf.setFontSize(10);
+//   pdf.text(data.certificateNumber, sidebarWidth / 2, 96, { align: "center" });
+
+//   // Date
+//   const date = new Date(data.issuedAt).toLocaleDateString("ar-EG", {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//   });
+//   pdf.setTextColor(180, 142, 60);
+//   pdf.setFontSize(9);
+//   pdf.text("DATE OF ISSUE", sidebarWidth / 2, 115, { align: "center" });
+//   pdf.setTextColor(255, 255, 255);
+//   pdf.setFont("Amiri", "normal");
+//   pdf.text(date, sidebarWidth / 2, 122, { align: "center" });
+
+//   // ===== Main Content Area =====
+  
+//   // Decorative Gold Frame
+//   pdf.setDrawColor(180, 142, 60);
+//   pdf.setLineWidth(0.5);
+//   pdf.rect(sidebarWidth + 10, 10, pageWidth - sidebarWidth - 20, pageHeight - 20, "S");
+
+//   // Main Heading
+//   pdf.setTextColor(180, 142, 60);
+//   pdf.setFontSize(14);
+//   pdf.setFont("helvetica", "bold");
+//   pdf.text("CERTIFICATE OF COMPLETION", centerX, 45, { align: "center" });
+
+//   pdf.setTextColor(80, 80, 80);
+//   pdf.setFontSize(12);
+//   pdf.setFont("helvetica", "normal");
+//   pdf.text("This is to certify that", centerX, 60, { align: "center" });
+
+//   // ===== Learner Name =====
+//   pdf.setTextColor(5, 46, 22);
+//   pdf.setFontSize(38);
+//   setFontForText(pdf, data.learnerName, "bold");
+//   pdf.text(data.learnerName, centerX, 85, { align: "center" });
+
+//   // Underline decoration
+//   pdf.setDrawColor(180, 142, 60);
+//   pdf.setLineWidth(0.8);
+//   pdf.line(centerX - 60, 92, centerX + 60, 92);
+
+//   // ===== Course Info =====
+//   pdf.setFontSize(12);
+//   pdf.setTextColor(100);
+//   pdf.setFont("helvetica", "normal");
+//   pdf.text("Has successfully completed the specialized course in", centerX, 110, { align: "center" });
+
+//   pdf.setFontSize(22);
+//   pdf.setTextColor(5, 46, 22);
+//   setFontForText(pdf, data.courseName, "bold");
+//   pdf.text(data.courseName, centerX, 128, { align: "center", maxWidth: 180 });
+
+//   // ===== Instructor Section =====
+//   if (data.instructor) {
+//     pdf.setFontSize(9);
+//     pdf.setTextColor(150);
+//     pdf.setFont("helvetica", "normal");
+//     pdf.text("AUTHORIZED INSTRUCTOR", centerX, 155, { align: "center" });
+
+//     pdf.setFontSize(16);
+//     pdf.setTextColor(0);
+//     setFontForText(pdf, data.instructor, "bold");
+//     pdf.text(data.instructor, centerX, 165, { align: "center" });
+
+//     // Elegant signature line
+//     pdf.setDrawColor(180, 142, 60);
+//     pdf.setLineWidth(0.5);
+//     pdf.line(centerX - 45, 170, centerX + 45, 170);
+//   }
+
+//   // ===== Verification Badge (Footer) =====
+//   const verificationUrl = `nabta.vercel.app/verify/${data.certificateNumber}`;
+//   const footerY = pageHeight - 15;
+
+//   pdf.setFillColor(248, 248, 240);
+//   pdf.roundedRect(centerX - 60, footerY - 6, 120, 14, 2, 2, "F");
+  
+//   pdf.setFontSize(7);
+//   pdf.setFont("helvetica", "bold");
+//   pdf.setTextColor(150);
+//   pdf.text("TO VERIFY THE AUTHENTICITY OF THIS CERTIFICATE, VISIT:", centerX, footerY, { align: "center" });
+
+//   pdf.setFontSize(9);
+//   pdf.setTextColor(180, 142, 60);
+//   pdf.text(verificationUrl, centerX, footerY + 5, { align: "center" });
+
+//   // Save the file
+//   pdf.save(`Nabta-Certificate-${data.certificateNumber}.pdf`);
+// };
+
+// export const downloadCertificatePDF = generateCertificatePDF;
+
+//v5
 import jsPDF from "jspdf";
 
 export interface CertificateData {
@@ -832,23 +1036,14 @@ let amiriBoldBase64 = "";
 
 const ensureFontsLoaded = async (pdf: jsPDF) => {
   if (!fontsLoaded) {
-    try {
-      amiriRegularBase64 = await loadFont("/fonts/Amiri-Regular.ttf");
-      amiriBoldBase64 = await loadFont("/fonts/Amiri-Bold.ttf");
-      fontsLoaded = true;
-    } catch (e) {
-      console.error("Error loading fonts:", e);
-    }
+    amiriRegularBase64 = await loadFont("/fonts/Amiri-Regular.ttf");
+    amiriBoldBase64 = await loadFont("/fonts/Amiri-Bold.ttf");
+    fontsLoaded = true;
   }
-
-  if (amiriRegularBase64) {
-    pdf.addFileToVFS("Amiri-Regular.ttf", amiriRegularBase64);
-    pdf.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-  }
-  if (amiriBoldBase64) {
-    pdf.addFileToVFS("Amiri-Bold.ttf", amiriBoldBase64);
-    pdf.addFont("Amiri-Bold.ttf", "Amiri", "bold");
-  }
+  pdf.addFileToVFS("Amiri-Regular.ttf", amiriRegularBase64);
+  pdf.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+  pdf.addFileToVFS("Amiri-Bold.ttf", amiriBoldBase64);
+  pdf.addFont("Amiri-Bold.ttf", "Amiri", "bold");
 };
 
 const setFontForText = (pdf: jsPDF, text: string, style: "normal" | "bold") => {
@@ -859,9 +1054,7 @@ const setFontForText = (pdf: jsPDF, text: string, style: "normal" | "bold") => {
   }
 };
 
-export const generateCertificatePDF = async (
-  data: CertificateData
-): Promise<void> => {
+export const generateCertificatePDF = async (data: CertificateData): Promise<void> => {
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -872,133 +1065,114 @@ export const generateCertificatePDF = async (
 
   const pageWidth = 297;
   const pageHeight = 210;
-  const sidebarWidth = 65;
-  const contentStartX = sidebarWidth;
-  const centerX = contentStartX + (pageWidth - contentStartX) / 2;
+  const centerX = pageWidth / 2;
 
-  // ===== Background =====
-  pdf.setFillColor(255, 255, 252); // Off-white cream background
+  // 1. ===== Background (Luxury Ivory) =====
+  pdf.setFillColor(255, 255, 245); 
   pdf.rect(0, 0, pageWidth, pageHeight, "F");
 
-  // ===== Elegant Sidebar (Dark Green) =====
-  pdf.setFillColor(5, 46, 22); // Deep emerald green
-  pdf.rect(0, 0, sidebarWidth, pageHeight, "F");
+  // 2. ===== Outer Border (Double Gold Line) =====
+  pdf.setDrawColor(180, 142, 60); // Gold
+  pdf.setLineWidth(1.5);
+  pdf.rect(10, 10, pageWidth - 20, pageHeight - 20, "S");
+  pdf.setLineWidth(0.5);
+  pdf.rect(12, 12, pageWidth - 24, pageHeight - 24, "S");
 
-  // Gold Borders in Sidebar
-  pdf.setFillColor(180, 142, 60); // Gold
-  pdf.rect(0, 0, sidebarWidth, 4, "F");
-  pdf.rect(0, pageHeight - 4, sidebarWidth, 4, "F");
+  // Corner Ornaments (Small Rectangles)
+  pdf.setFillColor(180, 142, 60);
+  pdf.rect(8, 8, 10, 10, "F"); // Top Left
+  pdf.rect(pageWidth - 18, 8, 10, 10, "F"); // Top Right
+  pdf.rect(8, pageHeight - 18, 10, 10, "F"); // Bottom Left
+  pdf.rect(pageWidth - 18, pageHeight - 18, 10, 10, "F"); // Bottom Right
 
-  // ===== Academy Branding (Sidebar) =====
-  pdf.setTextColor(180, 142, 60);
+  // 3. ===== Header: Logo & Academy Name =====
+  pdf.setTextColor(5, 46, 22); // Deep Green
   pdf.setFont("Amiri", "bold");
-  pdf.setFontSize(28);
-  pdf.text("نـَـبْـتـَـة", sidebarWidth / 2, 45, { align: "center" });
+  pdf.setFontSize(45);
+  pdf.text("نـَـبْـتـَـة", centerX, 40, { align: "center" });
 
+  pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
-  pdf.setTextColor(255, 255, 255);
+  pdf.setTextColor(180, 142, 60);
+  pdf.text("NABTA AGRICULTURAL ACADEMY", centerX, 48, { align: "center", charSpace: 2 });
+
+  // 4. ===== Title =====
+  pdf.setTextColor(60, 60, 60);
+  pdf.setFontSize(14);
   pdf.setFont("helvetica", "normal");
-  pdf.text("NABTA ACADEMY", sidebarWidth / 2, 52, { align: "center" });
-  pdf.text("AGRICULTURAL EDUCATION", sidebarWidth / 2, 57, { align: "center" });
+  pdf.text("This official certificate is awarded to", centerX, 65, { align: "center" });
 
-  // ===== Certificate Details (Sidebar) =====
-  // Cert Number
-  pdf.setFontSize(9);
-  pdf.setTextColor(180, 142, 60);
-  pdf.text("CERTIFICATE ID", sidebarWidth / 2, 90, { align: "center" });
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(10);
-  pdf.text(data.certificateNumber, sidebarWidth / 2, 96, { align: "center" });
+  // 5. ===== Learner Name (The Star) =====
+  pdf.setTextColor(5, 46, 22);
+  pdf.setFontSize(42);
+  setFontForText(pdf, data.learnerName, "bold");
+  pdf.text(data.learnerName, centerX, 90, { align: "center" });
 
-  // Date
-  const date = new Date(data.issuedAt).toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  pdf.setTextColor(180, 142, 60);
-  pdf.setFontSize(9);
-  pdf.text("DATE OF ISSUE", sidebarWidth / 2, 115, { align: "center" });
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFont("Amiri", "normal");
-  pdf.text(date, sidebarWidth / 2, 122, { align: "center" });
-
-  // ===== Main Content Area =====
-  
-  // Decorative Gold Frame
+  // Decorative Divider under name
   pdf.setDrawColor(180, 142, 60);
   pdf.setLineWidth(0.5);
-  pdf.rect(sidebarWidth + 10, 10, pageWidth - sidebarWidth - 20, pageHeight - 20, "S");
+  pdf.line(centerX - 60, 98, centerX + 60, 98);
+  pdf.circle(centerX, 98, 1, "F"); // Center dot
 
-  // Main Heading
-  pdf.setTextColor(180, 142, 60);
-  pdf.setFontSize(14);
-  pdf.setFont("helvetica", "bold");
-  pdf.text("CERTIFICATE OF COMPLETION", centerX, 45, { align: "center" });
-
+  // 6. ===== Course Completion Text =====
   pdf.setTextColor(80, 80, 80);
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "normal");
-  pdf.text("This is to certify that", centerX, 60, { align: "center" });
+  pdf.text("For successfully mastering all requirements of the professional course:", centerX, 115, { align: "center" });
 
-  // ===== Learner Name =====
-  pdf.setTextColor(5, 46, 22);
-  pdf.setFontSize(38);
-  setFontForText(pdf, data.learnerName, "bold");
-  pdf.text(data.learnerName, centerX, 85, { align: "center" });
-
-  // Underline decoration
-  pdf.setDrawColor(180, 142, 60);
-  pdf.setLineWidth(0.8);
-  pdf.line(centerX - 60, 92, centerX + 60, 92);
-
-  // ===== Course Info =====
-  pdf.setFontSize(12);
-  pdf.setTextColor(100);
-  pdf.setFont("helvetica", "normal");
-  pdf.text("Has successfully completed the specialized course in", centerX, 110, { align: "center" });
-
-  pdf.setFontSize(22);
-  pdf.setTextColor(5, 46, 22);
+  pdf.setTextColor(180, 142, 60);
+  pdf.setFontSize(24);
   setFontForText(pdf, data.courseName, "bold");
-  pdf.text(data.courseName, centerX, 128, { align: "center", maxWidth: 180 });
+  pdf.text(data.courseName, centerX, 130, { align: "center", maxWidth: 200 });
 
-  // ===== Instructor Section =====
+  // 7. ===== Instructor & Seal Section =====
+  const bottomY = 165;
+  
+  // Left: Instructor
   if (data.instructor) {
+    pdf.setTextColor(100);
     pdf.setFontSize(9);
-    pdf.setTextColor(150);
     pdf.setFont("helvetica", "normal");
-    pdf.text("AUTHORIZED INSTRUCTOR", centerX, 155, { align: "center" });
-
-    pdf.setFontSize(16);
-    pdf.setTextColor(0);
+    pdf.text("AUTHORIZED INSTRUCTOR", centerX - 70, bottomY - 5, { align: "center" });
+    
+    pdf.setTextColor(5, 46, 22);
+    pdf.setFontSize(14);
     setFontForText(pdf, data.instructor, "bold");
-    pdf.text(data.instructor, centerX, 165, { align: "center" });
-
-    // Elegant signature line
+    pdf.text(data.instructor, centerX - 70, bottomY + 5, { align: "center" });
+    
     pdf.setDrawColor(180, 142, 60);
-    pdf.setLineWidth(0.5);
-    pdf.line(centerX - 45, 170, centerX + 45, 170);
+    pdf.line(centerX - 100, bottomY + 8, centerX - 40, bottomY + 8);
   }
 
-  // ===== Verification Badge (Footer) =====
-  const verificationUrl = `nabta.vercel.app/verify/${data.certificateNumber}`;
-  const footerY = pageHeight - 15;
-
-  pdf.setFillColor(248, 248, 240);
-  pdf.roundedRect(centerX - 60, footerY - 6, 120, 14, 2, 2, "F");
-  
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(150);
-  pdf.text("TO VERIFY THE AUTHENTICITY OF THIS CERTIFICATE, VISIT:", centerX, footerY, { align: "center" });
-
+  // Right: Date
+  const dateStr = new Date(data.issuedAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+  pdf.setTextColor(100);
   pdf.setFontSize(9);
-  pdf.setTextColor(180, 142, 60);
-  pdf.text(verificationUrl, centerX, footerY + 5, { align: "center" });
+  pdf.text("DATE OF ISSUANCE", centerX + 70, bottomY - 5, { align: "center" });
+  pdf.setTextColor(5, 46, 22);
+  pdf.setFontSize(12);
+  pdf.text(dateStr, centerX + 70, bottomY + 5, { align: "center" });
+  pdf.line(centerX + 40, bottomY + 8, centerX + 100, bottomY + 8);
 
-  // Save the file
-  pdf.save(`Nabta-Certificate-${data.certificateNumber}.pdf`);
+  // Center: The Golden Seal
+  pdf.setDrawColor(180, 142, 60);
+  pdf.setFillColor(180, 142, 60);
+  pdf.circle(centerX, bottomY, 15, "S"); // Outer circle
+  pdf.circle(centerX, bottomY, 13, "S"); // Inner circle
+  pdf.setFont("Amiri", "bold");
+  pdf.setFontSize(12);
+  pdf.setTextColor(180, 142, 60);
+  pdf.text("نبتة", centerX, bottomY + 2, { align: "center" });
+
+  // 8. ===== Verification Footer =====
+  const verifyUrl = `nabta.vercel.app/verify/${data.certificateNumber}`;
+  pdf.setFontSize(8);
+  pdf.setTextColor(150);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`Certificate ID: ${data.certificateNumber}  |  Verify at: ${verifyUrl}`, centerX, pageHeight - 15, { align: "center" });
+
+  // Save
+  pdf.save(`Nabta_Luxury_Cert_${data.certificateNumber}.pdf`);
 };
 
 export const downloadCertificatePDF = generateCertificatePDF;
