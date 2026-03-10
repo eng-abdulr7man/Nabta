@@ -80,24 +80,26 @@ export const generateCertificatePDF = async (data: CertificateData): Promise<voi
   pdf.rect(8, pageHeight - 18, 10, 10, "F"); // Bottom Left
   pdf.rect(pageWidth - 18, pageHeight - 18, 10, 10, "F"); // Bottom Right
 
-  // 3. ===== Header: Logo & Academy Name =====
-  // 3. ===== Header: Logo & Academy Name =====
+ // 3. ===== Header: Logo & Academy Name =====
   pdf.setTextColor(5, 46, 22); // الأخضر الداكن
   pdf.setFont("Amiri", "bold");
   pdf.setFontSize(45);
   pdf.text("نـَـبْـتـَـة", centerX, 40, { align: "center" });
 
-  // السطر اللي كان مرحل - دلوقت في المنتصف تماماً
+  // السطر اللي محتاج سنترة دقيقة
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.setTextColor(180, 142, 60); // الذهبي
-  
-  // شيلنا الـ charSpace اللي كان بيعمل الترحيل وظبطنا المحاذاة
-  pdf.text("NABTA AGRICULTURAL ACADEMY", centerX, 48, { 
-    align: "center",
-    charSpace: 1 // قللت المسافة شوية عشان السنترة تكون أدق
-  });
 
+  const academyName = "NABTA AGRICULTURAL ACADEMY";
+  
+  // الحل السحري: هنخلي الـ charSpace صفر للحظة عشان نحسب العرض الحقيقي
+  // وبعدين نستخدم الـ Center العادي بتاع jsPDF بدون ترحيل
+  pdf.text(academyName, centerX, 48, { 
+    align: "center",
+    charSpace: 0.5 // مسافة صغيرة جداً لا تؤثر على السنترة لكن تعطي فخامة
+  });
+  
   // 4. ===== Title =====
   pdf.setTextColor(60, 60, 60);
   pdf.setFontSize(14);
