@@ -2,7 +2,8 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { ShieldCheck, XCircle, Award, Download, Calendar, User, BookOpen, Fingerprint } from "lucide-react";
+// السطر المعدل - تأكد من إضافة ExternalLink هنا
+import { ShieldCheck, XCircle, Award, Download, Calendar, User, BookOpen, Fingerprint, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 
