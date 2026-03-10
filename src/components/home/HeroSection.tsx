@@ -954,7 +954,7 @@ const HeroDarkSection = () => {
                   <span className="text-emerald-400">{profile.full_name.split(' ')[0]}</span>
                 ) : (
                   "بك"
-                )}، مستعد تطور مهاراتك في <br />
+                )}<br /> جاهز تتعلم<br />
                 
                 {/* الحاوية الجديدة باستخدام Grid لمنع قص النص */}
                 <span className="inline-grid [grid-template-areas:'text'] mt-2">
