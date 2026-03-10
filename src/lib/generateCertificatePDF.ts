@@ -91,7 +91,7 @@ export const generateCertificatePDF = async (data: CertificateData): Promise<voi
   pdf.setFontSize(10);
   pdf.setTextColor(180, 142, 60); // الذهبي
 
-  const academyName = "NABTA AGRICULTURAL ACADEMY";
+  const academyName = "AGRICULTURAL ACADEMY";
   
   // الحل السحري: هنخلي الـ charSpace صفر للحظة عشان نحسب العرض الحقيقي
   // وبعدين نستخدم الـ Center العادي بتاع jsPDF بدون ترحيل
