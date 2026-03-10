@@ -214,9 +214,7 @@ const SpecializationCard = ({ id, name, description, coursesCount, index }) => {
               {name || "اسم التخصص"}
             </h3>
             
-            <p className="text-sm text-neutral-400 line-clamp-2 leading-relaxed">
-              /* {description || "وصف مختصر للتخصص وما سيتعلمه المتدرب في هذا المسار التعليمي."} */
-            </p>
+          
           </div>
 
           <div className="mt-8 flex items-center justify-between border-t border-neutral-800/50 pt-4 overflow-hidden">
