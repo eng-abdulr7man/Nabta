@@ -208,161 +208,300 @@
 
 //v3
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+// import { useRef } from "react";
+// import { motion, useScroll, useTransform } from "framer-motion";
+// import { Link } from "react-router-dom";
+// import { ArrowLeft, Sparkles, BookOpen, Flame } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import CourseCard from "@/components/courses/CourseCard";
+// import { useCourses } from "@/hooks/useCourses";
+
+// // ==========================================
+// // إعدادات الأنيميشن للكروت
+// // ==========================================
+// const containerVariants = {
+//   hidden: { opacity: 0 },
+//   show: {
+//     opacity: 1,
+//     transition: { staggerChildren: 0.15 },
+//   },
+// };
+
+// const itemVariants = {
+//   hidden: { opacity: 0, y: 40, scale: 0.95 },
+//   show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 70, damping: 20 } },
+// };
+
+// // ==========================================
+// // القسم الرئيسي للكورسات المميزة
+// // ==========================================
+// const FeaturedCourses = () => {
+//   const { data: courses, isLoading } = useCourses();
+//   const containerRef = useRef(null);
+
+//   // تأثير بارالاكس (Parallax) خفيف للإضاءة الخلفية
+//   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
+//   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+
+//   return (
+//     <section ref={containerRef} className="relative py-24 bg-[#050806] overflow-hidden border-t border-neutral-800/20">
+      
+//       {/* 1. إضاءات خلفية ديناميكية (Dynamic Glowing Backgrounds) */}
+//       <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none">
+//         <div className="absolute top-[10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-900/10 blur-[150px]" />
+//         <div className="absolute bottom-[20%] left-[-5%] w-[400px] h-[400px] rounded-full bg-green-900/5 blur-[120px]" />
+//         {/* شبكة هندسية خفيفة جداً للعمق */}
+//         <div className="absolute inset-0 opacity-[0.015] bg-[url('/grid.svg')] bg-center" />
+//       </motion.div>
+
+//       <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        
+//         {/* التخطيط اللامتماثل (Asymmetrical Layout) */}
+//         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+          
+//           {/* ======================================= */}
+//           {/* الجانب الأيمن: لاصق (Sticky Header Side) */}
+//           {/* ======================================= */}
+//           <div className="lg:w-[35%] lg:sticky lg:top-32 space-y-8 z-20">
+//             <motion.div
+//               initial={{ opacity: 0, x: 30 }}
+//               whileInView={{ opacity: 1, x: 0 }}
+//               viewport={{ once: true, margin: "-100px" }}
+//               transition={{ duration: 0.6 }}
+//               className="space-y-6"
+//             >
+//               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-semibold shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+//                 <Flame className="w-4 h-4 text-amber-500 animate-pulse" />
+//                 الأكثر طلباً في السوق
+//               </div>
+              
+//               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.15] tracking-tight">
+//                 أقوى <br className="hidden lg:block" />
+//                 <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600 relative">
+//                   الكورسات
+//                   <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-gradient-to-l from-emerald-500 to-transparent rounded-full" />
+//                 </span>
+//               </h2>
+              
+//               <p className="text-lg text-neutral-400 leading-relaxed pr-2">
+//                 برامج تدريبية مكثفة مصممة على يد خبراء الصناعة. اكتسب المهارات العملية التي تضعك في مقدمة سوق العمل الزراعي.
+//               </p>
+
+//               <Link to="/courses" className="inline-block pt-4">
+//                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+//                   <Button 
+//                     size="lg"
+//                     className="bg-white hover:bg-neutral-200 text-black px-8 h-14 text-base font-bold transition-all shadow-xl rounded-2xl gap-3 group"
+//                   >
+//                     تصفح جميع الكورسات
+//                     <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform" />
+//                   </Button>
+//                 </motion.div>
+//               </Link>
+//             </motion.div>
+//           </div>
+
+//           {/* ======================================= */}
+//           {/* الجانب الأيسر: متحرك (Scrollable Grid Side) */}
+//           {/* ======================================= */}
+//           <div className="lg:w-[65%] w-full min-h-[50vh]">
+            
+//             {isLoading ? (
+//               // --- حالة التحميل (Premium Skeleton) ---
+//               <div className="flex lg:grid lg:grid-cols-2 gap-6 overflow-x-hidden">
+//                 {Array.from({ length: 4 }).map((_, i) => (
+//                   <div key={i} className="min-w-[85vw] sm:min-w-[340px] lg:min-w-0 bg-[#0c120e] border border-neutral-800/40 rounded-3xl p-4 h-[440px] flex flex-col animate-pulse">
+//                     <div className="w-full h-52 bg-neutral-900 rounded-2xl mb-5" />
+//                     <div className="space-y-4 flex-1 px-2">
+//                       <div className="h-4 w-1/3 bg-emerald-900/30 rounded-md mb-3" />
+//                       <div className="h-6 w-full bg-neutral-800/80 rounded-md" />
+//                       <div className="h-6 w-4/5 bg-neutral-800/80 rounded-md" />
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+
+//             ) : (courses || []).length === 0 ? (
+//               // --- حالة عدم وجود كورسات (Empty State) ---
+//               <motion.div 
+//                 initial={{ opacity: 0, y: 20 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 className="flex flex-col items-center justify-center py-24 px-4 text-center border border-dashed border-neutral-800/60 rounded-3xl bg-[#0c120e]/50 backdrop-blur-sm"
+//               >
+//                 <div className="w-20 h-20 bg-neutral-900 rounded-3xl flex items-center justify-center mb-6 shadow-inner border border-neutral-800">
+//                   <BookOpen className="w-10 h-10 text-neutral-600" />
+//                 </div>
+//                 <h3 className="text-2xl font-bold text-white mb-3">لا توجد كورسات متاحة حالياً</h3>
+//                 <p className="text-neutral-500 max-w-md leading-relaxed">
+//                   نعمل على إضافة محتوى حصري قريباً. يرجى متابعة المنصة للإصدارات الجديدة.
+//                 </p>
+//               </motion.div>
+
+//             ) : (
+//               // --- عرض الكورسات (The Courses Grid / Slider) ---
+//               <motion.div 
+//                 variants={containerVariants}
+//                 initial="hidden"
+//                 whileInView="show"
+//                 viewport={{ once: true, margin: "-50px" }}
+//                 className="flex lg:grid lg:grid-cols-2 gap-6 overflow-x-auto lg:overflow-visible pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+//               >
+//                 {(courses || []).slice(0, 6).map((course, i) => (
+//                   <motion.div 
+//                     key={course.id} 
+//                     variants={itemVariants}
+//                     className="snap-center lg:snap-align-none shrink-0 w-[85vw] sm:w-[340px] lg:w-auto h-full"
+//                   >
+//                     <CourseCard
+//                       {...course}
+//                       index={i}
+//                     />
+//                   </motion.div>
+//                 ))}
+//               </motion.div>
+//             )}
+
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default FeaturedCourses;
+
+//v4
+
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, BookOpen, Flame } from "lucide-react";
+import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CourseCard from "@/components/courses/CourseCard";
 import { useCourses } from "@/hooks/useCourses";
 
-// ==========================================
-// إعدادات الأنيميشن للكروت
-// ==========================================
+// إعدادات الأنيميشن
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.15 },
+    transition: { staggerChildren: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 40, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 70, damping: 20 } },
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-// ==========================================
-// القسم الرئيسي للكورسات المميزة
-// ==========================================
 const FeaturedCourses = () => {
   const { data: courses, isLoading } = useCourses();
-  const containerRef = useRef(null);
-
-  // تأثير بارالاكس (Parallax) خفيف للإضاءة الخلفية
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   return (
-    <section ref={containerRef} className="relative py-24 bg-[#050806] overflow-hidden border-t border-neutral-800/20">
+    <section className="relative py-24 bg-[#090D0A] overflow-hidden">
       
-      {/* 1. إضاءات خلفية ديناميكية (Dynamic Glowing Backgrounds) */}
-      <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-900/10 blur-[150px]" />
-        <div className="absolute bottom-[20%] left-[-5%] w-[400px] h-[400px] rounded-full bg-green-900/5 blur-[120px]" />
-        {/* شبكة هندسية خفيفة جداً للعمق */}
-        <div className="absolute inset-0 opacity-[0.015] bg-[url('/grid.svg')] bg-center" />
-      </motion.div>
+      {/* إضاءات خلفية مركزية (Center Glow) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[70%] h-[1px] bg-gradient-to-r from-transparent via-emerald-900/50 to-transparent" />
+      <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         
-        {/* التخطيط اللامتماثل (Asymmetrical Layout) */}
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+        {/* ======================================= */}
+        {/* الهيدر المركزي (Centered Header) */}
+        {/* ======================================= */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16 space-y-6"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-800/50 border border-neutral-700 text-emerald-400 text-sm font-medium shadow-inner">
+            <Sparkles className="w-4 h-4" />
+            الأكثر طلباً
+          </span>
           
-          {/* ======================================= */}
-          {/* الجانب الأيمن: لاصق (Sticky Header Side) */}
-          {/* ======================================= */}
-          <div className="lg:w-[35%] lg:sticky lg:top-32 space-y-8 z-20">
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6 }}
-              className="space-y-6"
+          <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+            الكورسات <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">المميزة</span>
+          </h2>
+          
+          <p className="text-lg text-neutral-400 leading-relaxed">
+            مجموعة منتقاة من أفضل البرامج التدريبية. ابدأ رحلتك الآن واكتسب المهارات التي يتطلبها سوق العمل الزراعي الحديث.
+          </p>
+
+          <Link to="/courses" className="inline-block pt-2">
+            <Button 
+              variant="outline" 
+              className="group border-neutral-700 text-white hover:text-black hover:bg-white hover:border-white px-8 h-12 text-base font-medium transition-all bg-transparent rounded-full"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-semibold shadow-[0_0_20px_rgba(16,185,129,0.05)]">
-                <Flame className="w-4 h-4 text-amber-500 animate-pulse" />
-                الأكثر طلباً في السوق
-              </div>
-              
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.15] tracking-tight">
-                أقوى <br className="hidden lg:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600 relative">
-                  الكورسات
-                  <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-gradient-to-l from-emerald-500 to-transparent rounded-full" />
-                </span>
-              </h2>
-              
-              <p className="text-lg text-neutral-400 leading-relaxed pr-2">
-                برامج تدريبية مكثفة مصممة على يد خبراء الصناعة. اكتسب المهارات العملية التي تضعك في مقدمة سوق العمل الزراعي.
-              </p>
+              تصفح جميع الكورسات
+              <ArrowLeft className="w-4 h-4 ml-2 group-hover:-translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </motion.div>
 
-              <Link to="/courses" className="inline-block pt-4">
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button 
-                    size="lg"
-                    className="bg-white hover:bg-neutral-200 text-black px-8 h-14 text-base font-bold transition-all shadow-xl rounded-2xl gap-3 group"
-                  >
-                    تصفح جميع الكورسات
-                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform" />
-                  </Button>
-                </motion.div>
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* ======================================= */}
-          {/* الجانب الأيسر: متحرك (Scrollable Grid Side) */}
-          {/* ======================================= */}
-          <div className="lg:w-[65%] w-full min-h-[50vh]">
-            
-            {isLoading ? (
-              // --- حالة التحميل (Premium Skeleton) ---
-              <div className="flex lg:grid lg:grid-cols-2 gap-6 overflow-x-hidden">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="min-w-[85vw] sm:min-w-[340px] lg:min-w-0 bg-[#0c120e] border border-neutral-800/40 rounded-3xl p-4 h-[440px] flex flex-col animate-pulse">
-                    <div className="w-full h-52 bg-neutral-900 rounded-2xl mb-5" />
-                    <div className="space-y-4 flex-1 px-2">
-                      <div className="h-4 w-1/3 bg-emerald-900/30 rounded-md mb-3" />
-                      <div className="h-6 w-full bg-neutral-800/80 rounded-md" />
-                      <div className="h-6 w-4/5 bg-neutral-800/80 rounded-md" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            ) : (courses || []).length === 0 ? (
-              // --- حالة عدم وجود كورسات (Empty State) ---
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-24 px-4 text-center border border-dashed border-neutral-800/60 rounded-3xl bg-[#0c120e]/50 backdrop-blur-sm"
-              >
-                <div className="w-20 h-20 bg-neutral-900 rounded-3xl flex items-center justify-center mb-6 shadow-inner border border-neutral-800">
-                  <BookOpen className="w-10 h-10 text-neutral-600" />
+        {/* ======================================= */}
+        {/* شبكة الكورسات (Courses Grid) */}
+        {/* ======================================= */}
+        {isLoading ? (
+          
+          // --- Skeleton Loading ---
+          <div className="flex lg:grid lg:grid-cols-3 gap-6 overflow-x-hidden">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="min-w-[85vw] sm:min-w-[340px] lg:min-w-0 bg-[#121A15] border border-neutral-800/50 rounded-3xl p-4 h-[420px] flex flex-col animate-pulse">
+                <div className="w-full h-48 bg-neutral-800 rounded-2xl mb-4" />
+                <div className="space-y-3 flex-1">
+                  <div className="h-4 w-1/3 bg-emerald-900/40 rounded-md mb-2" />
+                  <div className="h-6 w-full bg-neutral-800 rounded-md" />
+                  <div className="h-6 w-3/4 bg-neutral-800 rounded-md" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">لا توجد كورسات متاحة حالياً</h3>
-                <p className="text-neutral-500 max-w-md leading-relaxed">
-                  نعمل على إضافة محتوى حصري قريباً. يرجى متابعة المنصة للإصدارات الجديدة.
-                </p>
-              </motion.div>
-
-            ) : (
-              // --- عرض الكورسات (The Courses Grid / Slider) ---
-              <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-50px" }}
-                className="flex lg:grid lg:grid-cols-2 gap-6 overflow-x-auto lg:overflow-visible pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-              >
-                {(courses || []).slice(0, 6).map((course, i) => (
-                  <motion.div 
-                    key={course.id} 
-                    variants={itemVariants}
-                    className="snap-center lg:snap-align-none shrink-0 w-[85vw] sm:w-[340px] lg:w-auto h-full"
-                  >
-                    <CourseCard
-                      {...course}
-                      index={i}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-
+              </div>
+            ))}
           </div>
-        </div>
+
+        ) : (courses || []).length === 0 ? (
+          
+          // --- Empty State ---
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-neutral-800 rounded-3xl bg-[#121A15]/50"
+          >
+            <div className="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-4 text-neutral-500">
+              <BookOpen className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">لا توجد كورسات حالياً</h3>
+            <p className="text-neutral-500 max-w-sm">
+              لم يتم إضافة أي كورسات مميزة بعد.
+            </p>
+          </motion.div>
+
+        ) : (
+          
+          // --- عرض الكورسات مع تأثير التركيز (Focus Hover Effect) ---
+          // الكلاس group/list هو اللي بيتحكم في إخفاء باقي الكروت عند عمل Hover على كارت واحد
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-50px" }}
+            className="group/list flex lg:grid lg:grid-cols-3 gap-6 overflow-x-auto lg:overflow-visible pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          >
+            {(courses || []).slice(0, 6).map((course, i) => (
+              <motion.div 
+                key={course.id} 
+                variants={itemVariants}
+                // transition-all group-hover/list:opacity-50 hover:!opacity-100: دي اللي بتعمل التأثير السحري
+                className="snap-center lg:snap-align-none shrink-0 w-[85vw] sm:w-[340px] lg:w-auto h-full transition-all duration-500 lg:group-hover/list:opacity-40 lg:hover:!opacity-100 lg:hover:scale-[1.02]"
+              >
+                <CourseCard
+                  {...course}
+                  index={i}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+
+        )}
       </div>
     </section>
   );
