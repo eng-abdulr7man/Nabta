@@ -215,7 +215,7 @@ const SpecializationCard = ({ id, name, description, coursesCount, index }) => {
             </h3>
             
             <p className="text-sm text-neutral-400 line-clamp-2 leading-relaxed">
-              {description || "وصف مختصر للتخصص وما سيتعلمه المتدرب في هذا المسار التعليمي."}
+              /* {description || "وصف مختصر للتخصص وما سيتعلمه المتدرب في هذا المسار التعليمي."} */
             </p>
           </div>
 
