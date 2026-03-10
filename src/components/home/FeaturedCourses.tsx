@@ -372,6 +372,145 @@
 
 //v4
 
+// import { motion } from "framer-motion";
+// import { Link } from "react-router-dom";
+// import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import CourseCard from "@/components/courses/CourseCard";
+// import { useCourses } from "@/hooks/useCourses";
+
+// // إعدادات الأنيميشن
+// const containerVariants = {
+//   hidden: { opacity: 0 },
+//   show: {
+//     opacity: 1,
+//     transition: { staggerChildren: 0.1 },
+//   },
+// };
+
+// const itemVariants = {
+//   hidden: { opacity: 0, y: 30 },
+//   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+// };
+
+// const FeaturedCourses = () => {
+//   const { data: courses, isLoading } = useCourses();
+
+//   return (
+//     <section className="relative py-24 bg-[#090D0A] overflow-hidden">
+      
+//       {/* إضاءات خلفية مركزية (Center Glow) */}
+//       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[70%] h-[1px] bg-gradient-to-r from-transparent via-emerald-900/50 to-transparent" />
+//       <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
+
+//       <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        
+//         {/* ======================================= */}
+//         {/* الهيدر المركزي (Centered Header) */}
+//         {/* ======================================= */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           whileInView={{ opacity: 1, y: 0 }}
+//           viewport={{ once: true, margin: "-100px" }}
+//           transition={{ duration: 0.6 }}
+//           className="text-center max-w-3xl mx-auto mb-16 space-y-6"
+//         >
+//           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-800/50 border border-neutral-700 text-emerald-400 text-sm font-medium shadow-inner">
+//             <Sparkles className="w-4 h-4" />
+//             الأكثر طلباً
+//           </span>
+          
+//           <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+//             الكورسات <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">المميزة</span>
+//           </h2>
+          
+//           <p className="text-lg text-neutral-400 leading-relaxed">
+//             مجموعة منتقاة من أفضل البرامج التدريبية. ابدأ رحلتك الآن واكتسب المهارات التي يتطلبها سوق العمل الزراعي الحديث.
+//           </p>
+
+//           <Link to="/courses" className="inline-block pt-2">
+//             <Button 
+//               variant="outline" 
+//               className="group border-neutral-700 text-white hover:text-black hover:bg-white hover:border-white px-8 h-12 text-base font-medium transition-all bg-transparent rounded-full"
+//             >
+//               تصفح جميع الكورسات
+//               <ArrowLeft className="w-4 h-4 ml-2 group-hover:-translate-x-1 transition-transform" />
+//             </Button>
+//           </Link>
+//         </motion.div>
+
+//         {/* ======================================= */}
+//         {/* شبكة الكورسات (Courses Grid) */}
+//         {/* ======================================= */}
+//         {isLoading ? (
+          
+//           // --- Skeleton Loading ---
+//           <div className="flex lg:grid lg:grid-cols-3 gap-6 overflow-x-hidden">
+//             {Array.from({ length: 3 }).map((_, i) => (
+//               <div key={i} className="min-w-[85vw] sm:min-w-[340px] lg:min-w-0 bg-[#121A15] border border-neutral-800/50 rounded-3xl p-4 h-[420px] flex flex-col animate-pulse">
+//                 <div className="w-full h-48 bg-neutral-800 rounded-2xl mb-4" />
+//                 <div className="space-y-3 flex-1">
+//                   <div className="h-4 w-1/3 bg-emerald-900/40 rounded-md mb-2" />
+//                   <div className="h-6 w-full bg-neutral-800 rounded-md" />
+//                   <div className="h-6 w-3/4 bg-neutral-800 rounded-md" />
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+
+//         ) : (courses || []).length === 0 ? (
+          
+//           // --- Empty State ---
+//           <motion.div 
+//             initial={{ opacity: 0, scale: 0.95 }}
+//             animate={{ opacity: 1, scale: 1 }}
+//             className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-neutral-800 rounded-3xl bg-[#121A15]/50"
+//           >
+//             <div className="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center mb-4 text-neutral-500">
+//               <BookOpen className="w-8 h-8" />
+//             </div>
+//             <h3 className="text-xl font-bold text-white mb-2">لا توجد كورسات حالياً</h3>
+//             <p className="text-neutral-500 max-w-sm">
+//               لم يتم إضافة أي كورسات مميزة بعد.
+//             </p>
+//           </motion.div>
+
+//         ) : (
+          
+//           // --- عرض الكورسات مع تأثير التركيز (Focus Hover Effect) ---
+//           // الكلاس group/list هو اللي بيتحكم في إخفاء باقي الكروت عند عمل Hover على كارت واحد
+//           <motion.div 
+//             variants={containerVariants}
+//             initial="hidden"
+//             whileInView="show"
+//             viewport={{ once: true, margin: "-50px" }}
+//             className="group/list flex lg:grid lg:grid-cols-3 gap-6 overflow-x-auto lg:overflow-visible pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+//           >
+//             {(courses || []).slice(0, 6).map((course, i) => (
+//               <motion.div 
+//                 key={course.id} 
+//                 variants={itemVariants}
+//                 // transition-all group-hover/list:opacity-50 hover:!opacity-100: دي اللي بتعمل التأثير السحري
+//                 className="snap-center lg:snap-align-none shrink-0 w-[85vw] sm:w-[340px] lg:w-auto h-full transition-all duration-500 lg:group-hover/list:opacity-40 lg:hover:!opacity-100 lg:hover:scale-[1.02]"
+//               >
+//                 <CourseCard
+//                   {...course}
+//                   index={i}
+//                 />
+//               </motion.div>
+//             ))}
+//           </motion.div>
+
+//         )}
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default FeaturedCourses;
+
+//v5
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
@@ -430,8 +569,7 @@ const FeaturedCourses = () => {
 
           <Link to="/courses" className="inline-block pt-2">
             <Button 
-              variant="outline" 
-              className="group border-neutral-700 text-white hover:text-black hover:bg-white hover:border-white px-8 h-12 text-base font-medium transition-all bg-transparent rounded-full"
+              className="group bg-white text-neutral-900 hover:bg-emerald-600 hover:text-white px-8 h-12 text-base font-bold transition-all duration-300 rounded-full border-none shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
             >
               تصفح جميع الكورسات
               <ArrowLeft className="w-4 h-4 ml-2 group-hover:-translate-x-1 transition-transform" />
@@ -478,7 +616,6 @@ const FeaturedCourses = () => {
         ) : (
           
           // --- عرض الكورسات مع تأثير التركيز (Focus Hover Effect) ---
-          // الكلاس group/list هو اللي بيتحكم في إخفاء باقي الكروت عند عمل Hover على كارت واحد
           <motion.div 
             variants={containerVariants}
             initial="hidden"
@@ -490,7 +627,6 @@ const FeaturedCourses = () => {
               <motion.div 
                 key={course.id} 
                 variants={itemVariants}
-                // transition-all group-hover/list:opacity-50 hover:!opacity-100: دي اللي بتعمل التأثير السحري
                 className="snap-center lg:snap-align-none shrink-0 w-[85vw] sm:w-[340px] lg:w-auto h-full transition-all duration-500 lg:group-hover/list:opacity-40 lg:hover:!opacity-100 lg:hover:scale-[1.02]"
               >
                 <CourseCard
