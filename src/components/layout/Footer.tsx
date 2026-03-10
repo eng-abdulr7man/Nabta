@@ -465,7 +465,7 @@ const Footer = () => {
             </p>
 
             {/* النشرة البريدية (تصميم SaaS احترافي) */}
-            {/* <div className="space-y-4 pt-2">
+             {/* <div className="space-y-4 pt-2">
               <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest">انضم لنشرتنا البريدية</p>
               <div className="flex items-center relative group max-w-sm bg-[#0a0f0c] border border-neutral-800/80 rounded-2xl p-1 focus-within:border-emerald-500/50 focus-within:ring-1 focus-within:ring-emerald-500/20 transition-all duration-300">
                 <input 
@@ -477,8 +477,8 @@ const Footer = () => {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
               </div>
-            </div>
-          </div> */}
+            </div> */}
+          </div> 
 
           {/* ======================================= */}
           {/* العمود الثاني: الروابط الرئيسية */}
