@@ -53,9 +53,9 @@ const RegisterPage = () => {
               <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                 <Sprout className="w-6 h-6 text-primary" />
               </div>
-              <span className="font-tajawal font-bold text-xl">
-                نـَـبْـتـَـة
-              </span>
+              <span style={{ fontFamily: "Amiri, serif", fontSize: "32px", lineHeight: 1.8 }}>
+  نـَـبْـتـَـة
+</span>
             </Link>
             <h1 className="text-2xl font-black text-foreground">إنشاء حساب جديد</h1>
             <p className="text-sm text-muted-foreground mt-1">انضم إلى مجتمع MuAgriSmart</p>
