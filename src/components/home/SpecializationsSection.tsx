@@ -191,7 +191,7 @@ const SpecializationCard = ({ id, name, description, coursesCount, index }) => {
   };
 
   return (
-    <Link to={`/specializations/${id}`} className="block h-full outline-none">
+    <Link to={`/spec=${id}`} className="block h-full outline-none">
       <motion.div
         onMouseMove={handleMouseMove}
         className="group relative h-full bg-[#121A15] border border-neutral-800/60 rounded-3xl p-6 sm:p-8 overflow-hidden transition-all duration-500 hover:border-emerald-500/50 hover:shadow-[0_0_40px_rgba(16,185,129,0.1)] cursor-pointer min-w-[280px] lg:min-w-0"
