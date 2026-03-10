@@ -94,25 +94,40 @@ const VerifyCertificate = () => {
                 </div>
 
                 {/* Action Bar */}
-                <div className="pt-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-8">
-                   <div className="text-right">
-                      <p className="text-[10px] text-emerald-500/50 uppercase tracking-[0.2em] mb-1 font-black">Digital Signature Link</p>
-                      <p className="text-xs text-neutral-400 font-mono opacity-80">nabta.vercel.app/verify/{data.certificate_number}</p>
-                   </div>
-                   <Button 
-                    onClick={() => downloadCertificatePDF({
-                      learnerName: data.full_name,
-                      courseName: data.course_title,
-                      certificateNumber: data.certificate_number,
-                      issuedAt: data.issued_at,
-                      instructor: data.instructor,
-                    })}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl px-10 h-14 font-bold transition-all shadow-xl shadow-emerald-900/20 group w-full sm:w-auto"
-                   >
-                    <Download className="w-5 h-5 ml-2 group-hover:translate-y-0.5 transition-transform" />
-                    تحميل الشهادة
-                   </Button>
-                </div>
+<div className="pt-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-8">
+   
+   {/* رابط التوثيق الرقمي كـ "زر تفاعلي" */}
+   <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+      <p className="text-[10px] text-emerald-500/50 uppercase tracking-[0.2em] font-black ml-auto">سجل التوثيق الرقمي</p>
+      <a 
+        href={`https://nabta.vercel.app/verify/${data.certificate_number}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-emerald-500/30 transition-all group"
+      >
+        <span className="text-[11px] font-mono text-neutral-400 group-hover:text-emerald-400">
+          nabta.vercel.app/verify/{data.certificate_number}
+        </span>
+        <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+          <ExternalLink className="w-3 h-3 text-emerald-500" />
+        </div>
+      </a>
+   </div>
+
+   <Button 
+    onClick={() => downloadCertificatePDF({
+      learnerName: data.full_name,
+      courseName: data.course_title,
+      certificateNumber: data.certificate_number,
+      issuedAt: data.issued_at,
+      instructor: data.instructor,
+    })}
+    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl px-10 h-14 font-bold transition-all shadow-xl shadow-emerald-900/20 group w-full sm:w-auto"
+   >
+    <Download className="w-5 h-5 ml-2 group-hover:translate-y-0.5 transition-transform" />
+    تحميل الشهادة الرسمية
+   </Button>
+</div>
 
               </div>
             ) : (
