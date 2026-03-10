@@ -109,7 +109,7 @@ export const generateCertificatePDF = async (data: CertificateData): Promise<voi
   setFontForText(pdf, data.courseName, "bold");
   pdf.text(data.courseName, centerX, 130, { align: "center", maxWidth: 200 });
 
-  // Footer Signatures
+  // Footer Section
   const bottomY = 165;
   if (data.instructor) {
     pdf.setTextColor(100);
@@ -117,18 +117,14 @@ export const generateCertificatePDF = async (data: CertificateData): Promise<voi
     pdf.setFont("helvetica", "normal");
     pdf.text("AUTHORIZED INSTRUCTOR", centerX - 70, bottomY - 10, { align: "center" });
     
+    // التوقيع المائل (فقط)
     pdf.setFont("times", "italic");
     pdf.setTextColor(5, 46, 22);
     pdf.setFontSize(18);
-    pdf.text(data.instructor, centerX - 70, bottomY, { align: "center" });
+    pdf.text(data.instructor, centerX - 70, bottomY + 2, { align: "center" });
     
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(12);
-    pdf.setTextColor(0);
-    pdf.text(data.instructor, centerX - 70, bottomY + 7, { align: "center" });
-
     pdf.setDrawColor(180, 142, 60);
-    pdf.line(centerX - 100, bottomY + 10, centerX - 40, bottomY + 10);
+    pdf.line(centerX - 100, bottomY + 5, centerX - 40, bottomY + 5);
   }
 
   // Date
@@ -138,8 +134,8 @@ export const generateCertificatePDF = async (data: CertificateData): Promise<voi
   pdf.text("DATE OF ISSUANCE", centerX + 70, bottomY - 10, { align: "center" });
   pdf.setTextColor(5, 46, 22);
   pdf.setFontSize(12);
-  pdf.text(dateStr, centerX + 70, bottomY + 7, { align: "center" });
-  pdf.line(centerX + 40, bottomY + 10, centerX + 100, bottomY + 10);
+  pdf.text(dateStr, centerX + 70, bottomY + 2, { align: "center" });
+  pdf.line(centerX + 40, bottomY + 5, centerX + 100, bottomY + 5);
 
   // Seal
   pdf.setDrawColor(180, 142, 60);
