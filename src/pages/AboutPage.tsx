@@ -134,7 +134,7 @@ const AboutPage = () => {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
-              أكاديمية <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">MuAgriSmart</span>
+              أكاديمية <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">نـَـبْـتـَـة</span>
             </h1>
             
             <p className="text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed">
