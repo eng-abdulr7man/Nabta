@@ -496,14 +496,28 @@ import { Search, SlidersHorizontal, BookOpen, SearchX, Check, LayoutGrid } from 
 const CoursesPage = () => {
   const [searchParams] = useSearchParams();
   const initialSpec = searchParams.get("spec");
-  const [search, setSearch] = useState("");
+  
+  // 1. قراءة كلمة البحث من الرابط (لو موجودة)
+  const initialQ = searchParams.get("q") || ""; 
+  
+  // 2. وضع الكلمة كقيمة ابتدائية لحالة البحث
+  const [search, setSearch] = useState(initialQ); 
   const [selectedSpec, setSelectedSpec] = useState<string | null>(initialSpec);
+  
   const { data: courses, isLoading } = useCourses(selectedSpec);
   const { data: specializations } = useSpecializations();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // 3. الخطوة السحرية: تحديث البحث تلقائياً لو المستخدم بحث من النافبار وهو جوه صفحة الكورسات أصلاً
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q !== null) {
+      setSearch(q);
+    }
+  }, [searchParams]);
 
   const filtered = (courses || []).filter((c) => {
     return c.title.includes(search) || c.description.includes(search);
