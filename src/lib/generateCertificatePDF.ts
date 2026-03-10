@@ -152,7 +152,7 @@ export const generateCertificatePDF = async (data: CertificateData): Promise<voi
   pdf.setFontSize(8);
   pdf.setTextColor(150);
   pdf.setFont("helvetica", "normal");
-  pdf.text(`Certificate ID: ${data.certificateNumber}  |  Verify at: ${verifyUrl}`, centerX, pageHeight - 15, { align: "center" });
+  pdf.text(`Certificate ID: ${data.certificateNumber}  |  Verify at: https://${verifyUrl}`, centerX, pageHeight - 15, { align: "center" });
 
   pdf.save(`Nabta_Certificate_${data.certificateNumber}.pdf`);
 };
