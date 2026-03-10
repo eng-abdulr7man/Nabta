@@ -456,7 +456,7 @@ const Footer = () => {
                 <Sprout className="w-5 h-5 text-emerald-500" />
               </div>
               <span className="font-tajawal font-black text-2xl text-white tracking-tight">
-                MuAgri<span className="text-emerald-500">Smart</span>
+                  نـَـبْـتـَـة
               </span>
             </Link>
             
@@ -465,7 +465,7 @@ const Footer = () => {
             </p>
 
             {/* النشرة البريدية (تصميم SaaS احترافي) */}
-            <div className="space-y-4 pt-2">
+            {/* <div className="space-y-4 pt-2">
               <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest">انضم لنشرتنا البريدية</p>
               <div className="flex items-center relative group max-w-sm bg-[#0a0f0c] border border-neutral-800/80 rounded-2xl p-1 focus-within:border-emerald-500/50 focus-within:ring-1 focus-within:ring-emerald-500/20 transition-all duration-300">
                 <input 
@@ -478,7 +478,7 @@ const Footer = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* ======================================= */}
           {/* العمود الثاني: الروابط الرئيسية */}
@@ -490,7 +490,7 @@ const Footer = () => {
                 { label: "تصفح الكورسات", path: "/courses" },
                 { label: "التخصصات الزراعية", path: "/specializations" },
                 { label: "من نحن", path: "/about" },
-                { label: "المقالات والأخبار", path: "/blog" },
+                // { label: "المقالات والأخبار", path: "/blog" },
               ].map((link) => (
                 <li key={link.path}>
                   <Link to={link.path} className="text-sm text-neutral-400 hover:text-emerald-400 transition-colors inline-block hover:-translate-x-1 transform duration-300">
@@ -558,17 +558,17 @@ const Footer = () => {
         <div className="pt-8 border-t border-neutral-800/40 flex flex-col md:flex-row items-center justify-between gap-6 pb-28 md:pb-8">
           
           <div className="flex items-center gap-2 text-sm text-neutral-500 font-medium">
-            <span>© {new Date().getFullYear()} MuAgriSmart.</span>
+            <span>© {new Date().getFullYear()} نـَـبْـتـَـة.</span>
             <span className="hidden sm:inline">جميع الحقوق محفوظة.</span>
           </div>
           
           {/* أيقونات السوشيال ميديا (تصميم Minimal) */}
           <div className="flex items-center gap-2">
             {[
-              { icon: Facebook, href: "#" },
-              { icon: Twitter, href: "#" },
-              { icon: Instagram, href: "#" },
-              { icon: Linkedin, href: "#" },
+              { icon: Facebook, href: "https://www.facebook.com/share/18Dbz2ppwn/" },
+              { icon: Twitter, href: "اhttps://t.me/eng_abdulr7man" },
+              { icon: Instagram, href: "https://www.instagram.com/eng_abdulr7man/" },
+              { icon: Linkedin, href: "https://www.linkedin.com/in/eng_abdulr7man" },
             ].map((social, i) => {
               const Icon = social.icon;
               return (
