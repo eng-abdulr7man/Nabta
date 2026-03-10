@@ -754,6 +754,200 @@
 // export default Navbar;
 
 // v4
+// import { Link, useLocation, useNavigate } from "react-router-dom";
+// import { useState, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { Menu, X, Sprout, LogIn, Search, LogOut, LayoutDashboard, BookOpen, Heart, User } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useAuth } from "@/contexts/AuthContext";
+
+// const navLinks = [
+//   { label: "الرئيسية", path: "/" },
+//   { label: "الكورسات", path: "/courses" },
+//   { label: "التخصصات", path: "/specializations" },
+//   { label: "تواصل معنا", path: "/contact" },
+// ];
+
+// const Navbar = () => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [isSearchOpen, setIsSearchOpen] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const { user, profile, signOut, isAdmin } = useAuth();
+
+//   // منع السكرول لما المنيو تكون مفتوحة عشان م يحصلش كراش في الموبايل
+//   useEffect(() => {
+//     if (isOpen) {
+//       document.body.style.overflow = 'hidden';
+//     } else {
+//       document.body.style.overflow = 'unset';
+//     }
+//   }, [isOpen]);
+
+//   // إغلاق المنيو عند تغيير المسار
+//   useEffect(() => {
+//     setIsOpen(false);
+//   }, [location.pathname]);
+
+//   const handleSearch = (e: React.FormEvent) => {
+//     e.preventDefault();
+//     if (searchQuery.trim()) {
+//       navigate(`/courses?q=${encodeURIComponent(searchQuery)}`);
+//       setSearchQuery("");
+//       setIsSearchOpen(false);
+//       setIsOpen(false);
+//     }
+//   };
+
+//   const getInitial = () => {
+//     if (profile?.full_name) return profile.full_name.charAt(0);
+//     if (user?.email) return user.email.charAt(0).toUpperCase();
+//     return "U";
+//   };
+
+//   return (
+//     <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806]/80 backdrop-blur-xl border-b border-neutral-800/60 font-tajawal">
+//       <div className="container mx-auto px-4">
+//         <div className="flex items-center justify-between h-20">
+          
+//           {/* Logo */}
+//           <Link to="/" className="flex items-center gap-3 shrink-0">
+//             <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center">
+//               <Sprout className="w-5 h-5 text-emerald-500" />
+//             </div>
+//             <span style={{ fontFamily: "Amiri, serif", fontSize: "28px" }} className="text-white hidden xs:block">
+//               نـَـبْـتـَـة
+//             </span>
+//           </Link>
+
+//           {/* Desktop Nav */}
+//           <div className="hidden lg:flex items-center gap-1">
+//             {navLinks.map((link) => (
+//               <Link
+//                 key={link.path}
+//                 to={link.path}
+//                 className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+//                   location.pathname === link.path
+//                     ? "bg-emerald-600/10 text-emerald-400"
+//                     : "text-neutral-400 hover:text-white"
+//                 }`}
+//               >
+//                 {link.label}
+//               </Link>
+//             ))}
+//           </div>
+
+//           {/* Actions (Desktop) */}
+//           <div className="hidden lg:flex items-center gap-3">
+//              <motion.div
+//               animate={{ width: isSearchOpen ? 240 : 40 }}
+//               className="relative flex items-center h-10 rounded-xl overflow-hidden bg-[#121A15] border border-neutral-800"
+//             >
+//               <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="w-10 h-10 shrink-0 flex items-center justify-center text-neutral-400">
+//                 <Search className="w-4 h-4" />
+//               </button>
+//               <form onSubmit={handleSearch} className="flex-1 pr-2">
+//                 <input
+//                   type="text"
+//                   placeholder="ابحث..."
+//                   value={searchQuery}
+//                   onChange={(e) => setSearchQuery(e.target.value)}
+//                   className="w-full bg-transparent border-none text-white text-xs focus:outline-none"
+//                 />
+//               </form>
+//             </motion.div>
+
+//             {user ? (
+//               <div className="flex items-center gap-2">
+//                 <Link to="/profile">
+//                   <div className="w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center overflow-hidden">
+//                     {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 text-xs font-bold">{getInitial()}</span>}
+//                   </div>
+//                 </Link>
+//                 <Button variant="ghost" size="icon" onClick={() => signOut()} className="text-neutral-500 hover:text-red-400"><LogOut className="w-4 h-4" /></Button>
+//               </div>
+//             ) : (
+//               <Link to="/login"><Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-10 px-6 font-bold">دخول</Button></Link>
+//             )}
+//           </div>
+
+//           {/* Mobile toggle */}
+//           <button className="lg:hidden p-2 text-neutral-400" onClick={() => setIsOpen(!isOpen)}>
+//             {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* Mobile Menu - تم تحسينه لمنع الكراش */}
+//       <AnimatePresence>
+//         {isOpen && (
+//           <motion.div
+//             initial={{ x: "100%" }}
+//             animate={{ x: 0 }}
+//             exit={{ x: "100%" }}
+//             transition={{ type: "tween", duration: 0.3 }}
+//             className="fixed inset-0 top-20 z-[90] bg-[#050806] lg:hidden flex flex-col p-6 space-y-6"
+//           >
+//             {/* Search in Mobile */}
+//             <form onSubmit={handleSearch} className="relative">
+//               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+//               <input
+//                 type="text"
+//                 placeholder="ابحث عن كورس..."
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 className="w-full h-14 pr-12 pl-4 rounded-2xl bg-[#121A15] border border-neutral-800 text-white focus:border-emerald-500/50 outline-none"
+//               />
+//             </form>
+
+//             <div className="flex flex-col gap-2">
+//               {navLinks.map((link) => (
+//                 <Link
+//                   key={link.path}
+//                   to={link.path}
+//                   className={`p-4 rounded-2xl text-lg font-bold ${
+//                     location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400" : "text-neutral-400"
+//                   }`}
+//                 >
+//                   {link.label}
+//                 </Link>
+//               ))}
+//             </div>
+
+//             <div className="mt-auto pb-10 space-y-4">
+//               {user ? (
+//                 <div className="space-y-4">
+//                   <Link to="/profile" className="flex items-center gap-4 p-4 rounded-2xl bg-[#121A15] border border-neutral-800">
+//                     <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center overflow-hidden border border-emerald-500/30">
+//                       {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
+//                     </div>
+//                     <div>
+//                       <p className="font-bold text-white text-sm">{profile?.full_name || "مستخدم نبتة"}</p>
+//                       <p className="text-xs text-neutral-500">{user.email}</p>
+//                     </div>
+//                   </Link>
+//                   <Button onClick={() => signOut()} variant="outline" className="w-full h-14 rounded-2xl border-red-500/20 bg-red-500/5 text-red-500 gap-2">
+//                     <LogOut className="w-5 h-5" /> تسجيل الخروج
+//                   </Button>
+//                 </div>
+//               ) : (
+//                 <div className="grid grid-cols-2 gap-4">
+//                   <Link to="/login"><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-800 text-white">دخول</Button></Link>
+//                   <Link to="/register"><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white">حساب جديد</Button></Link>
+//                 </div>
+//               )}
+//             </div>
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </nav>
+//   );
+// };
+
+// export default Navbar;
+
+//v5
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -776,19 +970,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, isAdmin } = useAuth();
 
-  // منع السكرول لما المنيو تكون مفتوحة عشان م يحصلش كراش في الموبايل
+  // منع السكرول عند فتح المنيو
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
   }, [isOpen]);
-
-  // إغلاق المنيو عند تغيير المسار
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -807,30 +992,28 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806]/80 backdrop-blur-xl border-b border-neutral-800/60 font-tajawal">
+    <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806]/90 backdrop-blur-xl border-b border-neutral-800/60 font-tajawal h-20 flex items-center">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-full">
           
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center">
+          {/* الـ Logo مع الاسم - ثابت ومبيختفيش */}
+          <Link to="/" className="flex items-center gap-3 shrink-0 z-[110]">
+            <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shadow-emerald-500/5 shadow-lg">
               <Sprout className="w-5 h-5 text-emerald-500" />
             </div>
-            <span style={{ fontFamily: "Amiri, serif", fontSize: "28px" }} className="text-white hidden xs:block">
+            <span style={{ fontFamily: "Amiri, serif", fontSize: "28px" }} className="text-white mt-1">
               نـَـبْـتـَـة
             </span>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* روابط الكمبيوتر */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                  location.pathname === link.path
-                    ? "bg-emerald-600/10 text-emerald-400"
-                    : "text-neutral-400 hover:text-white"
+                  location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400" : "text-neutral-400 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -838,76 +1021,79 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Actions (Desktop) */}
-          <div className="hidden lg:flex items-center gap-3">
-             <motion.div
-              animate={{ width: isSearchOpen ? 240 : 40 }}
-              className="relative flex items-center h-10 rounded-xl overflow-hidden bg-[#121A15] border border-neutral-800"
-            >
-              <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="w-10 h-10 shrink-0 flex items-center justify-center text-neutral-400">
-                <Search className="w-4 h-4" />
-              </button>
-              <form onSubmit={handleSearch} className="flex-1 pr-2">
-                <input
-                  type="text"
-                  placeholder="ابحث..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none text-white text-xs focus:outline-none"
-                />
-              </form>
-            </motion.div>
+          {/* الأكشنز (بحث + بروفايل) */}
+          <div className="flex items-center gap-2 lg:gap-3">
+             {/* البحث في الكمبيوتر */}
+             <div className="hidden sm:flex items-center relative mr-2">
+                <motion.div
+                  animate={{ width: isSearchOpen ? 220 : 40 }}
+                  className="flex items-center h-10 rounded-xl bg-[#121A15] border border-neutral-800 overflow-hidden"
+                >
+                  <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="w-10 h-10 shrink-0 flex items-center justify-center text-neutral-400">
+                    <Search className="w-4 h-4" />
+                  </button>
+                  <form onSubmit={handleSearch} className="flex-1 pr-2">
+                    <input
+                      type="text"
+                      placeholder="ابحث..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-transparent border-none text-white text-xs focus:outline-none"
+                    />
+                  </form>
+                </motion.div>
+             </div>
 
             {user ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Link to="/profile">
-                  <div className="w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center overflow-hidden">
-                    {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 text-xs font-bold">{getInitial()}</span>}
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 border-2 border-neutral-800 flex items-center justify-center overflow-hidden hover:border-emerald-500/50 transition-all shadow-lg">
+                    {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
                   </div>
                 </Link>
-                <Button variant="ghost" size="icon" onClick={() => signOut()} className="text-neutral-500 hover:text-red-400"><LogOut className="w-4 h-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => signOut()} className="hidden sm:flex text-neutral-500 hover:text-red-400"><LogOut className="w-4 h-4" /></Button>
               </div>
             ) : (
-              <Link to="/login"><Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-10 px-6 font-bold">دخول</Button></Link>
+              <Link to="/login" className="hidden sm:block"><Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl px-6 font-bold h-10">دخول</Button></Link>
             )}
-          </div>
 
-          {/* Mobile toggle */}
-          <button className="lg:hidden p-2 text-neutral-400" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-          </button>
+            {/* زرار المنيو للموبايل */}
+            <button className="lg:hidden p-2 text-neutral-400 z-[110]" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Menu - تم تحسينه لمنع الكراش */}
+      {/* سلايدر الموبايل المحسن */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.3 }}
-            className="fixed inset-0 top-20 z-[90] bg-[#050806] lg:hidden flex flex-col p-6 space-y-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 top-0 z-[100] bg-[#050806] lg:hidden flex flex-col pt-24 p-6"
           >
-            {/* Search in Mobile */}
-            <form onSubmit={handleSearch} className="relative">
+            {/* البحث في الموبايل */}
+            <form onSubmit={handleSearch} className="relative mb-8">
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
               <input
                 type="text"
                 placeholder="ابحث عن كورس..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-14 pr-12 pl-4 rounded-2xl bg-[#121A15] border border-neutral-800 text-white focus:border-emerald-500/50 outline-none"
+                className="w-full h-14 pr-12 pl-4 rounded-2xl bg-[#121A15] border border-neutral-800 text-white outline-none focus:border-emerald-500/50"
               />
             </form>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`p-4 rounded-2xl text-lg font-bold ${
-                    location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400" : "text-neutral-400"
+                  onClick={() => setIsOpen(false)}
+                  className={`p-4 rounded-2xl text-xl font-bold transition-all ${
+                    location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400 border border-emerald-500/20" : "text-neutral-300"
                   }`}
                 >
                   {link.label}
@@ -917,24 +1103,24 @@ const Navbar = () => {
 
             <div className="mt-auto pb-10 space-y-4">
               {user ? (
-                <div className="space-y-4">
-                  <Link to="/profile" className="flex items-center gap-4 p-4 rounded-2xl bg-[#121A15] border border-neutral-800">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center overflow-hidden border border-emerald-500/30">
+                <div className="p-4 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-between">
+                  <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center overflow-hidden">
                       {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
                     </div>
                     <div>
                       <p className="font-bold text-white text-sm">{profile?.full_name || "مستخدم نبتة"}</p>
-                      <p className="text-xs text-neutral-500">{user.email}</p>
+                      <p className="text-xs text-neutral-500 truncate max-w-[150px]">{user.email}</p>
                     </div>
                   </Link>
-                  <Button onClick={() => signOut()} variant="outline" className="w-full h-14 rounded-2xl border-red-500/20 bg-red-500/5 text-red-500 gap-2">
-                    <LogOut className="w-5 h-5" /> تسجيل الخروج
-                  </Button>
+                  <button onClick={() => { signOut(); setIsOpen(false); }} className="p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors">
+                    <LogOut className="w-5 h-5" />
+                  </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4">
-                  <Link to="/login"><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-800 text-white">دخول</Button></Link>
-                  <Link to="/register"><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white">حساب جديد</Button></Link>
+                  <Link to="/login" onClick={() => setIsOpen(false)}><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-800 text-white">دخول</Button></Link>
+                  <Link to="/register" onClick={() => setIsOpen(false)}><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white">حساب جديد</Button></Link>
                 </div>
               )}
             </div>
