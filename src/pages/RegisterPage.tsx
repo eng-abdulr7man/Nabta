@@ -58,7 +58,7 @@ const RegisterPage = () => {
 </span>
             </Link>
             <h1 className="text-2xl font-black text-foreground">إنشاء حساب جديد</h1>
-            <p className="text-sm text-muted-foreground mt-1">انضم إلى مجتمع MuAgriSmart</p>
+            <p className="text-sm text-muted-foreground mt-1">انضم إلى مجتمع نـَـبْـتـَـة</p>
           </div>
 
           <form className="space-y-4" onSubmit={handleRegister}>
@@ -93,7 +93,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">رقم الهاتف</label>
               <div className="relative">
                 <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -106,7 +106,7 @@ const RegisterPage = () => {
                   dir="ltr"
                 />
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">كلمة المرور</label>
