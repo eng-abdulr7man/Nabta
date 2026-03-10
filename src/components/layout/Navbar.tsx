@@ -1,7 +1,190 @@
+// import { Link, useLocation } from "react-router-dom";
+// import { useState } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { Menu, X, Sprout, LogIn, Search, User, LogOut, LayoutDashboard, BookOpen, Heart } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useAuth } from "@/contexts/AuthContext";
+
+// const navLinks = [
+//   { label: "الرئيسية", path: "/" },
+//   { label: "الكورسات", path: "/courses" },
+//   { label: "التخصصات", path: "/specializations" },
+//   { label: "تواصل معنا", path: "/contact" },
+// ];
+
+// const Navbar = () => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const location = useLocation();
+//   const { user, profile, signOut, isAdmin } = useAuth();
+
+//   return (
+//     <nav className="fixed top-0 right-0 left-0 z-50 glass-card border-b border-border/50 backdrop-blur-xl bg-background/80">
+//       <div className="container mx-auto px-4">
+//         <div className="flex items-center justify-between h-16">
+//           {/* Logo */}
+//           <Link to="/" className="flex items-center gap-2">
+//             <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
+//               <Sprout className="w-5 h-5 text-primary" />
+//             </div>
+//             <span className="font-tajawal font-bold text-lg text-foreground">
+//               {/* MuAgri<span className="text-primary">Smart</span> */}
+//              <span style={{ fontFamily: "Amiri, serif", fontSize: "32px", lineHeight: 1.8 }}>
+//   نـَـبْـتـَـة
+// </span>
+//             </span>
+//           </Link>
+
+//           {/* Desktop Nav */}
+//           <div className="hidden md:flex items-center gap-1">
+//             {navLinks.map((link) => (
+//               <Link
+//                 key={link.path}
+//                 to={link.path}
+//                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+//                   location.pathname === link.path
+//                     ? "text-primary bg-primary/10"
+//                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+//                 }`}
+//               >
+//                 {link.label}
+//               </Link>
+//             ))}
+//           </div>
+
+//           {/* Actions */}
+//           <div className="hidden md:flex items-center gap-2">
+//             <Button variant="ghost" size="icon" className="text-muted-foreground">
+//               <Search className="w-4 h-4" />
+//             </Button>
+//             {user ? (
+//               <>
+//                 {isAdmin && (
+//                   <Link to="/admin">
+//                     <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+//                       <LayoutDashboard className="w-4 h-4" />
+//                       لوحة التحكم
+//                     </Button>
+//                   </Link>
+//                 )}
+//                 <Link to="/my-courses">
+//                   <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+//                     <BookOpen className="w-4 h-4" />
+//                     كورساتي
+//                   </Button>
+//                 </Link>
+//                 <Link to="/favorites">
+//                   <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+//                     <Heart className="w-4 h-4" />
+//                     المفضلة
+//                   </Button>
+//                 </Link>
+//                 <Link to="/profile">
+//                   <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+//                     <User className="w-4 h-4" />
+//                     {"حسابي"}
+//                     {/* profile?.full_name || */}
+//                   </Button>
+//                 </Link>
+//                 <Button
+//                   variant="ghost"
+//                   size="sm"
+//                   className="text-muted-foreground"
+//                   onClick={() => signOut()}
+//                 >
+//                   <LogOut className="w-4 h-4" />
+//                 </Button>
+//               </>
+//             ) : (
+//               <>
+//                 <Link to="/login">
+//                   <Button variant="ghost" size="sm" className="text-muted-foreground">
+//                     <LogIn className="w-4 h-4 ml-1" />
+//                     دخول
+//                   </Button>
+//                 </Link>
+//                 {/* <Link to="/register">
+//                   <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+//                     إنشاء حساب
+//                   </Button>
+//                 </Link> */}
+//               </>
+//             )}
+//           </div>
+
+//           {/* Mobile toggle */}
+//           <button
+//             className="md:hidden text-foreground"
+//             onClick={() => setIsOpen(!isOpen)}
+//           >
+//             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* Mobile Menu */}
+//       <AnimatePresence>
+//         {isOpen && (
+//           <motion.div
+//             initial={{ height: 0, opacity: 0 }}
+//             animate={{ height: "auto", opacity: 1 }}
+//             exit={{ height: 0, opacity: 0 }}
+//             className="md:hidden overflow-hidden bg-background/95 backdrop-blur-xl border-b border-border"
+//           >
+//             <div className="px-4 py-4 space-y-2">
+//               {navLinks.map((link) => (
+//                 <Link
+//                   key={link.path}
+//                   to={link.path}
+//                   onClick={() => setIsOpen(false)}
+//                   className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+//                     location.pathname === link.path
+//                       ? "text-primary bg-primary/10"
+//                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+//                   }`}
+//                 >
+//                   {link.label}
+//                 </Link>
+//               ))}
+//               <div className="flex gap-2 pt-2">
+//                 {user ? (
+//                   <>
+//                     <Link to="/profile" className="flex-1" onClick={() => setIsOpen(false)}>
+//                       <Button variant="outline" className="w-full border-border text-foreground">حسابي</Button>
+//                     </Link>
+//                     <Button
+//                       variant="outline"
+//                       className="border-border text-foreground"
+//                       onClick={() => { signOut(); setIsOpen(false); }}
+//                     >
+//                       <LogOut className="w-4 h-4" />
+//                     </Button>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <Link to="/login" className="flex-1" onClick={() => setIsOpen(false)}>
+//                       <Button variant="outline" className="w-full border-border text-foreground">دخول</Button>
+//                     </Link>
+//                     <Link to="/register" className="flex-1" onClick={() => setIsOpen(false)}>
+//                       <Button className="w-full bg-primary text-primary-foreground">إنشاء حساب</Button>
+//                     </Link>
+//                   </>
+//                 )}
+//               </div>
+//             </div>
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </nav>
+//   );
+// };
+
+// export default Navbar;
+
+//v2
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sprout, LogIn, Search, User, LogOut, LayoutDashboard, BookOpen, Heart } from "lucide-react";
+import { Menu, X, Sprout, LogIn, Search, LogOut, LayoutDashboard, BookOpen, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -17,33 +200,38 @@ const Navbar = () => {
   const location = useLocation();
   const { user, profile, signOut, isAdmin } = useAuth();
 
+  // دالة صغيرة عشان لو مفيش صورة، نعرض أول حرف
+  const getInitial = () => {
+    if (profile?.full_name) return profile.full_name.charAt(0);
+    if (user?.email) return user.email.charAt(0).toUpperCase();
+    return "U";
+  };
+
   return (
-    <nav className="fixed top-0 right-0 left-0 z-50 glass-card border-b border-border/50 backdrop-blur-xl bg-background/80">
+    <nav className="fixed top-0 right-0 left-0 z-50 bg-[#050806]/80 backdrop-blur-xl border-b border-neutral-800/60 shadow-sm font-tajawal">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
+          
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Sprout className="w-5 h-5 text-primary" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center group-hover:border-emerald-500/30 group-hover:bg-emerald-950/20 transition-all duration-300">
+              <Sprout className="w-5 h-5 text-emerald-500" />
             </div>
-            <span className="font-tajawal font-bold text-lg text-foreground">
-              {/* MuAgri<span className="text-primary">Smart</span> */}
-             <span style={{ fontFamily: "Amiri, serif", fontSize: "32px", lineHeight: 1.8 }}>
-  نـَـبْـتـَـة
-</span>
+            <span style={{ fontFamily: "Amiri, serif", fontSize: "32px", lineHeight: 1.8 }} className="text-white mt-1">
+              نـَـبْـتـَـة
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
                   location.pathname === link.path
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    ? "bg-emerald-600/10 text-emerald-400 border border-emerald-500/20"
+                    : "text-neutral-400 hover:text-white hover:bg-[#121A15] border border-transparent"
                 }`}
               >
                 {link.label}
@@ -51,69 +239,84 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Actions */}
-          <div className="hidden md:flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="text-muted-foreground">
+          {/* Actions (Desktop) */}
+          <div className="hidden lg:flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white hover:bg-[#121A15] rounded-xl h-10 w-10 border border-transparent hover:border-neutral-800">
               <Search className="w-4 h-4" />
             </Button>
+            
             {user ? (
-              <>
+              <div className="flex items-center gap-2 border-r border-neutral-800/60 pr-3">
+                
                 {isAdmin && (
                   <Link to="/admin">
-                    <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                    <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-emerald-400 hover:bg-emerald-900/10 gap-1.5 rounded-xl h-10 font-bold border border-transparent hover:border-emerald-500/20 transition-all">
                       <LayoutDashboard className="w-4 h-4" />
                       لوحة التحكم
                     </Button>
                   </Link>
                 )}
+                
                 <Link to="/my-courses">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                  <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-emerald-400 hover:bg-emerald-900/10 gap-1.5 rounded-xl h-10 font-bold border border-transparent hover:border-emerald-500/20 transition-all">
                     <BookOpen className="w-4 h-4" />
                     كورساتي
                   </Button>
                 </Link>
+                
                 <Link to="/favorites">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                  <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-emerald-400 hover:bg-emerald-900/10 gap-1.5 rounded-xl h-10 font-bold border border-transparent hover:border-emerald-500/20 transition-all">
                     <Heart className="w-4 h-4" />
                     المفضلة
                   </Button>
                 </Link>
-                <Link to="/profile">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
-                    <User className="w-4 h-4" />
-                    {"حسابي"}
-                    {/* profile?.full_name || */}
-                  </Button>
-                </Link>
+                
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground"
+                  size="icon"
+                  className="text-neutral-400 hover:text-red-400 hover:bg-red-900/10 rounded-xl h-10 w-10 border border-transparent hover:border-red-500/20 transition-all ml-1"
                   onClick={() => signOut()}
+                  title="تسجيل الخروج"
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>
-              </>
+
+                {/* ========================================== */}
+                {/* User Avatar (Profile Link) */}
+                {/* ========================================== */}
+                <Link to="/profile" className="ml-2 group">
+                  <div className="w-10 h-10 rounded-full bg-[#121A15] flex items-center justify-center overflow-hidden border-2 border-neutral-800 group-hover:border-emerald-500/50 transition-colors shadow-sm">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-sm font-bold text-emerald-500">
+                        {getInitial()}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+
+              </div>
             ) : (
-              <>
+              <div className="flex items-center gap-3">
                 <Link to="/login">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    <LogIn className="w-4 h-4 ml-1" />
-                    دخول
+                  <Button variant="ghost" className="text-neutral-300 hover:text-white hover:bg-[#121A15] gap-2 rounded-xl h-11 px-5 font-bold transition-all">
+                    <LogIn className="w-4 h-4" />
+                    تسجيل الدخول
                   </Button>
                 </Link>
-                {/* <Link to="/register">
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link to="/register">
+                  <Button className="bg-emerald-600 hover:bg-emerald-500 text-white h-11 px-6 font-bold rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all">
                     إنشاء حساب
                   </Button>
-                </Link> */}
-              </>
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden text-foreground"
+            className="lg:hidden text-neutral-300 hover:text-white p-2"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -128,46 +331,101 @@ const Navbar = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden overflow-hidden bg-background/95 backdrop-blur-xl border-b border-border"
+            className="lg:hidden overflow-hidden bg-[#0a0f0c] border-b border-neutral-800/60 shadow-xl"
           >
-            <div className="px-4 py-4 space-y-2">
+            <div className="px-4 py-6 space-y-2">
+              
+              {/* User Info (Mobile Only) */}
+              {user && (
+                <div className="flex items-center gap-3 p-4 mb-4 rounded-xl bg-[#121A15] border border-neutral-800">
+                  <div className="w-12 h-12 rounded-full bg-[#0a0f0c] flex items-center justify-center overflow-hidden border border-neutral-700 shrink-0">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-base font-bold text-emerald-500">
+                        {getInitial()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-white text-sm truncate">{profile?.full_name || "مستخدم نبتة"}</span>
+                    <span className="text-xs text-neutral-400 truncate" dir="ltr">{user.email}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Links */}
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  className={`block px-5 py-4 rounded-xl text-sm font-bold transition-colors ${
                     location.pathname === link.path
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                      ? "bg-emerald-600/10 text-emerald-400 border border-emerald-500/20"
+                      : "text-neutral-400 hover:text-white hover:bg-[#121A15] border border-transparent"
                   }`}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="flex gap-2 pt-2">
+              
+              <div className="pt-4 mt-2 border-t border-neutral-800/60 flex flex-col gap-3">
                 {user ? (
                   <>
-                    <Link to="/profile" className="flex-1" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full border-border text-foreground">حسابي</Button>
+                    {isAdmin && (
+                       <Link to="/admin" onClick={() => setIsOpen(false)}>
+                         <Button variant="outline" className="w-full justify-start border-neutral-800 bg-[#121A15] text-neutral-300 hover:text-white h-12 rounded-xl font-bold gap-3">
+                           <LayoutDashboard className="w-4 h-4 text-emerald-500" />
+                           لوحة التحكم
+                         </Button>
+                       </Link>
+                    )}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link to="/my-courses" onClick={() => setIsOpen(false)}>
+                        <Button variant="outline" className="w-full border-neutral-800 bg-[#121A15] text-neutral-300 hover:text-white h-12 rounded-xl font-bold gap-2">
+                          <BookOpen className="w-4 h-4 text-emerald-500" />
+                          كورساتي
+                        </Button>
+                      </Link>
+                      <Link to="/favorites" onClick={() => setIsOpen(false)}>
+                        <Button variant="outline" className="w-full border-neutral-800 bg-[#121A15] text-neutral-300 hover:text-white h-12 rounded-xl font-bold gap-2">
+                          <Heart className="w-4 h-4 text-emerald-500" />
+                          المفضلة
+                        </Button>
+                      </Link>
+                    </div>
+                    
+                    <Link to="/profile" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-12 rounded-xl font-bold gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                        <User className="w-4 h-4" />
+                        إعدادات الحساب
+                      </Button>
                     </Link>
+
                     <Button
                       variant="outline"
-                      className="border-border text-foreground"
+                      className="w-full border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500/10 h-12 rounded-xl font-bold gap-2"
                       onClick={() => { signOut(); setIsOpen(false); }}
                     >
                       <LogOut className="w-4 h-4" />
+                      تسجيل الخروج
                     </Button>
                   </>
                 ) : (
-                  <>
-                    <Link to="/login" className="flex-1" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full border-border text-foreground">دخول</Button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link to="/login" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" className="w-full border-neutral-800 bg-[#121A15] text-neutral-300 hover:text-white h-12 rounded-xl font-bold gap-2">
+                        <LogIn className="w-4 h-4" />
+                        دخول
+                      </Button>
                     </Link>
-                    <Link to="/register" className="flex-1" onClick={() => setIsOpen(false)}>
-                      <Button className="w-full bg-primary text-primary-foreground">إنشاء حساب</Button>
+                    <Link to="/register" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-12 rounded-xl font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                        إنشاء حساب
+                      </Button>
                     </Link>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
