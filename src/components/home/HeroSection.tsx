@@ -702,10 +702,9 @@ const HeroDarkSection = () => {
   <Link to="/register">
     <Button 
       size="lg" 
-      // شيلنا variant="outline" عشان نتحكم في الألوان براحتنا
-      className="group w-full sm:w-auto bg-white text-neutral-900 hover:bg-emerald-600 hover:text-white px-8 h-14 text-base font-bold transition-all duration-300 border-none shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+      variant="outline" 
+      className="group w-full sm:w-auto bg-white hover:bg-emerald-600 text-black hover:text-white border-transparent hover:border-emerald-500 px-8 h-14 text-base font-bold transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
     >
-      {/* ضفنا تأثير بسيط للأيقونة عشان تكبر شوية مع الـ Hover */}
       <Play className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:scale-110" />
       انشئ حسابك مجانا
     </Button>
