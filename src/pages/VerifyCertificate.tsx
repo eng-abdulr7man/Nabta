@@ -40,64 +40,64 @@ const VerifyCertificate = () => {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fcfcf9] dark:bg-[#050505] px-4 font-tajawal">
-      {/* خلفية هادية جداً */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
+    <div className="min-h-screen flex items-center justify-center bg-[#050806] px-4 font-tajawal relative overflow-hidden">
+      {/* تأثير إضاءة خلفي خفيف جداً */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-900/10 blur-[120px] rounded-full pointer-events-none" />
 
       <motion.div 
-        initial={{ opacity: 0, y: 10 }} 
-        animate={{ opacity: 1, y: 0 }} 
+        initial={{ opacity: 0, scale: 0.98 }} 
+        animate={{ opacity: 1, scale: 1 }} 
         className="w-full max-w-2xl z-10"
       >
-        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm">
+        <div className="bg-[#0a0f0c] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl shadow-black">
           
-          {/* Header Bar */}
-          <div className="h-2 bg-emerald-600 w-full" />
+          {/* خط التزيين العلوي الأخضر */}
+          <div className="h-1.5 bg-gradient-to-r from-emerald-900 via-emerald-500 to-emerald-900 w-full" />
           
           <div className="p-8 lg:p-12">
-            {/* Branding */}
-            <div className="flex justify-between items-start mb-12">
+            {/* Branding Section */}
+            <div className="flex justify-between items-center mb-12">
               <div className="text-right">
-                <h1 className="text-2xl font-black text-neutral-900 dark:text-white">توثيق الشهادات</h1>
-                <p className="text-neutral-500 text-sm tracking-tight">أكاديمية نبتة التعليمية</p>
+                <h1 className="text-2xl font-black text-white">توثيق الشهادات</h1>
+                <p className="text-emerald-500/60 text-xs font-bold tracking-widest uppercase mt-1">Nabta Smart Verification</p>
               </div>
-              <div className="w-12 h-12 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-xl flex items-center justify-center border border-emerald-100 dark:border-emerald-500/20">
-                <Award className="w-6 h-6 text-emerald-600" />
+              <div className="w-14 h-14 bg-emerald-500/5 rounded-2xl flex items-center justify-center border border-emerald-500/10 shadow-inner">
+                <Award className="w-7 h-7 text-emerald-500" />
               </div>
             </div>
 
             {isLoading ? (
-              <div className="py-20 text-center space-y-4">
-                <div className="w-10 h-10 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-neutral-400 text-sm">جاري الاستعلام عن الرقم التسلسلي...</p>
+              <div className="py-24 text-center">
+                <div className="w-12 h-12 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-neutral-500 text-sm animate-pulse">جاري فحص قاعدة البيانات الرقمية...</p>
               </div>
             ) : data ? (
               <div className="space-y-10">
                 
-                {/* Success Indicator */}
-                <div className="flex items-center gap-4 p-4 bg-emerald-50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/10">
-                  <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/20">
-                    <ShieldCheck className="w-5 h-5 text-white" />
+                {/* Status Indicator - Dark Style */}
+                <div className="flex items-center gap-5 p-5 bg-white/[0.02] rounded-2xl border border-white/[0.05]">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                    <ShieldCheck className="w-6 h-6 text-[#050806]" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-emerald-900 dark:text-emerald-400">مستند رسمي معتمد</h3>
-                    <p className="text-xs text-emerald-700/70 dark:text-emerald-500/50">تمت مطابقة البيانات بنجاح مع قاعدة بياناتنا</p>
+                    <h3 className="font-bold text-white text-lg">مستند رسمي معتمد</h3>
+                    <p className="text-sm text-neutral-500">تم التحقق من ملكية الشهادة وصحة البيانات</p>
                   </div>
                 </div>
 
-                {/* Data Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                  <DetailItem icon={<User size={16}/>} label="اسم الخريج" value={data.full_name} />
-                  <DetailItem icon={<BookOpen size={16}/>} label="الدورة التدريبية" value={data.course_title} />
-                  <DetailItem icon={<Fingerprint size={16}/>} label="رقم التوثيق" value={data.certificate_number} isMono />
-                  <DetailItem icon={<Calendar size={16}/>} label="تاريخ الإصدار" value={new Date(data.issued_at).toLocaleDateString("ar-EG", {day:'numeric', month:'long', year:'numeric'})} />
+                {/* Grid Data */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                  <DetailItem icon={<User size={18}/>} label="اسم الخريج" value={data.full_name} />
+                  <DetailItem icon={<BookOpen size={18}/>} label="الدورة التدريبية" value={data.course_title} />
+                  <DetailItem icon={<Fingerprint size={18}/>} label="رقم التوثيق" value={data.certificate_number} isMono />
+                  <DetailItem icon={<Calendar size={18}/>} label="تاريخ الإصدار" value={new Date(data.issued_at).toLocaleDateString("ar-EG", {day:'numeric', month:'long', year:'numeric'})} />
                 </div>
 
-                {/* Footer Action */}
-                <div className="pt-8 border-t border-neutral-100 dark:border-neutral-900 flex flex-col sm:flex-row items-center justify-between gap-6">
+                {/* Action Bar */}
+                <div className="pt-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-8">
                    <div className="text-right">
-                      <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1 font-bold">Verification Secure Link</p>
-                      <p className="text-xs text-neutral-500 font-mono">nabta.vercel.app/verify/{data.certificate_number}</p>
+                      <p className="text-[10px] text-emerald-500/50 uppercase tracking-[0.2em] mb-1 font-black">Digital Signature Link</p>
+                      <p className="text-xs text-neutral-400 font-mono opacity-80">nabta.vercel.app/verify/{data.certificate_number}</p>
                    </div>
                    <Button 
                     onClick={() => downloadCertificatePDF({
@@ -107,29 +107,33 @@ const VerifyCertificate = () => {
                       issuedAt: data.issued_at,
                       instructor: data.instructor,
                     })}
-                    className="bg-neutral-900 dark:bg-white text-white dark:text-black hover:opacity-90 rounded-full px-8 h-12 font-bold transition-all shadow-xl shadow-neutral-900/10"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl px-10 h-14 font-bold transition-all shadow-xl shadow-emerald-900/20 group w-full sm:w-auto"
                    >
-                    <Download className="w-4 h-4 ml-2" />
+                    <Download className="w-5 h-5 ml-2 group-hover:translate-y-0.5 transition-transform" />
                     تحميل الشهادة
                    </Button>
                 </div>
 
               </div>
             ) : (
-              <div className="py-12 text-center">
-                <div className="w-16 h-16 bg-red-50 dark:bg-red-500/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <XCircle className="w-8 h-8 text-red-500" />
+              <div className="py-16 text-center space-y-6">
+                <div className="w-20 h-20 bg-red-500/5 rounded-full flex items-center justify-center mx-auto border border-red-500/10">
+                  <XCircle className="w-10 h-10 text-red-500" />
                 </div>
-                <h2 className="text-xl font-bold text-neutral-900 dark:text-white">الشهادة غير صالحة</h2>
-                <p className="text-neutral-500 text-sm mt-2 max-w-[250px] mx-auto">لم يتم العثور على أي سجلات مطابقة لهذا الرقم في منظومتنا.</p>
-                <Button variant="link" className="mt-6 text-emerald-600" onClick={() => window.location.href = '/'}>العودة للرئيسية</Button>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">الشهادة غير صالحة</h2>
+                  <p className="text-neutral-500 mt-2 max-w-[300px] mx-auto text-sm leading-relaxed">
+                    لم يتم العثور على سجلات مطابقة. يرجى التأكد من أنك قمت بنسخ الرابط بشكل صحيح.
+                  </p>
+                </div>
+                <Button variant="ghost" className="text-emerald-500 hover:bg-emerald-500/5" onClick={() => window.location.href = '/'}>العودة للرئيسية</Button>
               </div>
             )}
           </div>
         </div>
 
-        <p className="text-center mt-8 text-neutral-400 text-[11px] uppercase tracking-[0.2em]">
-          &copy; 2026 Nabta Agricultural Academy - Secure Verification System
+        <p className="text-center mt-10 text-neutral-600 text-[10px] uppercase tracking-[0.3em] font-medium">
+          &copy; 2026 Nabta Academy &bull; Secure Verification Infrastructure
         </p>
       </motion.div>
     </div>
@@ -137,12 +141,12 @@ const VerifyCertificate = () => {
 };
 
 const DetailItem = ({ icon, label, value, isMono = false }: { icon: any, label: string, value: string, isMono?: boolean }) => (
-  <div className="space-y-2 text-right">
-    <div className="flex items-center justify-start gap-2 text-neutral-400">
-      <span className="opacity-60">{icon}</span>
-      <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+  <div className="space-y-3 text-right group">
+    <div className="flex items-center justify-start gap-2.5 text-neutral-500 group-hover:text-emerald-500 transition-colors">
+      <span className="opacity-70">{icon}</span>
+      <span className="text-[10px] font-black uppercase tracking-[0.15em]">{label}</span>
     </div>
-    <p className={`text-neutral-900 dark:text-neutral-200 font-bold text-base ${isMono ? 'font-mono tracking-tighter' : ''}`}>
+    <p className={`text-neutral-200 font-bold text-lg leading-tight ${isMono ? 'font-mono tracking-tighter text-emerald-500/90' : ''}`}>
       {value}
     </p>
   </div>
