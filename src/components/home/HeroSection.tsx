@@ -509,9 +509,19 @@ import heroBg from "@/assets/hero-bg.jpg";
 const specialties = [
   "الزراعة الحديثة",
   "الزراعة المائية",
-  "اللاندسكيب",
   "الزراعة العضوية",
-  "تغذية النبات"
+  "تنسيق الحدائق (اللاندسكيب)",
+  "تغذية النباتات",
+  "وقاية النبات",
+  "إنتاج المحاصيل",
+  "الإنتاج الحيواني",
+  "الإنتاج الداجني",
+  "علوم التربة",
+  "الهندسة الزراعية",
+  "البيوت المحمية",
+  "إدارة المزارع",
+  "الري والصرف",
+  "التكنولوجيا الزراعية"
 ];
 
 const HeroDarkSection = () => {
@@ -530,7 +540,7 @@ const HeroDarkSection = () => {
   // 2. التحكم في ظهور النافذة المنبثقة بناءً على الـ Local Storage
   useEffect(() => {
     const popupClosedTime = localStorage.getItem("agriPopupClosed");
-    const waitTime = 3 * 24 * 60 * 60 * 1000; // 3 أيام
+    const waitTime = 1 * 24 * 60 * 60 * 1000; // 3 أيام
     
     let shouldShow = true;
 
@@ -590,12 +600,12 @@ const HeroDarkSection = () => {
                 
                 <h3 className="text-2xl font-bold text-white tracking-tight">انضم لمجتمعنا الزراعي!</h3>
                 <p className="text-neutral-400 text-sm leading-relaxed mb-6">
-                  لا تفوت أحدث الكورسات، النصائح الزراعية، والنقاشات المفيدة. انضم لآلاف المهندسين والمهتمين بالمجال الآن مجاناً.
+                  لا تفوت أحدث الكورسات، النصائح الزراعية، والنقاشات المفيدة. انضم لآلاف المهندسين والمهتمين بالمجال الآن مجاناً لمعرفة جميع تحديثات المنصه.
                 </p>
 
                 <div className="space-y-3 pt-4">
                   <a 
-                    href="#" 
+                    href="https://chat.whatsapp.com/Ifb8sOwZiGr4cYcDfvqEIx?mode=hq2tcla" 
                     onClick={handleClosePopup}
                     target="_blank" 
                     rel="noopener noreferrer" 
@@ -605,7 +615,7 @@ const HeroDarkSection = () => {
                     جروب الواتساب
                   </a>
                   <a 
-                    href="#" 
+                    href="https://t.me/NabtaUpdates" 
                     onClick={handleClosePopup}
                     target="_blank" 
                     rel="noopener noreferrer" 
@@ -689,14 +699,18 @@ const HeroDarkSection = () => {
                 </Link>
                 
                 {!user && (
-                  <Link to="/register">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-800 hover:border-neutral-600 px-8 h-14 text-base font-medium transition-all bg-transparent">
-                      <Play className="w-4 h-4 ml-2" />
-                      شاهد كيف نعمل
-                    </Button>
-                  </Link>
-                )}
-              </motion.div>
+  <Link to="/register">
+    <Button 
+      size="lg" 
+      // شيلنا variant="outline" عشان نتحكم في الألوان براحتنا
+      className="group w-full sm:w-auto bg-white text-neutral-900 hover:bg-emerald-600 hover:text-white px-8 h-14 text-base font-bold transition-all duration-300 border-none shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+    >
+      {/* ضفنا تأثير بسيط للأيقونة عشان تكبر شوية مع الـ Hover */}
+      <Play className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:scale-110" />
+      انشئ حسابك مجانا
+    </Button>
+  </Link>
+)}
 
               <motion.div 
                 initial={{ opacity: 0 }}
