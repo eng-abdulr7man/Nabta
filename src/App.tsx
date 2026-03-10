@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
 
 const CoursesPage = lazy(() => import("./pages/CoursesPage"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
