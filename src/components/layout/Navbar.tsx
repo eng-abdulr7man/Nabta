@@ -948,6 +948,192 @@
 // export default Navbar;
 
 //v5
+// import { Link, useLocation, useNavigate } from "react-router-dom";
+// import { useState, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { Menu, X, Sprout, LogIn, Search, LogOut, LayoutDashboard, BookOpen, Heart, User } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useAuth } from "@/contexts/AuthContext";
+
+// const navLinks = [
+//   { label: "الرئيسية", path: "/" },
+//   { label: "الكورسات", path: "/courses" },
+//   { label: "التخصصات", path: "/specializations" },
+//   { label: "تواصل معنا", path: "/contact" },
+// ];
+
+// const Navbar = () => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [isSearchOpen, setIsSearchOpen] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const { user, profile, signOut, isAdmin } = useAuth();
+
+//   // منع السكرول عند فتح المنيو
+//   useEffect(() => {
+//     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+//   }, [isOpen]);
+
+//   const handleSearch = (e: React.FormEvent) => {
+//     e.preventDefault();
+//     if (searchQuery.trim()) {
+//       navigate(`/courses?q=${encodeURIComponent(searchQuery)}`);
+//       setSearchQuery("");
+//       setIsSearchOpen(false);
+//       setIsOpen(false);
+//     }
+//   };
+
+//   const getInitial = () => {
+//     if (profile?.full_name) return profile.full_name.charAt(0);
+//     if (user?.email) return user.email.charAt(0).toUpperCase();
+//     return "U";
+//   };
+
+//   return (
+//     <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806]/90 backdrop-blur-xl border-b border-neutral-800/60 font-tajawal h-20 flex items-center">
+//       <div className="container mx-auto px-4">
+//         <div className="flex items-center justify-between h-full">
+          
+//           {/* الـ Logo مع الاسم - ثابت ومبيختفيش */}
+//           <Link to="/" className="flex items-center gap-3 shrink-0 z-[110]">
+//             <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shadow-emerald-500/5 shadow-lg">
+//               <Sprout className="w-5 h-5 text-emerald-500" />
+//             </div>
+//             <span style={{ fontFamily: "Amiri, serif", fontSize: "28px" }} className="text-white mt-1">
+//               نـَـبْـتـَـة
+//             </span>
+//           </Link>
+
+//           {/* روابط الكمبيوتر */}
+//           <div className="hidden lg:flex items-center gap-1">
+//             {navLinks.map((link) => (
+//               <Link
+//                 key={link.path}
+//                 to={link.path}
+//                 className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+//                   location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400" : "text-neutral-400 hover:text-white"
+//                 }`}
+//               >
+//                 {link.label}
+//               </Link>
+//             ))}
+//           </div>
+
+//           {/* الأكشنز (بحث + بروفايل) */}
+//           <div className="flex items-center gap-2 lg:gap-3">
+//              {/* البحث في الكمبيوتر */}
+//              <div className="hidden sm:flex items-center relative mr-2">
+//                 <motion.div
+//                   animate={{ width: isSearchOpen ? 220 : 40 }}
+//                   className="flex items-center h-10 rounded-xl bg-[#121A15] border border-neutral-800 overflow-hidden"
+//                 >
+//                   <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="w-10 h-10 shrink-0 flex items-center justify-center text-neutral-400">
+//                     <Search className="w-4 h-4" />
+//                   </button>
+//                   <form onSubmit={handleSearch} className="flex-1 pr-2">
+//                     <input
+//                       type="text"
+//                       placeholder="ابحث..."
+//                       value={searchQuery}
+//                       onChange={(e) => setSearchQuery(e.target.value)}
+//                       className="w-full bg-transparent border-none text-white text-xs focus:outline-none"
+//                     />
+//                   </form>
+//                 </motion.div>
+//              </div>
+
+//             {user ? (
+//               <div className="flex items-center gap-3">
+//                 <Link to="/profile">
+//                   <div className="w-10 h-10 rounded-full bg-emerald-500/10 border-2 border-neutral-800 flex items-center justify-center overflow-hidden hover:border-emerald-500/50 transition-all shadow-lg">
+//                     {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
+//                   </div>
+//                 </Link>
+//                 <Button variant="ghost" size="icon" onClick={() => signOut()} className="hidden sm:flex text-neutral-500 hover:text-red-400"><LogOut className="w-4 h-4" /></Button>
+//               </div>
+//             ) : (
+//               <Link to="/login" className="hidden sm:block"><Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl px-6 font-bold h-10">دخول</Button></Link>
+//             )}
+
+//             {/* زرار المنيو للموبايل */}
+//             <button className="lg:hidden p-2 text-neutral-400 z-[110]" onClick={() => setIsOpen(!isOpen)}>
+//               {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* سلايدر الموبايل المحسن */}
+//       <AnimatePresence>
+//         {isOpen && (
+//           <motion.div
+//             initial={{ opacity: 0, y: -20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             exit={{ opacity: 0, y: -20 }}
+//             className="fixed inset-0 top-0 z-[100] bg-[#050806] lg:hidden flex flex-col pt-24 p-6"
+//           >
+//             {/* البحث في الموبايل */}
+//             <form onSubmit={handleSearch} className="relative mb-8">
+//               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+//               <input
+//                 type="text"
+//                 placeholder="ابحث عن كورس..."
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 className="w-full h-14 pr-12 pl-4 rounded-2xl bg-[#121A15] border border-neutral-800 text-white outline-none focus:border-emerald-500/50"
+//               />
+//             </form>
+
+//             <div className="flex flex-col gap-4">
+//               {navLinks.map((link) => (
+//                 <Link
+//                   key={link.path}
+//                   to={link.path}
+//                   onClick={() => setIsOpen(false)}
+//                   className={`p-4 rounded-2xl text-xl font-bold transition-all ${
+//                     location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400 border border-emerald-500/20" : "text-neutral-300"
+//                   }`}
+//                 >
+//                   {link.label}
+//                 </Link>
+//               ))}
+//             </div>
+
+//             <div className="mt-auto pb-10 space-y-4">
+//               {user ? (
+//                 <div className="p-4 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-between">
+//                   <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
+//                     <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center overflow-hidden">
+//                       {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
+//                     </div>
+//                     <div>
+//                       <p className="font-bold text-white text-sm">{profile?.full_name || "مستخدم نبتة"}</p>
+//                       <p className="text-xs text-neutral-500 truncate max-w-[150px]">{user.email}</p>
+//                     </div>
+//                   </Link>
+//                   <button onClick={() => { signOut(); setIsOpen(false); }} className="p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors">
+//                     <LogOut className="w-5 h-5" />
+//                   </button>
+//                 </div>
+//               ) : (
+//                 <div className="grid grid-cols-2 gap-4">
+//                   <Link to="/login" onClick={() => setIsOpen(false)}><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-800 text-white">دخول</Button></Link>
+//                   <Link to="/register" onClick={() => setIsOpen(false)}><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white">حساب جديد</Button></Link>
+//                 </div>
+//               )}
+//             </div>
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+//     </nav>
+//   );
+// };
+
+// export default Navbar;
+
+//v5
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -970,7 +1156,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, isAdmin } = useAuth();
 
-  // منع السكرول عند فتح المنيو
+  // منع السكرول عند فتح المنيو لضمان الثبات
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
   }, [isOpen]);
@@ -992,28 +1178,28 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806]/90 backdrop-blur-xl border-b border-neutral-800/60 font-tajawal h-20 flex items-center">
+    <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806] border-b border-neutral-800 font-tajawal h-20 flex items-center">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-full">
           
-          {/* الـ Logo مع الاسم - ثابت ومبيختفيش */}
+          {/* الـ Logo ثابت وواضح */}
           <Link to="/" className="flex items-center gap-3 shrink-0 z-[110]">
-            <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shadow-emerald-500/5 shadow-lg">
+            <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shadow-emerald-500/10 shadow-lg">
               <Sprout className="w-5 h-5 text-emerald-500" />
             </div>
-            <span style={{ fontFamily: "Amiri, serif", fontSize: "28px" }} className="text-white mt-1">
+            <span style={{ fontFamily: "Amiri, serif", fontSize: "28px" }} className="text-white font-bold mt-1">
               نـَـبْـتـَـة
             </span>
           </Link>
 
-          {/* روابط الكمبيوتر */}
+          {/* روابط الـ Desktop */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                  location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400" : "text-neutral-400 hover:text-white"
+                  location.pathname === link.path ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30" : "text-neutral-300 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -1021,7 +1207,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* الأكشنز (بحث + بروفايل) */}
+          {/* الأكشنز */}
           <div className="flex items-center gap-2 lg:gap-3">
              {/* البحث في الكمبيوتر */}
              <div className="hidden sm:flex items-center relative mr-2">
@@ -1029,7 +1215,7 @@ const Navbar = () => {
                   animate={{ width: isSearchOpen ? 220 : 40 }}
                   className="flex items-center h-10 rounded-xl bg-[#121A15] border border-neutral-800 overflow-hidden"
                 >
-                  <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="w-10 h-10 shrink-0 flex items-center justify-center text-neutral-400">
+                  <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="w-10 h-10 shrink-0 flex items-center justify-center text-neutral-400 hover:text-white">
                     <Search className="w-4 h-4" />
                   </button>
                   <form onSubmit={handleSearch} className="flex-1 pr-2">
@@ -1038,7 +1224,7 @@ const Navbar = () => {
                       placeholder="ابحث..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-transparent border-none text-white text-xs focus:outline-none"
+                      className="w-full bg-transparent border-none text-white text-xs focus:outline-none placeholder:text-neutral-600"
                     />
                   </form>
                 </motion.div>
@@ -1047,53 +1233,59 @@ const Navbar = () => {
             {user ? (
               <div className="flex items-center gap-3">
                 <Link to="/profile">
-                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 border-2 border-neutral-800 flex items-center justify-center overflow-hidden hover:border-emerald-500/50 transition-all shadow-lg">
+                  <div className="w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 flex items-center justify-center overflow-hidden hover:border-emerald-500 transition-all shadow-lg">
                     {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
                   </div>
                 </Link>
-                <Button variant="ghost" size="icon" onClick={() => signOut()} className="hidden sm:flex text-neutral-500 hover:text-red-400"><LogOut className="w-4 h-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => signOut()} className="hidden sm:flex text-neutral-400 hover:text-red-500 hover:bg-red-500/10"><LogOut className="w-4 h-4" /></Button>
               </div>
             ) : (
-              <Link to="/login" className="hidden sm:block"><Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl px-6 font-bold h-10">دخول</Button></Link>
+              <Link to="/login" className="hidden sm:block">
+                <Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl px-6 font-bold h-10 shadow-lg shadow-emerald-900/20">دخول</Button>
+              </Link>
             )}
 
-            {/* زرار المنيو للموبايل */}
-            <button className="lg:hidden p-2 text-neutral-400 z-[110]" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            {/* زرار المنيو - واضح جداً */}
+            <button className="lg:hidden p-2 text-white z-[110]" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* سلايدر الموبايل المحسن */}
+      {/* سلايدر الموبايل (أسود معتم بالكامل) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 top-0 z-[100] bg-[#050806] lg:hidden flex flex-col pt-24 p-6"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[100] bg-[#050806] lg:hidden flex flex-col pt-24 p-6 overflow-y-auto"
           >
-            {/* البحث في الموبايل */}
-            <form onSubmit={handleSearch} className="relative mb-8">
-              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+            {/* شريط البحث في الموبايل - تباين عالي */}
+            <form onSubmit={handleSearch} className="relative mb-10">
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
               <input
                 type="text"
                 placeholder="ابحث عن كورس..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-14 pr-12 pl-4 rounded-2xl bg-[#121A15] border border-neutral-800 text-white outline-none focus:border-emerald-500/50"
+                className="w-full h-14 pr-12 pl-4 rounded-2xl bg-[#0a0f0c] border border-neutral-700 text-white text-lg outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 shadow-xl"
               />
             </form>
 
-            <div className="flex flex-col gap-4">
+            {/* الروابط بنصوص بيضاء واضحة */}
+            <div className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`p-4 rounded-2xl text-xl font-bold transition-all ${
-                    location.pathname === link.path ? "bg-emerald-600/10 text-emerald-400 border border-emerald-500/20" : "text-neutral-300"
+                  className={`p-5 rounded-2xl text-xl font-bold transition-all border ${
+                    location.pathname === link.path 
+                    ? "bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-900/20" 
+                    : "bg-[#0a0f0c] text-neutral-200 border-neutral-800 hover:bg-[#121A15] hover:text-white"
                   }`}
                 >
                   {link.label}
@@ -1101,26 +1293,37 @@ const Navbar = () => {
               ))}
             </div>
 
-            <div className="mt-auto pb-10 space-y-4">
+            {/* الجزء السفلي - البروفايل أو الدخول */}
+            <div className="mt-auto pt-10 pb-6 space-y-4">
               {user ? (
-                <div className="p-4 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-between">
-                  <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center overflow-hidden">
-                      {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
-                    </div>
-                    <div>
-                      <p className="font-bold text-white text-sm">{profile?.full_name || "مستخدم نبتة"}</p>
-                      <p className="text-xs text-neutral-500 truncate max-w-[150px]">{user.email}</p>
-                    </div>
-                  </Link>
-                  <button onClick={() => { signOut(); setIsOpen(false); }} className="p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors">
-                    <LogOut className="w-5 h-5" />
-                  </button>
+                <div className="p-5 rounded-3xl bg-[#0a0f0c] border border-neutral-800 shadow-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center overflow-hidden shadow-inner">
+                        {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 text-xl font-bold">{getInitial()}</span>}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-white text-lg truncate">{profile?.full_name || "مستخدم نبتة"}</p>
+                        <p className="text-sm text-neutral-500 truncate max-w-[180px]">{user.email}</p>
+                      </div>
+                    </Link>
+                  </div>
+                  <Button 
+                    onClick={() => { signOut(); setIsOpen(false); }} 
+                    variant="outline" 
+                    className="w-full h-14 rounded-2xl border-red-500/30 bg-red-500/5 text-red-500 font-bold hover:bg-red-500 hover:text-white transition-all gap-2"
+                  >
+                    <LogOut className="w-5 h-5" /> تسجيل الخروج
+                  </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <Link to="/login" onClick={() => setIsOpen(false)}><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-800 text-white">دخول</Button></Link>
-                  <Link to="/register" onClick={() => setIsOpen(false)}><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white">حساب جديد</Button></Link>
+                <div className="grid grid-cols-1 gap-4">
+                  <Link to="/login" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-700 bg-transparent text-white text-lg font-bold">دخول</Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-bold shadow-lg shadow-emerald-900/20">حساب جديد</Button>
+                  </Link>
                 </div>
               )}
             </div>
