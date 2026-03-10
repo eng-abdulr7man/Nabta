@@ -20,6 +20,7 @@ export default {
     extend: {
       fontFamily: {
         tajawal: ["Tajawal", "sans-serif"],
+        animation: { shine: 'shine 1.5s ease-in-out infinite' }, keyframes: { shine: { '100%': { left: '125%' } } }
       },
       colors: {
         border: "hsl(var(--border))",
