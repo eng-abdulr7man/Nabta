@@ -36,6 +36,7 @@ const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
 const AdminSpecializations = lazy(() => import("./pages/admin/AdminSpecializations"));
 const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
 const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
+const AdminArticles = lazy(() => import("./pages/admin/AdminArticles"));
 
 // Support pages
 const FAQPage = lazy(() => import("./pages/FAQPage"));
@@ -92,6 +93,7 @@ const App = () => (
               <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/messages" element={<ProtectedRoute adminOnly><AdminMessages /></ProtectedRoute>} />
               <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
+              <Route path="/admin/articles" element={<ProtectedRoute adminOnly><AdminArticles /></ProtectedRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
