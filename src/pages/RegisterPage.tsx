@@ -200,7 +200,7 @@ const RegisterPage = () => {
     } else {
       toast({
         title: "تم إنشاء الحساب بنجاح",
-        description: "تم انشاء الحساب بنجاح قم بتسجيل الدخول الان ل",
+        description: "تم انشاء الحساب بنجاح قم بتسجيل الدخول الان !",
       });
       navigate("/login");
     }
