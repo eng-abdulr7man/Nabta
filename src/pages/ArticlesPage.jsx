@@ -21,7 +21,9 @@ const categories = [
 const ArticlesPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  
+  // ضفنا الـ profile هنا عشان لو صلاحيات الأدمن متسجلة جواه
+  const { user, profile } = useAuth(); 
   const { toast } = useToast();
 
   const queryQ = searchParams.get("q") || "";
@@ -33,15 +35,20 @@ const ArticlesPage = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // حالات نافذة إضافة مقال (للمشرف فقط)
+  // حالات نافذة إضافة مقال
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState("account");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // التحقق من أن المستخدم هو الإدمن (استخدمنا includes لتفادي أي مسافات مخفية)
-  const isAdmin = user?.email?.toLowerCase().includes("wwwbgaro59@gmail.com");
+  // الشرط الشامل: لو الإيميل هو المحدد، أو لو حسابه واخد صلاحية "أدمن" بأي شكل في الداتا بيز
+  const isAdmin = 
+    user?.email?.toLowerCase().includes("wwwbgaro59@gmail.com") || 
+    profile?.role === "admin" ||
+    profile?.is_admin === true ||
+    user?.user_metadata?.role === "admin" ||
+    user?.role === "admin";
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -76,7 +83,7 @@ const ArticlesPage = () => {
       setShowAddModal(false);
       setNewTitle("");
       setNewContent("");
-      fetchArticles(); // تحديث القائمة
+      fetchArticles();
     }
   };
 
@@ -89,7 +96,6 @@ const ArticlesPage = () => {
     }
   };
 
-  // فلترة المقالات حسب البحث والتصنيف
   const filteredArticles = articles.filter((article) => {
     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           article.content.toLowerCase().includes(searchQuery.toLowerCase());
@@ -102,10 +108,8 @@ const ArticlesPage = () => {
       <Navbar />
 
       <main className="flex-1 pt-28 pb-16 container mx-auto px-4 lg:px-8 max-w-5xl relative">
-        {/* خلفية ضوئية */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
 
-        {/* الترويسة وأدوات البحث */}
         <div className="relative z-10 mb-12 space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -124,7 +128,6 @@ const ArticlesPage = () => {
             )}
           </div>
 
-          {/* شريط البحث */}
           <div className="relative">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
             <input
@@ -136,7 +139,6 @@ const ArticlesPage = () => {
             />
           </div>
           
-          {/* أزرار التصنيفات */}
           <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
             {categories.map((cat) => (
               <button
@@ -154,7 +156,6 @@ const ArticlesPage = () => {
           </div>
         </div>
 
-        {/* قائمة المقالات */}
         <div className="relative z-10 space-y-4">
           {isLoading ? (
             <div className="text-center py-20 text-emerald-500 animate-pulse font-bold">جاري تحميل المقالات...</div>
@@ -212,7 +213,6 @@ const ArticlesPage = () => {
         </div>
       </main>
 
-      {/* نافذة إضافة مقال (للمدير فقط) */}
       {isAdmin && showAddModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div 
