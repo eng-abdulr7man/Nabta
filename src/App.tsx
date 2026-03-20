@@ -11,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import SupportPage from "./pages/Support"; // أو المسار الصحيح اللي إنت حافظ فيه الملف
 
+// استدعاء صفحة المقالات بالـ Lazy Load
+const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
+
 const CoursesPage = lazy(() => import("./pages/CoursesPage"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const SpecializationsPage = lazy(() => import("./pages/SpecializationsPage"));
@@ -79,6 +82,8 @@ const App = () => (
               <Route path="/help" element={<HelpPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/support" element={<SupportPage />} />
+              <Route path="/articles" element={<ArticlesPage />} />
+              
               {/* Admin */}
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />
