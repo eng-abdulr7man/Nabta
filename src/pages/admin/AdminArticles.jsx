@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Trash2, ArrowRight, FileText } from "lucide-react";
+import { Plus, Trash2, ArrowRight, FileText, Edit3 } from "lucide-react"; // ضفنا Edit3
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -11,8 +11,12 @@ const AdminArticles = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // حالات نافذة الإضافة
-  const [showAddModal, setShowAddModal] = useState(false);
+  // حالات النافذة المنبثقة (Modal)
+  const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentArticleId, setCurrentArticleId] = useState(null);
+
+  // بيانات النموذج (Form)
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState("account");
@@ -29,27 +33,60 @@ const AdminArticles = () => {
     setIsLoading(false);
   };
 
-  const handleAddArticle = async (e) => {
+  // فتح النافذة للإضافة
+  const openAddModal = () => {
+    setIsEditing(false);
+    setNewTitle("");
+    setNewContent("");
+    setNewCategory("account");
+    setShowModal(true);
+  };
+
+  // فتح النافذة للتعديل
+  const openEditModal = (article) => {
+    setIsEditing(true);
+    setCurrentArticleId(article.id);
+    setNewTitle(article.title);
+    setNewContent(article.content);
+    setNewCategory(article.category);
+    setShowModal(true);
+  };
+
+  const handleSaveArticle = async (e) => {
     e.preventDefault();
     if (!newTitle.trim() || !newContent.trim()) {
       toast({ title: "خطأ", description: "يرجى ملء جميع الحقول", variant: "destructive" });
       return;
     }
     setIsSubmitting(true);
-    const { error } = await supabase.from("help_articles").insert({
+
+    const articleData = {
       title: newTitle,
       content: newContent,
       category: newCategory,
-    });
+    };
+
+    let error;
+    if (isEditing) {
+      // عملية التعديل
+      const result = await supabase
+        .from("help_articles")
+        .update(articleData)
+        .eq("id", currentArticleId);
+      error = result.error;
+    } else {
+      // عملية الإضافة الجديدة
+      const result = await supabase.from("help_articles").insert(articleData);
+      error = result.error;
+    }
+
     setIsSubmitting(false);
 
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "نجاح", description: "تم نشر المقال بنجاح!" });
-      setShowAddModal(false);
-      setNewTitle("");
-      setNewContent("");
+      toast({ title: "نجاح", description: isEditing ? "تم تحديث المقال بنجاح!" : "تم نشر المقال بنجاح!" });
+      setShowModal(false);
       fetchArticles();
     }
   };
@@ -58,7 +95,7 @@ const AdminArticles = () => {
     if (!window.confirm("هل أنت متأكد من حذف هذا المقال نهائياً؟")) return;
     const { error } = await supabase.from("help_articles").delete().eq("id", id);
     if (!error) {
-      toast({ title: "تم الحذف", description: "تم مسح المقال." });
+      toast({ title: "تم الحذف", description: "تم مسح المقال بنجاح." });
       setArticles(articles.filter((a) => a.id !== id));
     }
   };
@@ -74,13 +111,12 @@ const AdminArticles = () => {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">إدارة مقالات المساعدة</h1>
-              <p className="text-neutral-400 mt-1">أضف، عدل، أو احذف مقالات مركز المعرفة.</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">إدارة المقالات</h1>
             </div>
           </div>
           
           <Button 
-            onClick={() => setShowAddModal(true)}
+            onClick={openAddModal}
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl h-11 px-6 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
           >
             <Plus className="w-5 h-5 ml-2" />
@@ -88,47 +124,57 @@ const AdminArticles = () => {
           </Button>
         </div>
 
-        {/* جدول المقالات */}
+        {/* الجدول */}
         <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl overflow-hidden">
           {isLoading ? (
-            <div className="p-10 text-center text-emerald-500 animate-pulse">جاري التحميل...</div>
+            <div className="p-10 text-center text-emerald-500 animate-pulse font-bold">جاري تحميل البيانات...</div>
           ) : articles.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="w-full text-right">
+              <table className="w-full text-right border-collapse">
                 <thead className="bg-[#121A15] border-b border-neutral-800">
                   <tr>
-                    <th className="px-6 py-4 text-sm font-bold text-neutral-300">عنوان المقال</th>
+                    <th className="px-6 py-4 text-sm font-bold text-neutral-300">المقال</th>
                     <th className="px-6 py-4 text-sm font-bold text-neutral-300">التصنيف</th>
-                    <th className="px-6 py-4 text-sm font-bold text-neutral-300">تاريخ النشر</th>
                     <th className="px-6 py-4 text-sm font-bold text-neutral-300 text-left">إجراءات</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-800/60">
                   {articles.map((article) => (
-                    <tr key={article.id} className="hover:bg-white/[0.02] transition-colors">
+                    <tr key={article.id} className="hover:bg-white/[0.02] transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <FileText className="w-4 h-4 text-emerald-500" />
+                          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                            <FileText className="w-4 h-4 text-emerald-500" />
+                          </div>
                           <span className="font-bold text-sm text-white">{article.title}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-neutral-400">
-                        {article.category === "account" ? "الحساب الشخصي" :
-                         article.category === "payment" ? "المدفوعات" :
-                         article.category === "course" ? "الكورسات" : "الشهادات"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-500" dir="ltr">
-                        {new Date(article.created_at).toLocaleDateString()}
+                      <td className="px-6 py-4">
+                        <span className="text-xs font-bold px-2 py-1 rounded-md bg-neutral-800 text-neutral-400">
+                          {article.category}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-left">
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handleDelete(article.id)}
-                          className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          {/* زر التعديل الجديد */}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => openEditModal(article)}
+                            className="border-neutral-800 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/50"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </Button>
+                          
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDelete(article.id)}
+                            className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -136,29 +182,31 @@ const AdminArticles = () => {
               </table>
             </div>
           ) : (
-            <div className="p-20 text-center text-neutral-500">لا يوجد مقالات مضافة حتى الآن.</div>
+            <div className="p-20 text-center text-neutral-500 font-bold">لا توجد مقالات مضافة.</div>
           )}
         </div>
 
       </div>
 
-      {/* نافذة الإضافة المنبثقة */}
-      {showAddModal && (
+      {/* النافذة المنبثقة (Modal) - تعمل للإضافة والتعديل */}
+      {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <motion.div 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="bg-[#0a0f0c] border border-neutral-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">نشر مقال جديد</h2>
-            <form onSubmit={handleAddArticle} className="space-y-5">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              {isEditing ? "تعديل المقال" : "نشر مقال جديد"}
+            </h2>
+            <form onSubmit={handleSaveArticle} className="space-y-5">
               <div>
                 <label className="text-sm text-neutral-400 mb-2 block">عنوان المقال</label>
                 <input 
                   type="text" 
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-all"
                   required
                 />
               </div>
@@ -167,7 +215,7 @@ const AdminArticles = () => {
                 <select 
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
                 >
                   <option value="account">الحساب الشخصي</option>
                   <option value="payment">المدفوعات</option>
@@ -176,19 +224,19 @@ const AdminArticles = () => {
                 </select>
               </div>
               <div>
-                <label className="text-sm text-neutral-400 mb-2 block">المحتوى</label>
+                <label className="text-sm text-neutral-400 mb-2 block">المحتوى (يدعم Markdown)</label>
                 <textarea 
-                  rows={8}
+                  rows={10}
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 resize-none"
+                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 resize-none font-mono text-sm leading-relaxed"
                   required
                 ></textarea>
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <Button 
                   type="button" 
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => setShowModal(false)}
                   className="bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800"
                 >
                   إلغاء
@@ -196,9 +244,9 @@ const AdminArticles = () => {
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8"
                 >
-                  {isSubmitting ? "جاري النشر..." : "نشر المقال"}
+                  {isSubmitting ? "جاري الحفظ..." : isEditing ? "تحديث المقال" : "نشر المقال"}
                 </Button>
               </div>
             </form>
