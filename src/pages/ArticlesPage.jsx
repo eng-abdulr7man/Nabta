@@ -7,6 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, BookOpen, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
+// --- الاستيرادات الجديدة للماركدوان ---
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 const categories = [
   { id: "all", label: "الكل" },
   { id: "account", label: "الحساب الشخصي" },
@@ -53,19 +57,19 @@ const ArticlesPage = () => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
 
         <div className="relative z-10 mb-12 space-y-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-3">مركز المعرفة</h1>
-            <p className="text-neutral-400">ابحث عن إجابات لأسئلتك أو تصفح المقالات المتاحة.</p>
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">مركز المعرفة</h1>
+            <p className="text-neutral-400">دليلك الشامل لاستخدام منصة نبتة التعليمية.</p>
           </div>
 
-          <div className="relative">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+          <div className="relative group">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 group-focus-within:text-emerald-500 transition-colors" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث عن مشكلة أو سؤال..."
-              className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl py-4 pr-12 pl-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20"
+              className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl py-4 pr-12 pl-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
             />
           </div>
           
@@ -94,15 +98,15 @@ const ArticlesPage = () => {
               <div key={article.id} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl overflow-hidden transition-all hover:border-emerald-500/30">
                 <button
                   onClick={() => setExpandedId(expandedId === article.id ? null : article.id)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-right"
+                  className="w-full px-6 py-6 flex items-center justify-between text-right"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shrink-0">
-                      <BookOpen className="w-5 h-5 text-emerald-500" />
+                    <div className="w-12 h-12 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shrink-0">
+                      <BookOpen className="w-6 h-6 text-emerald-500" />
                     </div>
-                    <span className="font-bold text-lg text-white">{article.title}</span>
+                    <span className="font-bold text-lg text-white leading-relaxed">{article.title}</span>
                   </div>
-                  <ChevronDown className={`w-5 h-5 text-neutral-500 transition-transform ${expandedId === article.id ? "rotate-180 text-emerald-500" : ""}`} />
+                  <ChevronDown className={`w-5 h-5 text-neutral-500 transition-transform duration-300 ${expandedId === article.id ? "rotate-180 text-emerald-500" : ""}`} />
                 </button>
                 
                 <AnimatePresence>
@@ -111,10 +115,20 @@ const ArticlesPage = () => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="px-6 pb-6 pt-2 border-t border-neutral-800/40"
+                      className="px-6 pb-8 pt-2 border-t border-neutral-800/40"
                     >
-                      <div className="prose prose-invert max-w-none text-neutral-300 leading-loose whitespace-pre-wrap">
-                        {article.content}
+                      {/* --- عرض المحتوى باستخدام ReactMarkdown --- */}
+                      <div className="prose prose-sm md:prose-base prose-invert max-w-none 
+                        prose-headings:font-black prose-headings:text-white prose-headings:mb-4
+                        prose-p:text-neutral-300 prose-p:leading-loose
+                        prose-strong:text-emerald-400 prose-strong:font-bold
+                        prose-blockquote:border-r-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-l-lg
+                        prose-ul:list-disc prose-li:text-neutral-300
+                        prose-hr:border-neutral-800 my-4"
+                      >
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {article.content}
+                        </ReactMarkdown>
                       </div>
                     </motion.div>
                   )}
