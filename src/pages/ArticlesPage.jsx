@@ -40,9 +40,8 @@ const ArticlesPage = () => {
   const [newCategory, setNewCategory] = useState("account");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // التحقق من أن المستخدم هو الإدمن
-  // ضفنا toLowerCase() و trim() عشان لو فيه أي مسافات أو حروف كابيتال يتجاهلها
-  const isAdmin = user?.email?.toLowerCase().trim() === "wwwbgaro59@gmail.com";
+  // التحقق من أن المستخدم هو الإدمن (استخدمنا includes لتفادي أي مسافات مخفية)
+  const isAdmin = user?.email?.toLowerCase().includes("wwwbgaro59@gmail.com");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -136,15 +135,7 @@ const ArticlesPage = () => {
               className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl py-4 pr-12 pl-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20"
             />
           </div>
-          <div>
-              <h1 className="text-3xl md:text-4xl font-black text-white mb-3">مركز المعرفة</h1>
-              <p className="text-neutral-400">ابحث عن إجابات لأسئلتك أو تصفح المقالات المتاحة.</p>
-              
-              {/* السطر ده للاختبار بس، امسحه لما الزرار يشتغل */}
-              <p className="text-red-500 mt-2 font-bold text-sm">
-                حالة الدخول: {user ? user.email : "غير مسجل الدخول"}
-              </p>
-            </div>
+          
           {/* أزرار التصنيفات */}
           <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
             {categories.map((cat) => (
