@@ -490,7 +490,7 @@ const Footer = () => {
                 { label: "تصفح الكورسات", path: "/courses" },
                 { label: "التخصصات الزراعية", path: "/specializations" },
                 { label: "من نحن", path: "/about" },
-                // { label: "المقالات والأخبار", path: "/blog" },
+                { label: "المقالات والأخبار", path: "/articles" },
               ].map((link) => (
                 <li key={link.path}>
                   <Link to={link.path} className="text-sm text-neutral-400 hover:text-emerald-400 transition-colors inline-block hover:-translate-x-1 transform duration-300">
