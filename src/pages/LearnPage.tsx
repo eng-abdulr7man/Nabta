@@ -974,11 +974,27 @@ const LearnPage = () => {
   const goToNextLesson = () => {
     if (!lessons || !currentLessonId) return;
     const idx = lessons.findIndex((l) => l.id === currentLessonId);
+    
     if (idx < lessons.length - 1) {
+      // الانتقال للدرس التالي
       setCurrentLessonId(lessons[idx + 1].id);
+    } else {
+      // نحن في الدرس الأخير
+      if (completedCount >= totalLessons && totalLessons > 0) {
+        // لو مخلص كل الدروس، اعرض الشهادة
+        issueCertificate();
+      } else {
+        // لو مش مخلص، اعرض رسالة تنبيه
+        toast({ 
+          title: "عذراً!", 
+          description: "يجب إكمال جميع الدروس أولاً للحصول على الشهادة.",
+          variant: "destructive" 
+        });
+      }
     }
   };
-
+      
+  const isLastLesson = lessons && currentLessonId ? lessons.findIndex((l) => l.id === currentLessonId) === lessons.length - 1 : false;
   return (
     // لغينا الـ h-screen والـ overflow-hidden عشان الصفحة تنزل وتطلع براحتها
     <div className="min-h-screen bg-[#050806] font-tajawal text-white flex flex-col" dir="rtl">
@@ -1058,7 +1074,7 @@ const LearnPage = () => {
                   onClick={goToNextLesson}
                   className="flex-1 sm:flex-none bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white h-11 px-5 rounded-xl font-bold transition-all"
                 >
-                  الدرس التالي
+                  {isLastLesson ? "إنهاء وعرض الشهادة" : "الدرس التالي"}
                 </Button>
               </div>
             </div>
