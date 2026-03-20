@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, BookOpen, Plus, Trash2, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, BookOpen, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 const categories = [
   { id: "all", label: "الكل" },
@@ -19,9 +17,6 @@ const categories = [
 
 const ArticlesPage = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
   const queryQ = searchParams.get("q") || "";
   const queryCat = searchParams.get("category") || "all";
 
@@ -31,16 +26,6 @@ const ArticlesPage = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // حالات نافذة إضافة مقال
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newContent, setNewContent] = useState("");
-  const [newCategory, setNewCategory] = useState("account");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 🔥 الضربة القاضية: إجبار النظام على رؤيتك كأدمن بدون أي شروط
-  const isAdmin = true; 
-
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchArticles();
@@ -48,43 +33,9 @@ const ArticlesPage = () => {
 
   const fetchArticles = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase.from("help_articles").select("*").order("created_at", { ascending: false });
-    if (!error && data) setArticles(data);
+    const { data } = await supabase.from("help_articles").select("*").order("created_at", { ascending: false });
+    if (data) setArticles(data);
     setIsLoading(false);
-  };
-
-  const handleAddArticle = async (e) => {
-    e.preventDefault();
-    if (!newTitle.trim() || !newContent.trim()) {
-      toast({ title: "خطأ", description: "يرجى ملء العنوان والمحتوى", variant: "destructive" });
-      return;
-    }
-    setIsSubmitting(true);
-    const { error } = await supabase.from("help_articles").insert({
-      title: newTitle,
-      content: newContent,
-      category: newCategory,
-    });
-    setIsSubmitting(false);
-
-    if (error) {
-      toast({ title: "خطأ", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "نجاح", description: "تم نشر المقال بنجاح!" });
-      setShowAddModal(false);
-      setNewTitle("");
-      setNewContent("");
-      fetchArticles(); 
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("هل أنت متأكد من حذف هذا المقال؟")) return;
-    const { error } = await supabase.from("help_articles").delete().eq("id", id);
-    if (!error) {
-      toast({ title: "تم الحذف", description: "تم حذف المقال بنجاح." });
-      setArticles(articles.filter((a) => a.id !== id));
-    }
   };
 
   const filteredArticles = articles.filter((article) => {
@@ -102,21 +53,9 @@ const ArticlesPage = () => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
 
         <div className="relative z-10 mb-12 space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-black text-white mb-3">مركز المعرفة (اختبار)</h1>
-              <p className="text-neutral-400">ابحث عن إجابات لأسئلتك أو تصفح المقالات المتاحة.</p>
-            </div>
-            
-            {isAdmin && (
-              <Button 
-                onClick={() => setShowAddModal(true)}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl h-12 px-6 flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-              >
-                <Plus className="w-5 h-5" />
-                مقال جديد
-              </Button>
-            )}
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black text-white mb-3">مركز المعرفة</h1>
+            <p className="text-neutral-400">ابحث عن إجابات لأسئلتك أو تصفح المقالات المتاحة.</p>
           </div>
 
           <div className="relative">
@@ -177,19 +116,6 @@ const ArticlesPage = () => {
                       <div className="prose prose-invert max-w-none text-neutral-300 leading-loose whitespace-pre-wrap">
                         {article.content}
                       </div>
-                      
-                      {isAdmin && (
-                        <div className="mt-6 flex justify-end">
-                          <Button 
-                            variant="destructive" 
-                            onClick={() => handleDelete(article.id)}
-                            className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white text-sm h-9 px-4 rounded-lg"
-                          >
-                            <Trash2 className="w-4 h-4 ml-2" />
-                            حذف المقال
-                          </Button>
-                        </div>
-                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -203,69 +129,6 @@ const ArticlesPage = () => {
           )}
         </div>
       </main>
-
-      {isAdmin && showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div 
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-[#0a0f0c] border border-neutral-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl"
-          >
-            <h2 className="text-2xl font-bold text-white mb-6">نشر مقال جديد</h2>
-            <form onSubmit={handleAddArticle} className="space-y-5">
-              <div>
-                <label className="text-sm text-neutral-400 mb-2 block">عنوان المقال</label>
-                <input 
-                  type="text" 
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm text-neutral-400 mb-2 block">التصنيف</label>
-                <select 
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="account">الحساب الشخصي</option>
-                  <option value="payment">المدفوعات</option>
-                  <option value="course">الكورسات والمحتوى</option>
-                  <option value="certificate">الشهادات</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-sm text-neutral-400 mb-2 block">المحتوى</label>
-                <textarea 
-                  rows={8}
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 resize-none"
-                  required
-                ></textarea>
-              </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <Button 
-                  type="button" 
-                  onClick={() => setShowAddModal(false)}
-                  className="bg-transparent text-neutral-400 hover:text-white hover:bg-neutral-800"
-                >
-                  إلغاء
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
-                >
-                  {isSubmitting ? "جاري النشر..." : "نشر المقال"}
-                </Button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
 
       <Footer />
       <BottomNav />
