@@ -252,8 +252,8 @@
 // };
 
 // export default SupportPage;
-
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // تم إضافة هذا الاستيراد للربط
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
@@ -285,25 +285,29 @@ const fadeInUp = {
 };
 
 // ==========================================
-// بيانات تصنيفات المساعدة
+// بيانات تصنيفات المساعدة (تم إضافة id للربط)
 // ==========================================
 const helpCategories = [
   {
+    id: "account",
     icon: User,
     title: "الحساب الشخصي",
     desc: "إدارة حسابك، تغيير كلمة المرور، وإعدادات الملف الشخصي.",
   },
   {
+    id: "payment",
     icon: CreditCard,
     title: "المدفوعات والفواتير",
     desc: "طرق الدفع المتاحة، مشاكل الدفع، وسياسة استرداد الأموال.",
   },
   {
+    id: "course",
     icon: BookOpen,
     title: "الكورسات والمحتوى",
     desc: "كيفية الوصول للكورسات، ومشاكل تشغيل الفيديوهات.",
   },
   {
+    id: "certificate",
     icon: Award,
     title: "الشهادات والاعتمادات",
     desc: "كيفية استخراج شهادتك بعد إتمام الكورس وتوثيقها.",
@@ -311,6 +315,9 @@ const helpCategories = [
 ];
 
 const SupportPage = () => {
+  const navigate = useNavigate(); // لتوجيه المستخدم لصفحة المقالات
+  const [supportSearchQuery, setSupportSearchQuery] = useState(""); // لحفظ نص البحث
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [type, setType] = useState("");
@@ -335,8 +342,6 @@ const SupportPage = () => {
     
     setLoading(true);
     
-    // حفظ البيانات في قاعدة البيانات
-    // تم دمج الاسم والبريد في العنوان والرسالة لضمان التوافق مع هيكل البيانات السابق
     const { error } = await supabase.from("contact_messages").insert({
       user_id: user?.id || null,
       type,
@@ -350,7 +355,6 @@ const SupportPage = () => {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "تم الإرسال", description: "تم استلام رسالتك بنجاح، سنقوم بالرد قريباً." });
-      // تفريغ الحقول بعد الإرسال الناجح
       setName("");
       setEmail("");
       setType("");
@@ -386,22 +390,34 @@ const SupportPage = () => {
                 كيف يمكننا <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">مساعدتك اليوم؟</span>
               </h1>
               
-              {/* شريط البحث المتقدم */}
-              <div className="relative max-w-2xl mx-auto group">
+              {/* شريط البحث المتقدم (تم تحويله لـ Form للربط) */}
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (supportSearchQuery.trim()) {
+                    navigate(`/articles?q=${encodeURIComponent(supportSearchQuery)}`);
+                  } else {
+                    navigate(`/articles`); // لو ضغط بحث وهو فاضي يدخله على كل المقالات
+                  }
+                }}
+                className="relative max-w-2xl mx-auto group"
+              >
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                   <Search className="h-6 w-6 text-neutral-500 group-focus-within:text-emerald-500 transition-colors" />
                 </div>
                 <input
                   type="text"
+                  value={supportSearchQuery}
+                  onChange={(e) => setSupportSearchQuery(e.target.value)}
                   placeholder="ابحث عن سؤالك هنا (مثال: كيف أحصل على شهادتي؟)"
                   className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl py-5 pr-14 pl-6 text-base text-white placeholder:text-neutral-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                 />
                 <div className="absolute inset-y-2 left-2 flex items-center">
-                  <Button className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl px-6 h-full transition-colors">
+                  <Button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl px-6 h-full transition-colors">
                     بحث
                   </Button>
                 </div>
-              </div>
+              </form>
             </motion.div>
           </div>
         </section>
@@ -422,7 +438,11 @@ const SupportPage = () => {
                 const Icon = cat.icon;
                 return (
                   <motion.div key={index} variants={fadeInUp}>
-                    <div className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-8 hover:bg-[#121A15] hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(16,185,129,0.05)] cursor-pointer h-full flex flex-col">
+                    {/* تم إضافة دالة onClick للذهاب للمقالات حسب التصنيف المختار */}
+                    <div 
+                      onClick={() => navigate(`/articles?category=${cat.id}`)}
+                      className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-8 hover:bg-[#121A15] hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(16,185,129,0.05)] cursor-pointer h-full flex flex-col"
+                    >
                       <div className="w-14 h-14 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-center mb-6 group-hover:bg-emerald-900/30 group-hover:border-emerald-500/30 transition-colors">
                         <Icon className="w-7 h-7 text-emerald-500" />
                       </div>
@@ -447,12 +467,11 @@ const SupportPage = () => {
           <div className="container mx-auto px-4 lg:px-8">
             <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-8 lg:p-12 overflow-hidden relative">
               
-              {/* إضاءة داخلية للمربع */}
               <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
               
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
                 
-                {/* معلومات التواصل السريعة (يمين) */}
+                {/* معلومات التواصل السريعة */}
                 <div className="lg:col-span-4 space-y-8">
                   <div>
                     <h2 className="text-3xl font-black text-white mb-4">لم تجد إجابتك؟</h2>
@@ -494,7 +513,7 @@ const SupportPage = () => {
                   </div>
                 </div>
 
-                {/* نموذج إرسال رسالة (يسار) */}
+                {/* نموذج إرسال رسالة */}
                 <div className="lg:col-span-8">
                   <div className="bg-[#121A15] border border-neutral-800/80 rounded-3xl p-6 md:p-8">
                     <h3 className="text-2xl font-bold text-white mb-6">إرسال رسالة مباشرة</h3>
