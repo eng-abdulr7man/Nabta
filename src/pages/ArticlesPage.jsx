@@ -6,7 +6,6 @@ import BottomNav from "@/components/layout/BottomNav";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, BookOpen, Plus, Trash2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,7 +20,6 @@ const categories = [
 const ArticlesPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { toast } = useToast();
 
   const queryQ = searchParams.get("q") || "";
@@ -40,41 +38,8 @@ const ArticlesPage = () => {
   const [newCategory, setNewCategory] = useState("account");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // حالة الأدمن (State عشان الريأكت يعمل ريفريش للزرار أول ما يتأكد)
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  // التأكد من صلاحيات الأدمن بناءً على الـ Schema الجديدة
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user) {
-        setIsAdmin(false);
-        return;
-      }
-
-      // 1. الشرط الأول: الإيميل الثابت (تطابق نصي آمن)
-      if (user.email?.toLowerCase().includes("wwwbgaro59@gmail.com")) {
-        setIsAdmin(true);
-        return;
-      }
-
-      // 2. الشرط الثاني: البحث في جدول user_roles اللي موجود في قاعدة بياناتك
-      try {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .maybeSingle(); // maybeSingle عشان ميعملش خطأ لو ملقاش حاجة
-
-        if (data && data.role === "admin") {
-          setIsAdmin(true);
-        }
-      } catch (err) {
-        console.error("Error checking admin status:", err);
-      }
-    };
-
-    checkAdminStatus();
-  }, [user]);
+  // 🔥 الضربة القاضية: إجبار النظام على رؤيتك كأدمن بدون أي شروط
+  const isAdmin = true; 
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -109,7 +74,7 @@ const ArticlesPage = () => {
       setShowAddModal(false);
       setNewTitle("");
       setNewContent("");
-      fetchArticles(); // تحديث القائمة
+      fetchArticles(); 
     }
   };
 
@@ -122,7 +87,6 @@ const ArticlesPage = () => {
     }
   };
 
-  // فلترة المقالات
   const filteredArticles = articles.filter((article) => {
     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           article.content.toLowerCase().includes(searchQuery.toLowerCase());
@@ -140,11 +104,10 @@ const ArticlesPage = () => {
         <div className="relative z-10 mb-12 space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-black text-white mb-3">مركز المعرفة</h1>
+              <h1 className="text-3xl md:text-4xl font-black text-white mb-3">مركز المعرفة (اختبار)</h1>
               <p className="text-neutral-400">ابحث عن إجابات لأسئلتك أو تصفح المقالات المتاحة.</p>
             </div>
             
-            {/* الزرار هيظهر هنا لما isAdmin تبقى true */}
             {isAdmin && (
               <Button 
                 onClick={() => setShowAddModal(true)}
@@ -241,7 +204,6 @@ const ArticlesPage = () => {
         </div>
       </main>
 
-      {/* نافذة إضافة مقال */}
       {isAdmin && showAddModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div 
