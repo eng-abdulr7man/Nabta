@@ -34,7 +34,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
-import HeroDarkSection from "@/components/home/HeroDarkSection"; // 🌟 استخدمنا الهيرو الدارك اللي لسه عاملينه
+import HeroDarkSection from "@/components/home/HeroSection"; // 🌟 استخدمنا الهيرو الدارك اللي لسه عاملينه
 import SpecializationsSection from "@/components/home/SpecializationsSection";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
 import Roadmap from "@/components/home/Roadmap"; // ✅ استدعاء الرودماب
