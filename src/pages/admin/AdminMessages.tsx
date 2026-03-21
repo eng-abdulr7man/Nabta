@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 // 🔑 حط مفتاح الـ API بتاعك هنا عشان الرد الذكي يشتغل
-const GROQ_API_KEY = "حط_مفتاح_جروق_هنا";
+const GROQ_API_KEY = "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";
 
 const typeConfig: Record<string, { label: string, color: string, bg: string, border: string }> = {
   inquiry: { label: "استفسار", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
