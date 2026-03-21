@@ -149,10 +149,10 @@ const HeroDarkSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
+                {/* <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
                   <ShieldCheck className="w-4 h-4" />
                   المنصة الأولى للتعليم الزراعي المتقدم
-                </span>
+                </span> */}
               </motion.div>
 
               {/* ============================================== */}
