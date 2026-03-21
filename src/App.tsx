@@ -26,6 +26,7 @@ const LearnPage = lazy(() => import("./pages/LearnPage"));
 const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
 const MyCoursesPage = lazy(() => import("./pages/MyCoursesPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
+const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 
 // ✅ ضفنا استدعاء صفحة خريطة الطريق هنا
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
@@ -99,6 +100,7 @@ const App = () => (
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/help" element={<HelpPage />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/tools" element={<ToolsPage />} />
 
               {/* --- Student Protected Routes --- */}
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
