@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+// المفاتيح الخاصة بك - تأكد من صحتها
 const YOUTUBE_API_KEY = "AIzaSyAM5K8Aka_MvqfQNRmPITYExIIn9JmMWao";
+// مفتاح جروق - شغال في مصر وبدون حظر
 const GROQ_API_KEY = "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";
 
 const AdminYoutubeImport = () => {
@@ -22,6 +24,7 @@ const AdminYoutubeImport = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // جلب التخصصات عند التحميل
   useEffect(() => {
     const fetchSpecs = async () => {
       const { data } = await supabase.from("specializations").select("id, name").order("sort_order");
@@ -44,9 +47,10 @@ const AdminYoutubeImport = () => {
     return hours * 60 + minutes + (seconds > 30 ? 1 : 0);
   };
 
+  // توليد الوصف باستخدام Groq API (Llama 3.3)
   const generateAIDescription = async (courseName) => {
     setIsGenerating(true);
-    const prompt = `أنت خبير محتوى تعليمي زراعي في منصة نبتة. اكتب وصفاً تسويقياً لكورس بعنوان '${courseName}' في 4 أسطر احترافية باللغة العربية فقط. بدون مقدمات.`;
+    const prompt = `أنت خبير محتوى تعليمي زراعي في منصة نبتة 🌱. اكتب وصفاً تسويقياً احترافياً ومبسطاً لكورس بعنوان '${courseName}' في 4 أسطر احترافية باللغة العربية فقط. بدون مقدمات.`;
     
     try {
       const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
@@ -56,7 +60,7 @@ const AdminYoutubeImport = () => {
           "Authorization": `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+          model: "llama-3.3-70b-versatile", // موديل قوي وسريع جداً
           messages: [{ role: "user", content: prompt }]
         })
       });
@@ -66,8 +70,9 @@ const AdminYoutubeImport = () => {
       return data.choices[0].message.content.trim();
 
     } catch (error) {
+      console.error("AI Error:", error.message);
       toast({ title: "الذكاء الاصطناعي معطل", description: "يرجى كتابة الوصف يدوياً", variant: "destructive" });
-      return `كورس تدريبي متخصص ومبسط في ${courseName}.`;
+      return `كورس تدريبي متخصص ومبسط في ${courseName}. يغطي أهم المبادئ والتقنيات الأساسية بأسلوب عملي.`;
     } finally { 
       setIsGenerating(false); 
     }
@@ -79,10 +84,14 @@ const AdminYoutubeImport = () => {
 
     setIsLoading(true);
     try {
+      // 1. جلب بيانات البلاي ليست
       const resPlaylist = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${YOUTUBE_API_KEY}`);
       const dataPlaylist = await resPlaylist.json();
+      if (!dataPlaylist.items?.length) throw new Error("لم يتم العثور على القائمة");
+
       const playlistInfo = dataPlaylist.items[0].snippet;
 
+      // 2. جلب الفيديوهات والوقت الخاص بكل فيديو
       const resItems = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}`);
       const dataItems = await resItems.json();
       const videoIds = dataItems.items.map(i => i.snippet.resourceId.videoId).join(',');
@@ -90,11 +99,12 @@ const AdminYoutubeImport = () => {
       const resDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${YOUTUBE_API_KEY}`);
       const dataDetails = await resDetails.json();
 
+      // 3. توليد الوصف بالذكاء الاصطناعي (Groq)
       const aiDescription = await generateAIDescription(playlistInfo.title);
 
       setPreviewData({
         title: playlistInfo.title,
-        instructor: playlistInfo.channelTitle,
+        instructor: playlistInfo.channelTitle, // اسم الدكتور = اسم القناة
         description: aiDescription,
         thumbnail: playlistInfo.thumbnails.high?.url || playlistInfo.thumbnails.default?.url,
         lessons: dataItems.items.map((item, index) => {
@@ -116,7 +126,8 @@ const AdminYoutubeImport = () => {
     if (!previewData || !selectedSpec) return toast({ title: "تنبيه", description: "اختر التخصص أولاً", variant: "destructive" });
     setIsLoading(true);
     try {
-      const { data: course } = await supabase.from("courses").insert([{
+      // 1. إضافة الكورس
+      const { data: course, error: courseError } = await supabase.from("courses").insert([{
         title: previewData.title,
         description: previewData.description,
         thumbnail_url: previewData.thumbnail,
@@ -125,42 +136,59 @@ const AdminYoutubeImport = () => {
         published: true
       }]).select().single();
 
-      const { data: section } = await supabase.from("sections").insert([{ course_id: course.id, title: "المحتوى الرئيسي", sort_order: 1 }]).select().single();
+      if (courseError) throw courseError;
 
-      const lessons = previewData.lessons.map(l => ({
+      // 2. إضافة القسم الرئيسي
+      const { data: section } = await supabase.from("sections").insert([{
+        course_id: course.id,
+        title: "محتوى الدورة التعليمي",
+        sort_order: 1
+      }]).select().single();
+
+      // 3. إضافة الدروس
+      const lessonsToInsert = previewData.lessons.map(lesson => ({
         section_id: section.id,
-        title: l.title,
-        video_url: `https://www.youtube.com/embed/${l.video_id}`,
-        sort_order: l.order,
-        duration_minutes: l.duration
+        title: lesson.title,
+        video_url: `https://www.youtube.com/embed/${lesson.video_id}`,
+        sort_order: lesson.order,
+        duration_minutes: lesson.duration,
+        content: `درس مستورد بمدة ${lesson.duration} دقيقة.`
       }));
 
-      await supabase.from("lessons").insert(lessons);
-      toast({ title: "تم النشر بنجاح" });
+      await supabase.from("lessons").insert(lessonsToInsert);
+      toast({ title: "نجاح!", description: "تم استيراد ونشر الكورس بنجاح على منصة نبتة 🌱" });
       navigate("/admin/courses");
-    } catch (e) { toast({ title: "خطأ في الحفظ", variant: "destructive" }); }
+    } catch (e) { 
+      console.error(e);
+      toast({ title: "خطأ في الحفظ", description: "فشل حفظ البيانات في القاعدة", variant: "destructive" });
+    }
     finally { setIsLoading(false); }
   };
 
   return (
-    <div className="min-h-screen bg-[#050806] text-white p-4 md:p-8 font-tajawal overflow-x-hidden" dir="rtl">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#050806] text-white p-4 md:p-8 font-tajawal overflow-x-hidden relative" dir="rtl">
+      
+      {/* خلفية توهج خفيفة */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10" />
+
+      <div className="max-w-7xl mx-auto space-y-10 relative">
         
         {/* Header - Simple & Clean */}
-        <div className="flex items-center gap-4 border-b border-neutral-800/50 pb-6">
-          <Link to="/admin" className="p-2.5 bg-neutral-900/50 border border-neutral-800 rounded-xl text-neutral-400 hover:text-white transition-colors">
-            <ArrowRight className="w-5 h-5" />
+        <div className="flex items-center gap-4 border-b border-neutral-800/60 pb-6 bg-[#0a0f0c] p-5 rounded-2xl border border-neutral-800/50 shadow-2xl">
+          <Link to="/admin" className="p-3 bg-[#121A15] border border-neutral-800 rounded-xl text-neutral-400 hover:text-white transition-colors">
+            <ArrowRight className="w-6 h-6" />
           </Link>
           <div>
-            <h1 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-emerald-500" /> استيراد كورس يوتيوب
+            <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
+              <Sparkles className="w-7 h-7 text-emerald-500" /> استيراد كورس يوتيوب
             </h1>
-            <p className="text-neutral-500 text-xs font-medium mt-1">توليد تلقائي للمحتوى باستخدام Groq AI</p>
+            <p className="text-neutral-500 text-sm font-medium mt-1">توليد تلقائي للمحتوى باستخدام Groq AI</p>
           </div>
         </div>
 
         {/* 🌟 شريط الإدخال البسيط والمدمج 🌟 */}
-        <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-4 md:p-6 shadow-xl">
+        <div className="bg-[#0a0f0c] border border-neutral-800/80 rounded-3xl p-5 md:p-6 shadow-xl relative">
+          <div className="absolute top-0 left-10 w-40 h-1 bg-emerald-600 rounded-full opacity-30" />
           <div className="flex flex-col md:flex-row gap-4 items-end">
             
             {/* خانة الرابط */}
@@ -174,24 +202,24 @@ const AdminYoutubeImport = () => {
                 placeholder="https://youtube.com/playlist?list=..."
                 value={playlistUrl}
                 onChange={(e) => setPlaylistUrl(e.target.value)}
-                className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl px-5 py-3.5 text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all font-mono text-sm placeholder:font-tajawal placeholder:text-neutral-600 placeholder:text-right"
+                className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl px-5 py-3.5 text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all font-mono text-sm placeholder:font-tajawal placeholder:text-neutral-600 placeholder:text-right shadow-inner"
               />
             </div>
 
             {/* خانة التخصص */}
             <div className="flex-1 w-full space-y-2">
               <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
-                <TreePine className="w-4 h-4 text-emerald-500" /> التخصص
+                <TreePine className="w-4 h-4 text-emerald-500" /> التخصص (السكيمه)
               </label>
               <div className="relative">
                 <select
                   value={selectedSpec}
                   onChange={(e) => setSelectedSpec(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl pr-5 pl-10 py-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 appearance-none cursor-pointer transition-all"
+                  className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl pr-5 pl-10 py-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 appearance-none cursor-pointer transition-all shadow-inner"
                 >
-                  <option value="" className="text-neutral-500">اختر التخصص...</option>
+                  <option value="" className="text-neutral-500">اختر التخصص الزراعي...</option>
                   {specializations.map(spec => (
-                    <option key={spec.id} value={spec.id} className="bg-[#0a0f0c]">{spec.name}</option>
+                    <option key={spec.id} value={spec.id} className="bg-[#0a0f0c] font-bold text-white">{spec.name}</option>
                   ))}
                 </select>
                 <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
@@ -203,7 +231,7 @@ const AdminYoutubeImport = () => {
               <Button 
                 onClick={handleFetchPlaylist} 
                 disabled={isLoading || !playlistUrl} 
-                className="w-full md:w-32 h-[52px] bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold text-base shadow-md transition-all active:scale-95"
+                className="w-full md:w-36 h-[52px] bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 flex gap-2"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "معاينة"}
               </Button>
@@ -212,72 +240,97 @@ const AdminYoutubeImport = () => {
           </div>
         </div>
 
-        {/* Preview Section - Clean Layout */}
+        {/* 🌟 Preview Section - التنظيم الجديد كلياً 🌟 */}
         <AnimatePresence>
           {previewData && (
             <motion.div 
-              initial={{ opacity: 0, y: 15 }} 
+              initial={{ opacity: 0, y: 30 }} 
               animate={{ opacity: 1, y: 0 }} 
-              className="flex flex-col lg:flex-row gap-6 items-start"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
             >
-              {/* Thumbnail Card */}
-              <div className="w-full lg:w-[320px] shrink-0 space-y-4 sticky top-6">
-                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-4 shadow-xl">
-                  <div className="relative rounded-2xl overflow-hidden mb-4 border border-neutral-800">
-                    <img src={previewData.thumbnail} className="w-full aspect-video object-cover" />
-                    <div className="absolute bottom-2 left-2 right-2 flex justify-between">
-                      <span className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/10 flex items-center gap-1"><LayoutGrid className="w-3 h-3" /> {previewData.lessons.length}</span>
-                      <span className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-emerald-400 border border-white/10 flex items-center gap-1"><Clock className="w-3 h-3" /> {previewData.lessons.reduce((a, b) => a + b.duration, 0)} د</span>
+              
+              {/* 1. كارت الصورة والإحصائيات على اليمين */}
+              <div className="lg:col-span-1 space-y-6">
+                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-5 shadow-2xl space-y-5 sticky top-6">
+                  <div className="relative rounded-3xl overflow-hidden border border-neutral-800 group shadow-lg">
+                    <img src={previewData.thumbnail} className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-80" />
+                    <div className="absolute bottom-3 left-3 right-3 flex justify-between gap-2">
+                      <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black border border-white/10 flex items-center gap-1.5 shadow-xl">
+                        <LayoutGrid className="w-3.5 h-3.5" /> <span>{previewData.lessons.length} درس</span>
+                      </div>
+                      <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black text-emerald-400 border border-white/10 flex items-center gap-1.5 shadow-xl">
+                        <Clock className="w-3.5 h-3.5" /> <span>{previewData.lessons.reduce((a, b) => a + b.duration, 0)} دقيقة</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-[#121A15] p-3 rounded-xl flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-500 font-black text-sm">{previewData.instructor.charAt(0)}</div>
+                  
+                  {/* كارت الطبيب/القناة */}
+                  <div className="bg-[#121A15] p-4 rounded-2xl flex items-center gap-4 border border-neutral-800/50 shadow-inner">
+                    <div className="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-500 font-black text-xl border border-emerald-500/20 shadow-md">
+                      <User className="w-6 h-6" />
+                    </div>
                     <div>
-                      <p className="text-[10px] text-neutral-500 font-bold">مقدم الدورة</p>
-                      <h3 className="text-sm font-bold text-white line-clamp-1">{previewData.instructor}</h3>
+                      <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">مقدم الدورة / القناة</p>
+                      <h3 className="text-sm font-black text-white line-clamp-1">{previewData.instructor}</h3>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Content Card */}
-              <div className="flex-1 w-full bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 md:p-8 shadow-xl space-y-6">
-                <h2 className="text-xl md:text-2xl font-black text-white">{previewData.title}</h2>
+              {/* 2. كارت المحتوى الرئيسي على اليسار */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
                 
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center px-1">
-                    <label className="text-emerald-500 text-xs font-bold flex items-center gap-2"><Edit3 className="w-3.5 h-3.5" /> الوصف التعريفي</label>
-                    {isGenerating && <span className="text-[10px] text-emerald-500 animate-pulse font-bold">جاري الصياغة...</span>}
+                {/* العنوان والوصف */}
+                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl -z-10" />
+                  <h2 className="text-xl md:text-3xl font-black text-white leading-tight tracking-tight">{previewData.title}</h2>
+                  <div className="h-1 w-20 bg-emerald-600 rounded-full" />
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center px-1">
+                      <label className="text-emerald-500 text-xs font-black flex items-center gap-2"><Edit3 className="w-3.5 h-3.5" /> الوصف التعريفي (AI-Generated)</label>
+                      {isGenerating && <span className="text-[10px] text-emerald-500 animate-pulse font-bold flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin"/>جاري الصياغة...</span>}
+                    </div>
+                    <textarea
+                      value={previewData.description}
+                      onChange={(e) => setPreviewData({...previewData, description: e.target.value})}
+                      rows={5}
+                      className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl px-6 py-5 text-neutral-300 text-sm leading-relaxed focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 outline-none resize-none transition-colors shadow-inner font-tajawal placeholder:text-neutral-700"
+                      placeholder="اكتب وصفاً احترافياً هنا..."
+                    />
                   </div>
-                  <textarea
-                    value={previewData.description}
-                    onChange={(e) => setPreviewData({...previewData, description: e.target.value})}
-                    rows={4}
-                    className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl px-5 py-4 text-neutral-300 text-sm leading-relaxed focus:border-emerald-500/50 outline-none resize-none transition-colors"
-                  />
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-neutral-400 text-xs font-bold flex items-center gap-2 px-1"><ListVideo className="w-4 h-4" /> فهرس الدروس</label>
-                  <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                {/* قائمة الدروس */}
+                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-5">
+                  <label className="text-neutral-400 text-xs font-black uppercase tracking-widest flex items-center gap-2 px-1"><ListVideo className="w-4 h-4 text-emerald-600" /> محتوى الدورة التدريبية</label>
+                  
+                  <div className="flex flex-col gap-2.5 max-h-[350px] overflow-y-auto pr-3 custom-scrollbar">
                     {previewData.lessons.map((lesson) => (
-                      <div key={lesson.video_id} className="flex justify-between items-center p-3.5 bg-[#121A15] border border-neutral-800/50 rounded-xl hover:border-neutral-700 transition-colors">
-                        <span className="text-sm text-neutral-300 font-medium flex items-center gap-3">
-                          <span className="text-neutral-600 font-mono text-xs">#{lesson.order}</span> 
-                          <span className="line-clamp-1">{lesson.title}</span>
+                      <div key={lesson.video_id} className="flex justify-between items-center p-4 bg-[#121A15] border border-neutral-800/50 rounded-2xl hover:border-emerald-500/30 transition-all duration-300 group shadow-sm active:scale-[0.99]">
+                        <span className="text-sm text-neutral-300 font-medium flex items-center gap-3.5">
+                          <span className="text-neutral-600 font-mono text-xs w-6 text-left">#{lesson.order}</span> 
+                          <span className="line-clamp-1 group-hover:text-white">{lesson.title}</span>
                         </span>
-                        <span className="text-[10px] font-bold text-neutral-400 bg-[#0a0f0c] px-2 py-1 rounded-md shrink-0 border border-neutral-800">{lesson.duration} د</span>
+                        <span className="text-[11px] font-black text-neutral-400 bg-[#0a0f0c] px-2.5 py-1.5 rounded-lg shrink-0 border border-neutral-800 flex items-center gap-1 shadow-md">
+                          <Clock className="w-3 h-3 text-emerald-600" /> {lesson.duration} د
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-4 border-t border-neutral-800/50">
-                  <Button onClick={() => setPreviewData(null)} variant="ghost" className="h-14 px-6 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800">إلغاء</Button>
-                  <Button onClick={handleImportCourse} disabled={isLoading} className="flex-1 h-14 bg-white text-black hover:bg-neutral-200 rounded-xl font-bold text-lg flex gap-2">
-                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><CheckCircle2 className="w-5 h-5" /> حفظ ونشر الكورس</>}
+                {/* أزرار الإجراءات */}
+                <div className="flex gap-4 pt-2 border-t border-neutral-800/50">
+                  <Button onClick={() => setPreviewData(null)} variant="ghost" className="h-16 px-6 rounded-2xl text-neutral-500 bg-[#0a0f0c] border border-neutral-800 hover:bg-neutral-800 hover:text-white transition-all">
+                    إلغاء الأمر
+                  </Button>
+                  <Button onClick={handleImportCourse} disabled={isLoading} className="flex-1 h-16 bg-white text-black hover:bg-neutral-200 rounded-2xl font-black text-xl shadow-2xl flex gap-3 transition-all active:scale-[0.98]">
+                    {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <><CheckCircle2 className="w-6 h-6" /> حفظ ونشر الكورس 🌱</>}
                   </Button>
                 </div>
+
               </div>
             </motion.div>
           )}
