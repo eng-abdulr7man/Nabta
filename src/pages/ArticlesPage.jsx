@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
 
 const categories = [
   { id: "all", label: "الكل" },
@@ -160,7 +161,7 @@ const ArticlesPage = () => {
                         prose-hr:border-neutral-800 prose-hr:my-10
                         prose-img:rounded-3xl prose-img:shadow-2xl"
                       >
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeRaw]}>
                           {article.content}
                         </ReactMarkdown>
                       </div>
