@@ -43,22 +43,21 @@ const AdminYoutubeImport = () => {
     const seconds = parseInt(match[3] || 0);
     return hours * 60 + minutes + (seconds > 30 ? 1 : 0);
   };
-
- const generateAIDescription = async (courseName) => {
+const generateAIDescription = async (courseName) => {
     setIsGenerating(true);
-    const prompt = `اكتب وصفاً تسويقياً لكورس بعنوان '${courseName}' في 5 أسطر احترافية باللغة العربية.`;
+    const prompt = `أنت خبير محتوى تعليمي زراعي. اكتب وصفاً تسويقياً لكورس بعنوان '${courseName}' في 5 أسطر احترافية باللغة العربية فقط.`;
     
     try {
-      console.log("جاري الاتصال بـ Gemini API..."); // رسالة تتبع
+      console.log("جاري الاتصال بـ Gemini API..."); 
       
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      // التعديل هنا: استخدمنا gemini-2.0-flash الموديل الأحدث والأسرع
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
       
       const data = await response.json();
-      console.log("رد سيرفرات جوجل:", data); // هيطبع الرد هنا
 
       if (!response.ok) {
         throw new Error(data.error?.message || "مشكلة في الـ API Key أو السيرفر");
@@ -72,7 +71,6 @@ const AdminYoutubeImport = () => {
 
     } catch (error) {
       console.error("تفاصيل الخطأ:", error.message);
-      // هيطلعلك إشعار بالخطأ عشان تبقى عارف
       toast({ title: "فشل توليد الوصف", description: error.message, variant: "destructive" });
       return `كورس تدريبي متخصص ومبسط في ${courseName}. (يرجى كتابة الوصف يدوياً)`;
     } finally { 
