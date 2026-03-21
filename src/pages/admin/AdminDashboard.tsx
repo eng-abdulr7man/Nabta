@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   BookOpen, Users, Award, MessageSquare, TrendingUp, 
-  Star, Activity, Youtube, Plus, Zap, Clock 
+  Star, Activity, Youtube, Plus, Zap, Clock, Button
 } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
