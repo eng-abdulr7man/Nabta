@@ -9,11 +9,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
-import SupportPage from "./pages/Support"; // أو المسار الصحيح اللي إنت حافظ فيه الملف
+import SupportPage from "./pages/Support";
 
-// استدعاء صفحة المقالات بالـ Lazy Load
+// --- استدعاء الصفحات بالـ Lazy Load ---
 const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
-
 const CoursesPage = lazy(() => import("./pages/CoursesPage"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const SpecializationsPage = lazy(() => import("./pages/SpecializationsPage"));
@@ -37,6 +36,8 @@ const AdminSpecializations = lazy(() => import("./pages/admin/AdminSpecializatio
 const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
 const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
 const AdminArticles = lazy(() => import("./pages/admin/AdminArticles"));
+// السطر اللي كان ناقص:
+const AdminYoutubeImport = lazy(() => import("./pages/admin/AdminYoutubeImport")); 
 
 // Support pages
 const FAQPage = lazy(() => import("./pages/FAQPage"));
@@ -63,20 +64,17 @@ const App = () => (
         <AuthProvider>
           <Suspense fallback={<Loading />}>
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/courses" element={<CoursesPage />} />
               <Route path="/courses/:id" element={<CourseDetailPage />} />
-              <Route path="/courses/:id/learn" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
               <Route path="/specializations" element={<SpecializationsPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
-              <Route path="/my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
-              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
@@ -84,8 +82,14 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="/support" element={<SupportPage />} />
               <Route path="/articles" element={<ArticlesPage />} />
+
+              {/* Student Protected Routes */}
+              <Route path="/courses/:id/learn" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
               
-              {/* Admin */}
+              {/* Admin Protected Routes */}
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />
               <Route path="/admin/courses/:id" element={<ProtectedRoute adminOnly><AdminCourseDetail /></ProtectedRoute>} />
@@ -94,7 +98,10 @@ const App = () => (
               <Route path="/admin/messages" element={<ProtectedRoute adminOnly><AdminMessages /></ProtectedRoute>} />
               <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
               <Route path="/admin/articles" element={<ProtectedRoute adminOnly><AdminArticles /></ProtectedRoute>} />
+              {/* تم تأمين المسار بـ ProtectedRoute adminOnly */}
+              <Route path="/admin/youtube-import" element={<ProtectedRoute adminOnly><AdminYoutubeImport /></ProtectedRoute>} />
               
+              {/* 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
