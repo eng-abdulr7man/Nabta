@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 // استيراد مكتبات الماركدوان
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from 'remark-breaks';
 
 const categories = [
   { id: "all", label: "الكل" },
@@ -159,7 +160,7 @@ const ArticlesPage = () => {
                         prose-hr:border-neutral-800 prose-hr:my-10
                         prose-img:rounded-3xl prose-img:shadow-2xl"
                       >
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                           {article.content}
                         </ReactMarkdown>
                       </div>
