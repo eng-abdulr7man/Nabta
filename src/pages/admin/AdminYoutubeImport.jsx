@@ -3,14 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Youtube, ArrowRight, Loader2, LayoutGrid, Sparkles, 
-  Edit3, User, Clock, CheckCircle2, ChevronDown, TreePine, ListVideo 
+  Edit3, Clock, CheckCircle2, ChevronDown, TreePine, ListVideo 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const YOUTUBE_API_KEY = "AIzaSyAM5K8Aka_MvqfQNRmPITYExIIn9JmMWao";
-// مفتاح جروق المجاني (أسرع API في العالم وشغال في مصر)
 const GROQ_API_KEY = "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";
 
 const AdminYoutubeImport = () => {
@@ -45,14 +44,11 @@ const AdminYoutubeImport = () => {
     return hours * 60 + minutes + (seconds > 30 ? 1 : 0);
   };
 
-  // توليد الوصف باستخدام Groq API (Llama 3.3)
   const generateAIDescription = async (courseName) => {
     setIsGenerating(true);
     const prompt = `أنت خبير محتوى تعليمي زراعي في منصة نبتة. اكتب وصفاً تسويقياً لكورس بعنوان '${courseName}' في 4 أسطر احترافية باللغة العربية فقط. بدون مقدمات.`;
     
     try {
-      console.log("جاري الاتصال بـ Groq API..."); 
-      
       const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
         method: "POST",
         headers: { 
@@ -60,23 +56,18 @@ const AdminYoutubeImport = () => {
           "Authorization": `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile", // موديل قوي جداً ويدعم العربي
+          model: "llama-3.3-70b-versatile",
           messages: [{ role: "user", content: prompt }]
         })
       });
       
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || "مشكلة في الـ API Key أو السيرفر");
-      }
-
+      if (!response.ok) throw new Error(data.error?.message);
       return data.choices[0].message.content.trim();
 
     } catch (error) {
-      console.error("تفاصيل الخطأ:", error.message);
-      toast({ title: "الذكاء الاصطناعي معطل حالياً", description: "يرجى كتابة الوصف يدوياً", variant: "destructive" });
-      return `كورس تدريبي متخصص ومبسط في ${courseName}. (يرجى كتابة الوصف يدوياً)`;
+      toast({ title: "الذكاء الاصطناعي معطل", description: "يرجى كتابة الوصف يدوياً", variant: "destructive" });
+      return `كورس تدريبي متخصص ومبسط في ${courseName}.`;
     } finally { 
       setIsGenerating(false); 
     }
@@ -153,143 +144,142 @@ const AdminYoutubeImport = () => {
 
   return (
     <div className="min-h-screen bg-[#050806] text-white p-4 md:p-8 font-tajawal overflow-x-hidden" dir="rtl">
-      <div className="max-w-7xl mx-auto space-y-10">
+      <div className="max-w-6xl mx-auto space-y-8">
         
-        {/* Header Section */}
-        <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white/[0.02] p-6 rounded-[2rem] border border-white/5 shadow-2xl">
-          <div className="flex items-center gap-5">
-            <Link to="/admin" className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-500 hover:scale-105 transition-transform">
-              <ArrowRight className="w-6 h-6" />
-            </Link>
-            <div>
-              <h1 className="text-2xl md:text-4xl font-black flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-emerald-500" /> استيراد كورس يوتيوب
-              </h1>
-              <p className="text-neutral-500 font-bold mt-1">توليد تلقائي للمحتوى باستخدام Groq AI</p>
-            </div>
+        {/* Header - Simple & Clean */}
+        <div className="flex items-center gap-4 border-b border-neutral-800/50 pb-6">
+          <Link to="/admin" className="p-2.5 bg-neutral-900/50 border border-neutral-800 rounded-xl text-neutral-400 hover:text-white transition-colors">
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-emerald-500" /> استيراد كورس يوتيوب
+            </h1>
+            <p className="text-neutral-500 text-xs font-medium mt-1">توليد تلقائي للمحتوى باستخدام Groq AI</p>
           </div>
-        </header>
+        </div>
 
-        {/* Search & Selection Grid (المعدلة) */}
-        <section className="bg-white/[0.03] p-8 rounded-[2.5rem] border border-white/10 relative shadow-2xl flex flex-col gap-6">
-          
-          {/* خانة الرابط بقت بعرض الشاشة كلها */}
-          <div className="w-full space-y-3">
-            <label className="text-emerald-500 text-sm font-black uppercase tracking-widest px-1">رابط قائمة التشغيل (Playlist)</label>
-            <div className="relative group">
-              <Youtube className="absolute right-5 top-1/2 -translate-y-1/2 w-8 h-8 text-red-600 transition-transform group-focus-within:scale-110" />
+        {/* 🌟 شريط الإدخال البسيط والمدمج 🌟 */}
+        <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-4 md:p-6 shadow-xl">
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            
+            {/* خانة الرابط */}
+            <div className="flex-[2] w-full space-y-2">
+              <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
+                <Youtube className="w-4 h-4 text-red-500" /> رابط قائمة التشغيل
+              </label>
               <input
                 type="text"
-                placeholder="ضع الرابط هنا... (مثال: https://youtube.com/playlist?list=...)"
+                dir="ltr"
+                placeholder="https://youtube.com/playlist?list=..."
                 value={playlistUrl}
                 onChange={(e) => setPlaylistUrl(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-[1.5rem] pr-16 pl-6 py-6 text-xl outline-none focus:border-emerald-500/50 transition-all shadow-inner font-mono text-neutral-300 placeholder:font-tajawal placeholder:text-neutral-600"
+                className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl px-5 py-3.5 text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all font-mono text-sm placeholder:font-tajawal placeholder:text-neutral-600 placeholder:text-right"
               />
             </div>
-          </div>
 
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* التخصص */}
-            <div className="flex-[2] space-y-3">
-              <label className="text-emerald-500 text-xs font-black uppercase tracking-widest px-1">التخصص</label>
-              <div className="relative group">
-                <TreePine className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-emerald-600" />
+            {/* خانة التخصص */}
+            <div className="flex-1 w-full space-y-2">
+              <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
+                <TreePine className="w-4 h-4 text-emerald-500" /> التخصص
+              </label>
+              <div className="relative">
                 <select
                   value={selectedSpec}
                   onChange={(e) => setSelectedSpec(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl pr-14 pl-10 py-5 font-bold text-lg outline-none focus:border-emerald-500/50 appearance-none transition-all cursor-pointer"
+                  className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl pr-5 pl-10 py-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 appearance-none cursor-pointer transition-all"
                 >
-                  <option value="" className="bg-[#0a0f0c]">اختر تخصصاً للكورس...</option>
+                  <option value="" className="text-neutral-500">اختر التخصص...</option>
                   {specializations.map(spec => (
-                    <option key={spec.id} value={spec.id} className="bg-[#0a0f0c] font-bold text-white">{spec.name}</option>
+                    <option key={spec.id} value={spec.id} className="bg-[#0a0f0c]">{spec.name}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
               </div>
             </div>
 
-            {/* الزرار */}
-            <div className="flex-1 flex items-end">
-              <Button onClick={handleFetchPlaylist} disabled={isLoading || !playlistUrl} className="w-full h-[68px] bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-black text-xl shadow-xl shadow-emerald-900/20 active:scale-95 transition-all">
-                {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : "جلب وتحليل المحتوى"}
+            {/* زر الجلب */}
+            <div className="w-full md:w-auto">
+              <Button 
+                onClick={handleFetchPlaylist} 
+                disabled={isLoading || !playlistUrl} 
+                className="w-full md:w-32 h-[52px] bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold text-base shadow-md transition-all active:scale-95"
+              >
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "معاينة"}
               </Button>
             </div>
-          </div>
-        </section>
 
-        {/* Preview Results Section */}
+          </div>
+        </div>
+
+        {/* Preview Section - Clean Layout */}
         <AnimatePresence>
           {previewData && (
-            <motion.section 
-              initial={{ opacity: 0, y: 50 }} 
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }} 
               animate={{ opacity: 1, y: 0 }} 
-              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+              className="flex flex-col lg:flex-row gap-6 items-start"
             >
-              {/* Card Thumbnail */}
-              <div className="lg:col-span-1 space-y-6">
-                <div className="bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-6 shadow-2xl sticky top-8">
-                  <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              {/* Thumbnail Card */}
+              <div className="w-full lg:w-[320px] shrink-0 space-y-4 sticky top-6">
+                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-4 shadow-xl">
+                  <div className="relative rounded-2xl overflow-hidden mb-4 border border-neutral-800">
                     <img src={previewData.thumbnail} className="w-full aspect-video object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 inset-x-4 flex justify-between">
-                      <div className="bg-emerald-600 px-3 py-1.5 rounded-xl text-[10px] font-black flex items-center gap-2 shadow-xl"><LayoutGrid className="w-3 h-3" /> {previewData.lessons.length} درس</div>
-                      <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black flex items-center gap-2 border border-white/10"><Clock className="w-3 h-3 text-emerald-400" /> {previewData.lessons.reduce((acc, curr) => acc + curr.duration, 0)} د</div>
+                    <div className="absolute bottom-2 left-2 right-2 flex justify-between">
+                      <span className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/10 flex items-center gap-1"><LayoutGrid className="w-3 h-3" /> {previewData.lessons.length}</span>
+                      <span className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-emerald-400 border border-white/10 flex items-center gap-1"><Clock className="w-3 h-3" /> {previewData.lessons.reduce((a, b) => a + b.duration, 0)} د</span>
                     </div>
                   </div>
-                  <div className="mt-8 p-5 bg-white/[0.02] rounded-2xl border border-white/5 flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/30 text-emerald-500 font-black text-xl">{previewData.instructor.charAt(0)}</div>
+                  <div className="bg-[#121A15] p-3 rounded-xl flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-500 font-black text-sm">{previewData.instructor.charAt(0)}</div>
                     <div>
-                      <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">مقدم الدورة</p>
-                      <h4 className="font-black text-white text-lg">{previewData.instructor}</h4>
+                      <p className="text-[10px] text-neutral-500 font-bold">مقدم الدورة</p>
+                      <h3 className="text-sm font-bold text-white line-clamp-1">{previewData.instructor}</h3>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Data & Lessons */}
-              <div className="lg:col-span-2 space-y-6">
-                <div className="bg-[#0a0f0c] border border-white/10 rounded-[2.5rem] p-8 shadow-2xl space-y-8">
-                  <div>
-                    <h2 className="text-3xl font-black text-white leading-tight">{previewData.title}</h2>
-                    <div className="h-1.5 w-24 bg-emerald-600 rounded-full mt-4 shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
+              {/* Content Card */}
+              <div className="flex-1 w-full bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 md:p-8 shadow-xl space-y-6">
+                <h2 className="text-xl md:text-2xl font-black text-white">{previewData.title}</h2>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-emerald-500 text-xs font-bold flex items-center gap-2"><Edit3 className="w-3.5 h-3.5" /> الوصف التعريفي</label>
+                    {isGenerating && <span className="text-[10px] text-emerald-500 animate-pulse font-bold">جاري الصياغة...</span>}
                   </div>
+                  <textarea
+                    value={previewData.description}
+                    onChange={(e) => setPreviewData({...previewData, description: e.target.value})}
+                    rows={4}
+                    className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl px-5 py-4 text-neutral-300 text-sm leading-relaxed focus:border-emerald-500/50 outline-none resize-none transition-colors"
+                  />
+                </div>
 
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center px-1">
-                      <label className="text-emerald-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><Edit3 className="w-3 h-3" /> وصف الكورس الذكي</label>
-                      {isGenerating && <span className="text-[10px] text-emerald-500 animate-pulse font-black italic">جاري التوليد...</span>}
-                    </div>
-                    <textarea
-                      value={previewData.description}
-                      onChange={(e) => setPreviewData({...previewData, description: e.target.value})}
-                      rows={5}
-                      className="w-full bg-black/40 border border-white/5 rounded-[1.5rem] px-6 py-5 text-neutral-400 text-sm leading-relaxed focus:border-emerald-500/40 outline-none resize-none shadow-inner"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <label className="text-neutral-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 px-1"><ListVideo className="w-4 h-4 text-emerald-600" /> محتوى الدروس</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-72 overflow-y-auto custom-scrollbar pr-2">
-                      {previewData.lessons.map((lesson) => (
-                        <div key={lesson.video_id} className="flex justify-between items-center p-4 bg-white/[0.02] border border-white/5 rounded-xl group hover:border-emerald-500/20 transition-all cursor-default">
-                          <span className="text-xs text-neutral-400 font-bold flex items-center gap-3">
-                            <span className="text-emerald-500/40 font-mono text-[10px]">#{lesson.order}</span> {lesson.title}
-                          </span>
-                          <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/5 px-2 py-1 rounded-md">{lesson.duration} د</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 pt-6">
-                    <Button onClick={() => setPreviewData(null)} variant="ghost" className="flex-1 h-16 rounded-2xl text-neutral-500 hover:bg-red-500/10 hover:text-red-500">إلغاء</Button>
-                    <Button onClick={handleImportCourse} disabled={isLoading} className="flex-[3] h-16 bg-white text-black hover:bg-neutral-200 rounded-2xl font-black text-xl shadow-2xl active:scale-[0.98] transition-all flex gap-3">
-                      {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <><CheckCircle2 className="w-6 h-6" /> اعتماد ونشر الكورس</>}
-                    </Button>
+                <div className="space-y-3">
+                  <label className="text-neutral-400 text-xs font-bold flex items-center gap-2 px-1"><ListVideo className="w-4 h-4" /> فهرس الدروس</label>
+                  <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                    {previewData.lessons.map((lesson) => (
+                      <div key={lesson.video_id} className="flex justify-between items-center p-3.5 bg-[#121A15] border border-neutral-800/50 rounded-xl hover:border-neutral-700 transition-colors">
+                        <span className="text-sm text-neutral-300 font-medium flex items-center gap-3">
+                          <span className="text-neutral-600 font-mono text-xs">#{lesson.order}</span> 
+                          <span className="line-clamp-1">{lesson.title}</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-neutral-400 bg-[#0a0f0c] px-2 py-1 rounded-md shrink-0 border border-neutral-800">{lesson.duration} د</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
+                <div className="flex gap-3 pt-4 border-t border-neutral-800/50">
+                  <Button onClick={() => setPreviewData(null)} variant="ghost" className="h-14 px-6 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800">إلغاء</Button>
+                  <Button onClick={handleImportCourse} disabled={isLoading} className="flex-1 h-14 bg-white text-black hover:bg-neutral-200 rounded-xl font-bold text-lg flex gap-2">
+                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><CheckCircle2 className="w-5 h-5" /> حفظ ونشر الكورس</>}
+                  </Button>
+                </div>
               </div>
-            </motion.section>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
