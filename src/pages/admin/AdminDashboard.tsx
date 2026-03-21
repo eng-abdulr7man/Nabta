@@ -52,8 +52,7 @@ const AdminDashboard = () => {
       const counts: Record<string, number> = {};
       (enrollments || []).forEach((e: any) => { counts[e.course_id] = (counts[e.course_id] || 0) + 1; });
       return (courses || []).map((c: any) => ({
-        // قللنا عدد الحروف لـ 22 عشان تبقى متناسقة جداً
-        name: c.title.length > 22 ? c.title.slice(0, 22) + "..." : c.title,
+        name: c.title.length > 20 ? c.title.slice(0, 20) + "..." : c.title,
         طلاب: counts[c.id] || 0,
       })).sort((a: any, b: any) => b.طلاب - a.طلاب).slice(0, 5);
     },
@@ -115,7 +114,7 @@ const AdminDashboard = () => {
     { label: "رسائل الدعم", value: stats?.unreadMessages || 0, icon: MessageSquare, color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20", glow: "bg-rose-500" },
   ];
 
-  const customTooltipStyle = { backgroundColor: '#0a0f0c', borderColor: '#1e293b', borderRadius: '12px', color: '#fff', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' };
+  const customTooltipStyle = { backgroundColor: '#0a0f0c', borderColor: '#1e293b', borderRadius: '12px', color: '#fff', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)', textAlign: 'right' as const };
 
   return (
     <AdminLayout>
@@ -178,9 +177,8 @@ const AdminDashboard = () => {
               <Activity className="w-5 h-5 text-purple-500" /> معدل نمو التسجيلات 
             </h3>
             {(monthlyData || []).length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                {/* 🛠️ عكسنا الاتجاه عشان يمشي مع العربي */}
-                <LineChart data={monthlyData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+              <ResponsiveContainer width="100%" height={320}>
+                <LineChart data={monthlyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                   <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} dy={10} reversed={true} />
                   <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} orientation="right" dx={10} />
@@ -189,12 +187,12 @@ const AdminDashboard = () => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[300px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
+              <div className="h-[320px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
             )}
           </motion.div>
 
           {/* Live Feed */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="lg:col-span-1 bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 shadow-xl flex flex-col">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="lg:col-span-1 bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 shadow-xl flex flex-col min-h-[380px]">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-black text-white flex items-center gap-2">
                 <span className="relative flex h-3 w-3">
@@ -209,7 +207,7 @@ const AdminDashboard = () => {
             <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-3">
               {recentActivity && recentActivity.length > 0 ? (
                 recentActivity.map((act: any) => (
-                  <div key={act.id} className="bg-[#121A15] p-3 rounded-2xl border border-neutral-800/50 hover:border-emerald-500/30 transition-colors">
+                  <div key={act.id} className="bg-[#121A15] p-4 rounded-2xl border border-neutral-800/50 hover:border-emerald-500/30 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center font-black text-xs shrink-0">
                         {act.profile?.full_name?.charAt(0) || "U"}
@@ -218,6 +216,12 @@ const AdminDashboard = () => {
                         <p className="text-sm font-bold text-white truncate">{act.profile?.full_name || "مستخدم جديد"}</p>
                         <p className="text-[10px] text-emerald-500 font-bold truncate">{act.course?.title || "كورس محذوف"}</p>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-neutral-500 font-medium">
+                      <Clock className="w-3 h-3" />
+                      <span dir="ltr">
+                        {new Date(act.enrolled_at).toLocaleString("ar-EG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -230,62 +234,66 @@ const AdminDashboard = () => {
             </div>
           </motion.div>
 
-          {/* Bar Chart (الكورسات الأكثر إقبالاً - متظبط للـ RTL) */}
+          {/* Bar Chart - تم توسيع هوامش اليمين وحل مشكلة التداخل */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 shadow-xl">
             <h3 className="font-black text-white mb-6 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-emerald-500" /> الكورسات الأكثر إقبالاً
             </h3>
             {(courseEnrollments || []).length > 0 ? (
-              <ResponsiveContainer width="100%" height={280}>
-                {/* 🛠️ الحل الجذري للبار شارت في العربي */}
-                <BarChart data={courseEnrollments} layout="vertical" margin={{ left: 20, right: 0, top: 0, bottom: 0 }}>
+              <ResponsiveContainer width="100%" height={340}>
+                {/* 🛠️ زودنا Margin يمين لـ 150 عشان نوسع مكان للكلام، وخلينا التيك مارجن 15 */}
+                <BarChart data={courseEnrollments} layout="vertical" margin={{ left: 0, right: 150, top: 10, bottom: 10 }}>
                   <XAxis type="number" hide />
                   <YAxis 
                     dataKey="name" 
                     type="category" 
-                    orientation="right" /* ينقل الكلام لليمين */
-                    width={180} /* مساحة ضخمة للكلام عشان ميتقصش */
-                    stroke="#cbd5e1" 
-                    fontSize={13} 
-                    fontWeight={600}
+                    orientation="right" 
+                    width={150} 
+                    tickMargin={15}
+                    tick={{ fill: '#cbd5e1', fontSize: 13, fontWeight: 600 }}
                     tickLine={false} 
                     axisLine={false} 
                   />
                   <Tooltip cursor={{ fill: '#121A15' }} contentStyle={customTooltipStyle} />
-                  <Bar dataKey="طلاب" fill="#10b981" radius={[4, 0, 0, 4]} barSize={18} />
+                  <Bar dataKey="طلاب" fill="#10b981" radius={[4, 0, 0, 4]} barSize={16} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
+              <div className="h-[340px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
             )}
           </motion.div>
 
-          {/* Pie Chart (توزيع التخصصات - Legend نظيف) */}
+          {/* Pie Chart - تم تحسين الـ Legend */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 shadow-xl flex flex-col">
             <h3 className="font-black text-white mb-2 flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-500" /> توزيع التخصصات
             </h3>
             {(specDistribution || []).length > 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center mt-2">
-                <ResponsiveContainer width="100%" height={260}>
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <ResponsiveContainer width="100%" height={340}>
                   <PieChart>
-                    {/* 🛠️ صغرنا الدايرة ولغينا الكلام المزعج من عليها */}
-                    <Pie data={specDistribution} cx="50%" cy="45%" innerRadius={60} outerRadius={85} dataKey="value" paddingAngle={5} stroke="none">
+                    {/* 🛠️ رفعنا الدايرة لفوق شوية (cy=40%) عشان ندي مساحة للـ Legend تحت */}
+                    <Pie data={specDistribution} cx="50%" cy="40%" innerRadius={65} outerRadius={95} dataKey="value" paddingAngle={5} stroke="none">
                       {(specDistribution || []).map((_: any, idx: number) => <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />)}
                     </Pie>
                     <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#fff' }} />
-                    {/* 🛠️ حطينا مفتاح خريطة مرتب ومظبوط تحت */}
                     <Legend 
                       verticalAlign="bottom" 
                       align="center" 
                       iconType="circle" 
-                      wrapperStyle={{ fontSize: '13px', fontWeight: 'bold', color: '#94a3b8', paddingTop: '10px' }} 
+                      wrapperStyle={{ 
+                        fontSize: '12px', 
+                        fontWeight: 'bold', 
+                        color: '#94a3b8', 
+                        lineHeight: '2.5', // ده بيفرد المسافات بين التخصصات 
+                        paddingTop: '20px'
+                      }} 
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
+              <div className="h-[340px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
             )}
           </motion.div>
 
