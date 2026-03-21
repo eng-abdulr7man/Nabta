@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Pencil, Trash2, Eye, EyeOff, ListTree, 
-  Upload, X, Image, BookOpen, Loader2, Save, Layers 
+  Upload, X, Image, BookOpen, Loader2, Save, Layers, ChevronDown 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
