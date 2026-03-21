@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { 
-  Zap, Sprout, BookOpenCheck, BarChartBig, Trophy, 
-  ChevronLeft, Sparkles 
+  Zap, Sprout, BookOpenCheck, Trophy, 
+  ChevronLeft, Sparkles, ArrowLeft // ✅ ضفنا ArrowLeft هنا
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button"; // ✅ ضفنا الـ Button هنا
 
 // بيانات الخريطة الزراعية المهنية
 const journeySteps = [
