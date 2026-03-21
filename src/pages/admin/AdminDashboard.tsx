@@ -3,9 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button"; // <-- السطر اللي كان ناقص
 import { 
   BookOpen, Users, Award, MessageSquare, TrendingUp, 
-  Star, Activity, Youtube, Plus, Zap, Clock, Button
+  Star, Activity, Youtube, Plus, Zap, Clock 
 } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -123,7 +124,7 @@ const AdminDashboard = () => {
         
         <div className="absolute top-[-5%] right-[-5%] w-[300px] h-[300px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-        {/* 🌟 Header & Quick Actions (الجديد) 🌟 */}
+        {/* 🌟 Header & Quick Actions 🌟 */}
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 bg-[#0a0f0c] p-8 rounded-[2rem] border border-neutral-800/60 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 blur-3xl -z-10" />
@@ -175,7 +176,7 @@ const AdminDashboard = () => {
         {/* Charts & Live Feed Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Line Chart (أخد مساحة أكبر) */}
+          {/* Line Chart */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="lg:col-span-2 bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-xl">
             <h3 className="font-black text-white mb-6 flex items-center gap-2">
               <Activity className="w-5 h-5 text-purple-500" /> معدل نمو التسجيلات 
@@ -195,7 +196,7 @@ const AdminDashboard = () => {
             )}
           </motion.div>
 
-          {/* 🌟 Live Feed (أحدث النشاطات الحية) 🌟 */}
+          {/* 🌟 Live Feed 🌟 */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="lg:col-span-1 bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 shadow-xl flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-black text-white flex items-center gap-2">
@@ -238,7 +239,7 @@ const AdminDashboard = () => {
             </div>
           </motion.div>
 
-          {/* Bar Chart (أخد نص المساحة اللي تحت) */}
+          {/* Bar Chart */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 shadow-xl">
             <h3 className="font-black text-white mb-6 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-emerald-500" /> الكورسات الأكثر إقبالاً
@@ -257,7 +258,7 @@ const AdminDashboard = () => {
             )}
           </motion.div>
 
-          {/* Pie Chart (أخد النص التاني) */}
+          {/* Pie Chart */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 shadow-xl flex flex-col">
             <h3 className="font-black text-white mb-2 flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-500" /> توزيع التخصصات
