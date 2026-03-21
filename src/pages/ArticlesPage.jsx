@@ -76,7 +76,7 @@ const ArticlesPage = () => {
           <div className="relative z-10 mb-16 text-center md:text-right space-y-8">
             <div>
               <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
-                مركز المساعدة <span className="text-emerald-500">ونبض المعرفة</span>
+                مركز المساعدة 
               </h1>
               <p className="text-neutral-400 text-lg md:text-xl max-w-3xl leading-relaxed">
                 دليلك الكامل للإجابة على تساؤلاتك حول منصة نبتة التعليمية.
