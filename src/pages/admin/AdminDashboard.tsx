@@ -3,14 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button"; // <-- السطر اللي كان ناقص
+import { Button } from "@/components/ui/button";
 import { 
   BookOpen, Users, Award, MessageSquare, TrendingUp, 
   Star, Activity, Youtube, Plus, Zap, Clock 
 } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, LineChart, Line, CartesianGrid 
+  PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend 
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
       const counts: Record<string, number> = {};
       (enrollments || []).forEach((e: any) => { counts[e.course_id] = (counts[e.course_id] || 0) + 1; });
       return (courses || []).map((c: any) => ({
-        name: c.title.length > 15 ? c.title.slice(0, 15) + "..." : c.title,
+        name: c.title.length > 20 ? c.title.slice(0, 20) + "..." : c.title, // زودنا عدد الحروف شوية
         طلاب: counts[c.id] || 0,
       })).sort((a: any, b: any) => b.طلاب - a.طلاب).slice(0, 5);
     },
@@ -86,7 +86,6 @@ const AdminDashboard = () => {
     },
   });
 
-  // ميزة جديدة: جلب أحدث التسجيلات الحية
   const { data: recentActivity } = useQuery({
     queryKey: ["admin-recent-activity"],
     queryFn: async () => {
@@ -121,10 +120,9 @@ const AdminDashboard = () => {
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto space-y-8 p-2 font-tajawal relative overflow-x-hidden" dir="rtl">
-        
         <div className="absolute top-[-5%] right-[-5%] w-[300px] h-[300px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-        {/* 🌟 Header & Quick Actions 🌟 */}
+        {/* Header & Quick Actions */}
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 bg-[#0a0f0c] p-8 rounded-[2rem] border border-neutral-800/60 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 blur-3xl -z-10" />
@@ -134,7 +132,6 @@ const AdminDashboard = () => {
             <p className="text-neutral-400 font-medium mt-3 text-sm md:text-base">إليك ملخص شامل لأداء منصة نبتة اليوم. كل شيء يعمل بكفاءة.</p>
           </div>
 
-          {/* Quick Actions */}
           <div className="lg:w-1/3 flex flex-col justify-center gap-3 bg-[#050806] border border-neutral-800/50 p-4 rounded-[2rem]">
             <h3 className="text-xs font-black text-neutral-500 px-2 uppercase tracking-widest flex items-center gap-2">
               <Zap className="w-3 h-3 text-amber-500" /> وصول سريع
@@ -150,7 +147,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Stat Cards Grid */}
+        {/* Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {statCards.map((card, i) => {
             const Icon = card.icon;
@@ -173,7 +170,6 @@ const AdminDashboard = () => {
           })}
         </div>
 
-        {/* Charts & Live Feed Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Line Chart */}
@@ -192,11 +188,11 @@ const AdminDashboard = () => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[300px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية للرسم</div>
+              <div className="h-[300px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
             )}
           </motion.div>
 
-          {/* 🌟 Live Feed 🌟 */}
+          {/* Live Feed */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="lg:col-span-1 bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 shadow-xl flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-black text-white flex items-center gap-2">
@@ -239,7 +235,7 @@ const AdminDashboard = () => {
             </div>
           </motion.div>
 
-          {/* Bar Chart */}
+          {/* Bar Chart - تم توسيع الـ YAxis */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 shadow-xl">
             <h3 className="font-black text-white mb-6 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-emerald-500" /> الكورسات الأكثر إقبالاً
@@ -248,34 +244,38 @@ const AdminDashboard = () => {
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={courseEnrollments} layout="vertical" margin={{ left: 0, right: 20, top: 0, bottom: 0 }}>
                   <XAxis type="number" stroke="#475569" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis dataKey="name" type="category" width={110} stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip cursor={{ fill: '#121A15' }} contentStyle={customTooltipStyle} />
+                  {/* 🛠️ التعديل هنا: كبرنا الـ width لـ 140 وخلينا النص أوضح */}
+                  <YAxis dataKey="name" type="category" width={140} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tick={{ fill: '#cbd5e1' }} />
+                  <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={customTooltipStyle} />
                   <Bar dataKey="طلاب" fill="#10b981" radius={[0, 6, 6, 0]} barSize={24} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات</div>
+              <div className="h-[280px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
             )}
           </motion.div>
 
-          {/* Pie Chart */}
+          {/* Pie Chart - تم مسح النصوص المتداخلة وإضافة Legend */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 shadow-xl flex flex-col">
             <h3 className="font-black text-white mb-2 flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-500" /> توزيع التخصصات
             </h3>
             {(specDistribution || []).length > 0 ? (
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-center justify-center mt-4">
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
-                    <Pie data={specDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" paddingAngle={5} stroke="none" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelStyle={{ fontSize: '11px', fill: '#cbd5e1', fontWeight: 'bold' }}>
+                    {/* 🛠️ التعديل هنا: لغينا الـ Label الخارجي المزعج */}
+                    <Pie data={specDistribution} cx="50%" cy="45%" innerRadius={65} outerRadius={95} dataKey="value" paddingAngle={5} stroke="none">
                       {(specDistribution || []).map((_: any, idx: number) => <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />)}
                     </Pie>
                     <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#fff' }} />
+                    {/* 🛠️ ضفنا مفتاح الخريطة بشكل أنيق تحت الدايرة */}
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '13px', fontWeight: 'bold', color: '#cbd5e1', marginTop: '20px' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات</div>
+              <div className="h-[280px] flex items-center justify-center text-neutral-600 font-bold">لا توجد بيانات كافية</div>
             )}
           </motion.div>
 
