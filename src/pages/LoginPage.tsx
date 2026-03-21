@@ -283,6 +283,7 @@ import { Mail, Lock, Sprout, Eye, EyeOff, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/utils/logger";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -311,6 +312,10 @@ const LoginPage = () => {
     
     if (error) {
       toast({ title: "خطأ في تسجيل الدخول", description: error.message, variant: "destructive" });
+      
+      // (اختياري) ممكن نسجل محاولة الدخول الفاشلة عشان المراقبة الأمنية
+      logActivity("محاولة دخول فاشلة", { email: email, reason: error.message });
+      
     } else {
       // حفظ أو حذف البريد الإلكتروني بناءً على اختيار "تذكرني"
       if (rememberMe) {
@@ -319,11 +324,13 @@ const LoginPage = () => {
         localStorage.removeItem("rememberedEmail");
       }
       
+      // 🚀 السطر السحري: تسجيل النشاط بعد نجاح الدخول
+      logActivity("تسجيل دخول", { method: "Email/Password", email: email });
+      
       toast({ title: "تم تسجيل الدخول بنجاح" });
       navigate("/");
     }
   };
-
   return (
     // الخلفية الداكنة مع إضاءات خفيفة
     <div className="min-h-screen flex items-center justify-center bg-[#050806] px-4 py-20 relative overflow-hidden font-tajawal">
