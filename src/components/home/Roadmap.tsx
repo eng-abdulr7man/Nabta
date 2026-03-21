@@ -57,9 +57,9 @@ const Roadmap = () => {
             className="flex items-center gap-3 mb-5 justify-center md:justify-start"
           >
             <div className="h-[2px] w-14 bg-gradient-to-r from-emerald-500 to-transparent" />
-            <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em]">
+            {/* <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em]">
               دليلك نحو الاحتراف
-            </span>
+            </span> */}
           </motion.div>
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
