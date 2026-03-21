@@ -49,18 +49,18 @@ const Roadmap = () => {
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         
         {/* رأس القسم بتصميم Typography فخم */}
-        <div className="text-right mb-24 max-w-2xl md:mr-0 mr-auto text-center md:text-right">
+        {/* <div className="text-right mb-24 max-w-2xl md:mr-0 mr-auto text-center md:text-right">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="flex items-center gap-3 mb-5 justify-center md:justify-start"
           >
-            <div className="h-[2px] w-14 bg-gradient-to-r from-emerald-500 to-transparent" />
+            <div className="h-[2px] w-14 bg-gradient-to-r from-emerald-500 to-transparent" /> */}
             {/* <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em]">
               دليلك نحو الاحتراف
             </span> */}
-          </motion.div>
+          {/* </motion.div> */}
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
