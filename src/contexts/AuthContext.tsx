@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 type AppRole = "owner" | "admin" | "user";
 
@@ -11,6 +12,7 @@ interface Profile {
   email: string;
   phone: string;
   avatar_url: string;
+  is_suspended?: boolean; // ضفنا العمود الجديد هنا
 }
 
 interface AuthContextType {
@@ -38,14 +40,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-    setProfile(data as Profile | null);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+      if (error) throw error;
+
+      // 🛑 الفحص الجوهري: لو الحساب موقوف، اطرد المستخدم فوراً
+      if (data?.is_suspended) {
+        await supabase.auth.signOut();
+        setProfile(null);
+        setUser(null);
+        setSession(null);
+        setRoles([]);
+        
+        toast({
+          title: "حسابك موقوف 🚫",
+          description: "تم إيقاف صلاحية الوصول لهذا الحساب. يرجى التواصل مع الإدارة.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setProfile(data as Profile | null);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setProfile(null);
+    }
   };
 
   const fetchRoles = async (userId: string) => {
@@ -71,18 +98,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    // Set up auth listener BEFORE getting session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Use setTimeout to avoid Supabase deadlock
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-            fetchRoles(session.user.id);
-          }, 0);
+          // فحص البروفايل فور تسجيل الدخول أو تغيير الحالة
+          await fetchProfile(session.user.id);
+          await fetchRoles(session.user.id);
         } else {
           setProfile(null);
           setRoles([]);
@@ -91,6 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
+    // Initial check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
