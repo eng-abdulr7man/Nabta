@@ -3,262 +3,308 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ShieldCheck, ShieldX, Users, Search, Eye, UserX, UserCheck, X, Mail, Phone, Calendar, BookOpen } from "lucide-react";
+import { 
+  Shield, ShieldCheck, ShieldX, Users, Search, Eye, 
+  UserX, UserCheck, X, Mail, Phone, Calendar, 
+  BookOpen, Filter, UserCog, GraduationCap, Crown,
+  CheckCircle2, Trash2, MailForward, History, Award, Zap
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const AdminUsers = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("all");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
+  // 1. جلب البيانات الأساسية
   const { data: users, isLoading } = useQuery({
-    queryKey: ["admin-users"],
+    queryKey: ["admin-users-pro"],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      const { data: roles } = await supabase.from("user_roles").select("*");
+      const { data: profiles, error: pErr } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+      if (pErr) throw pErr;
       
-      // Get enrollment counts per user
-      const { data: enrollments } = await supabase.from("enrollments").select("user_id");
-      const enrollmentCounts: Record<string, number> = {};
-      (enrollments || []).forEach((e: any) => {
-        enrollmentCounts[e.user_id] = (enrollmentCounts[e.user_id] || 0) + 1;
-      });
+      const { data: roles } = await supabase.from("user_roles").select("*");
+      const { data: enrollments } = await supabase.from("enrollments").select("*, courses(title)");
 
-      return (profiles || []).map((p: any) => ({
-        ...p,
-        roles: (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role),
-        enrollmentCount: enrollmentCounts[p.user_id] || 0,
-      }));
+      return (profiles || []).map((p: any) => {
+        const userEnrollments = (enrollments || []).filter((e: any) => e.user_id === p.user_id);
+        const userRoles = (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role);
+        
+        // حساب الرتبة (Badge) بناءً على النشاط
+        let badge = { label: "مستكشف", color: "text-blue-400", bg: "bg-blue-400/10" };
+        if (userEnrollments.length >= 5) badge = { label: "خبير زراعي", color: "text-purple-400", bg: "bg-purple-400/10" };
+        else if (userEnrollments.length >= 2) badge = { label: "طالب مثابر", color: "text-emerald-400", bg: "bg-emerald-400/10" };
+
+        return {
+          ...p,
+          roles: userRoles,
+          enrollments: userEnrollments,
+          enrollmentCount: userEnrollments.length,
+          badge,
+          // افتراض الحالة "نشط" لو تم التحديث في آخر 10 دقائق
+          isOnline: new Date().getTime() - new Date(p.updated_at).getTime() < 600000
+        };
+      });
     },
   });
 
+  // 2. العمليات (Mutations)
   const toggleAdmin = useMutation({
     mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
-      if (isAdmin) {
-        const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
-        if (error) throw error;
-      }
+      if (isAdmin) await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
+      else await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
     },
     onSuccess: () => {
-      toast({ title: "تم تحديث الدور بنجاح" });
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-    },
-    onError: (err: any) => toast({ title: "خطأ", description: err.message, variant: "destructive" }),
+      toast({ title: "تم تحديث الصلاحيات" });
+      queryClient.invalidateQueries({ queryKey: ["admin-users-pro"] });
+    }
   });
 
-  // Note: actual account suspension requires auth admin API via edge function
-  // For now we track it via activity_log
-  const suspendUser = useMutation({
-    mutationFn: async ({ userId, fullName }: { userId: string; fullName: string }) => {
-      await supabase.from("activity_log").insert({
-        user_id: userId,
-        action: "إيقاف حساب",
-        details: { full_name: fullName, suspended_at: new Date().toISOString() },
-      });
+  const deleteUsers = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("profiles").delete().in("user_id", ids);
+      if (error) throw error;
     },
     onSuccess: () => {
-      toast({ title: "تم تسجيل إيقاف الحساب في سجل النشاطات" });
-    },
+      toast({ title: `تم حذف ${selectedUsers.length} مستخدم بنجاح` });
+      setSelectedUsers([]);
+      queryClient.invalidateQueries({ queryKey: ["admin-users-pro"] });
+    }
   });
 
-  const filtered = (users || []).filter((u: any) =>
-    u.full_name?.includes(search) || u.email?.includes(search)
-  );
+  // 3. الفلترة والبحث
+  const filtered = useMemo(() => {
+    return (users || []).filter((u: any) => {
+      const matchesSearch = u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase());
+      if (activeTab === "admins") return matchesSearch && (u.roles.includes("admin") || u.roles.includes("owner"));
+      if (activeTab === "students") return matchesSearch && !u.roles.includes("admin") && !u.roles.includes("owner");
+      if (activeTab === "online") return matchesSearch && u.isOnline;
+      return matchesSearch;
+    });
+  }, [users, search, activeTab]);
+
+  const handleSelectAll = () => {
+    if (selectedUsers.length === filtered.length) setSelectedUsers([]);
+    else setSelectedUsers(filtered.map(u => u.user_id));
+  };
+
+  const toggleSelectUser = (id: string) => {
+    setSelectedUsers(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-black text-foreground flex items-center gap-2">
-            <Users className="w-6 h-6 text-primary" />
-            إدارة المستخدمين
-          </h1>
-          <span className="text-sm text-muted-foreground">{(users || []).length} مستخدم</span>
+      <div className="max-w-7xl mx-auto space-y-6 p-2 font-tajawal relative" dir="rtl">
+        
+        {/* Header Section */}
+        <div className="bg-[#0a0f0c] p-6 rounded-[2rem] border border-neutral-800/60 shadow-xl flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl" />
+          <div className="text-center md:text-right">
+            <h1 className="text-3xl font-black text-white flex items-center justify-center md:justify-start gap-3">
+              <Users className="w-8 h-8 text-emerald-500" /> رادار المستخدمين
+            </h1>
+            <p className="text-neutral-500 font-bold mt-1">تحكم شامل في مجتمع نبتة وإدارة الصلاحيات.</p>
+          </div>
+          
+          <div className="flex gap-2">
+             <div className="bg-[#121A15] p-3 rounded-2xl border border-neutral-800 text-center min-w-[100px]">
+                <p className="text-[10px] text-neutral-500 font-black uppercase mb-1">المتصلين</p>
+                <p className="text-xl font-black text-emerald-500">{users?.filter(u => u.isOnline).length || 0}</p>
+             </div>
+             <div className="bg-[#121A15] p-3 rounded-2xl border border-neutral-800 text-center min-w-[100px]">
+                <p className="text-[10px] text-neutral-500 font-black uppercase mb-1">إجمالي الطلاب</p>
+                <p className="text-xl font-black text-white">{users?.length || 0}</p>
+             </div>
+          </div>
         </div>
 
-        <div className="relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="ابحث عن مستخدم..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pr-10 pl-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-          />
+        {/* Filters & Search */}
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex items-center gap-2 bg-[#0a0f0c] p-1.5 rounded-2xl border border-neutral-800/60 overflow-x-auto w-full md:w-auto">
+            <Button onClick={() => setActiveTab("all")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold ${activeTab === "all" ? "bg-neutral-800 text-white" : "text-neutral-500"}`}>الكل</Button>
+            <Button onClick={() => setActiveTab("online")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold ${activeTab === "online" ? "bg-emerald-500/10 text-emerald-500" : "text-neutral-500"}`}>نشط الآن</Button>
+            <Button onClick={() => setActiveTab("admins")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold ${activeTab === "admins" ? "bg-primary/10 text-primary" : "text-neutral-500"}`}>المشرفين</Button>
+          </div>
+          
+          <div className="relative flex-1 w-full group">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600 group-focus-within:text-emerald-500 transition-colors" />
+            <input 
+              type="text" placeholder="ابحث بالاسم أو البريد الإلكتروني..." 
+              value={search} onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-[#0a0f0c] border border-neutral-800 rounded-2xl pr-12 pl-4 py-3 text-white text-sm focus:border-emerald-500/50 outline-none transition-all"
+            />
+          </div>
+
+          <Button onClick={handleSelectAll} variant="outline" className="h-12 rounded-2xl border-neutral-800 text-xs font-bold shrink-0">
+            {selectedUsers.length === filtered.length ? "إلغاء التحديد" : "تحديد الكل"}
+          </Button>
         </div>
 
-        {/* User Detail Modal */}
-        <AnimatePresence>
-          {selectedUser && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
-              onClick={() => setSelectedUser(null)}
-            >
+        {/* Users Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <AnimatePresence>
+            {filtered.map((user: any) => (
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className="glass-card p-6 max-w-md w-full space-y-5"
+                key={user.user_id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className={`group relative bg-[#0a0f0c] border rounded-[2rem] p-5 transition-all duration-300 ${selectedUsers.includes(user.user_id) ? 'border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)]' : 'border-neutral-800/60 hover:border-neutral-700'}`}
               >
-                <div className="flex items-center justify-between">
-                  <h2 className="font-black text-foreground text-lg">بيانات المستخدم</h2>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedUser(null)}>
-                    <X className="w-4 h-4" />
-                  </Button>
+                {/* Checkbox */}
+                <div 
+                  onClick={() => toggleSelectUser(user.user_id)}
+                  className={`absolute top-4 left-4 w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-all ${selectedUsers.includes(user.user_id) ? 'bg-emerald-500 border-emerald-500' : 'border-neutral-700 bg-black/20 opacity-0 group-hover:opacity-100'}`}
+                >
+                  {selectedUsers.includes(user.user_id) && <CheckCircle2 className="w-3.5 h-3.5 text-black" strokeWidth={3} />}
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    {selectedUser.avatar_url ? (
-                      <img src={selectedUser.avatar_url} alt={`صورة ${selectedUser.full_name}`} className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                      <span className="text-2xl font-black text-primary">{(selectedUser.full_name || "م").charAt(0)}</span>
-                    )}
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden border border-neutral-800 shadow-inner">
+                      {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-neutral-900 flex items-center justify-center text-xl font-black text-neutral-600">{(user.full_name || "M").charAt(0)}</div>}
+                    </div>
+                    {user.isOnline && <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-4 border-[#0a0f0c] animate-pulse" />}
                   </div>
-                  <div>
-                    <p className="font-black text-foreground text-lg">{selectedUser.full_name || "بدون اسم"}</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      selectedUser.roles.includes("owner") ? "bg-yellow-500/10 text-yellow-600" :
-                      selectedUser.roles.includes("admin") ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
-                    }`}>
-                      {selectedUser.roles.includes("owner") ? "مالك" : selectedUser.roles.includes("admin") ? "مشرف" : "مستخدم"}
-                    </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-black text-white truncate text-base">{user.full_name || "مستخدم نبتة"}</h3>
+                      {user.roles.includes("owner") && <Crown className="w-3.5 h-3.5 text-yellow-500 shrink-0" />}
+                    </div>
+                    <p className="text-[11px] text-neutral-500 font-medium truncate mb-2">{user.email}</p>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${user.badge.bg} ${user.badge.color}`}>
+                        {user.badge.label}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Mail className="w-4 h-4 shrink-0" />
-                    <span>{selectedUser.email}</span>
+                <div className="flex items-center justify-between mt-5 pt-4 border-t border-neutral-800/50">
+                  <div className="flex items-center gap-1.5 text-neutral-500">
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span className="text-xs font-black">{user.enrollmentCount} كورس</span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone className="w-4 h-4 shrink-0" />
-                    <span>{selectedUser.phone || "لم يُحدد"}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-4 h-4 shrink-0" />
-                    <span>انضم في {new Date(selectedUser.created_at).toLocaleDateString("ar", { dateStyle: "long" })}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <BookOpen className="w-4 h-4 shrink-0" />
-                    <span>{selectedUser.enrollmentCount} كورس مسجل</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2 border-t border-border">
-                  {!selectedUser.roles.includes("owner") && (
-                    <>
-                      <Button
-                        variant={selectedUser.roles.includes("admin") ? "destructive" : "outline"}
-                        size="sm"
-                        className="gap-1.5 text-xs"
-                        onClick={() => {
-                          toggleAdmin.mutate({
-                            userId: selectedUser.user_id,
-                            isAdmin: selectedUser.roles.includes("admin"),
-                          });
-                          setSelectedUser(null);
-                        }}
-                      >
-                        {selectedUser.roles.includes("admin") ? (
-                          <><ShieldX className="w-3.5 h-3.5" /> إزالة مشرف</>
-                        ) : (
-                          <><ShieldCheck className="w-3.5 h-3.5" /> ترقية لمشرف</>
-                        )}
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="gap-1.5 text-xs"
-                        onClick={() => {
-                          suspendUser.mutate({ userId: selectedUser.user_id, fullName: selectedUser.full_name });
-                          setSelectedUser(null);
-                        }}
-                      >
-                        <UserX className="w-3.5 h-3.5" />
-                        إيقاف الحساب
-                      </Button>
-                    </>
-                  )}
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedUser(user)} className="h-8 rounded-xl bg-[#121A15] border border-neutral-800 text-xs font-bold hover:text-emerald-500 transition-colors">
+                    <Eye className="w-3.5 h-3.5 ml-1.5" /> التفاصيل
+                  </Button>
                 </div>
               </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {/* 🌟 Floating Bulk Actions Bar 🌟 */}
+        <AnimatePresence>
+          {selectedUsers.length > 0 && (
+            <motion.div 
+              initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 p-4 rounded-3xl shadow-2xl flex items-center gap-6 border border-white/20 backdrop-blur-xl"
+            >
+              <div className="flex flex-col items-start pr-2">
+                <span className="text-xs font-black text-emerald-100 uppercase">تم تحديد</span>
+                <span className="text-lg font-black text-white leading-none">{selectedUsers.length} مستخدم</span>
+              </div>
+              <div className="h-8 w-px bg-white/20 mx-2" />
+              <div className="flex gap-2">
+                <Button onClick={() => deleteUsers.mutate(selectedUsers)} className="bg-black/20 hover:bg-black/40 text-white font-bold h-11 px-5 rounded-2xl border border-white/10 gap-2">
+                  <Trash2 className="w-4 h-4" /> حذف المحدد
+                </Button>
+                <Button className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold h-11 px-5 rounded-2xl gap-2 shadow-lg">
+                  <MailForward className="w-4 h-4" /> رسالة جماعية
+                </Button>
+              </div>
+              <button onClick={() => setSelectedUsers([])} className="p-2 text-white/70 hover:text-white"><X className="w-5 h-5" /></button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {isLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => <div key={i} className="glass-card h-16 animate-pulse" />)}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {filtered.map((user: any, i: number) => {
-              const isAdmin = user.roles.includes("admin") || user.roles.includes("owner");
-              const isOwner = user.roles.includes("owner");
-              return (
-                <motion.div
-                  key={user.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="glass-card p-4 flex items-center justify-between gap-4"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      {user.avatar_url ? (
-                        <img src={user.avatar_url} alt={`صورة ${user.full_name}`} className="w-full h-full rounded-full object-cover" />
-                      ) : (
-                        <span className="text-sm font-bold text-primary">{(user.full_name || "م").charAt(0)}</span>
+        {/* 🌟 Enhanced Detail Modal 🌟 */}
+        <AnimatePresence>
+          {selectedUser && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedUser(null)} className="absolute inset-0 bg-black/90 backdrop-blur-md" />
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                className="bg-[#0a0f0c] border border-neutral-800 rounded-[2.5rem] p-6 md:p-8 max-w-2xl w-full shadow-2xl relative overflow-hidden"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Left Column: Basic Info */}
+                  <div className="space-y-6">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-24 h-24 rounded-[2rem] bg-[#121A15] p-1.5 border border-neutral-800 shadow-2xl mb-4 relative">
+                        {selectedUser.avatar_url ? <img src={selectedUser.avatar_url} className="w-full h-full rounded-[1.6rem] object-cover" /> : <div className="w-full h-full rounded-[1.6rem] bg-emerald-500/10 flex items-center justify-center text-3xl font-black text-emerald-500">{(selectedUser.full_name || "M").charAt(0)}</div>}
+                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-[#0a0f0c] ${selectedUser.isOnline ? 'bg-emerald-500' : 'bg-neutral-700'}`} />
+                      </div>
+                      <h2 className="text-2xl font-black text-white">{selectedUser.full_name || "مستخدم مجهول"}</h2>
+                      <p className="text-neutral-500 text-sm font-medium mb-4">{selectedUser.email}</p>
+                      <div className={`px-4 py-1.5 rounded-xl font-black text-[10px] uppercase border ${selectedUser.badge.bg} ${selectedUser.badge.color} border-current/20`}>
+                        <Award className="w-3.5 h-3.5 inline ml-1.5" /> {selectedUser.badge.label}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="bg-[#121A15] p-4 rounded-2xl border border-neutral-800/50 flex items-center justify-between">
+                        <span className="text-xs font-bold text-neutral-500">آخر ظهور</span>
+                        <span className="text-xs font-black text-white">{selectedUser.isOnline ? 'متصل الآن' : new Date(selectedUser.updated_at).toLocaleDateString("ar-EG")}</span>
+                      </div>
+                      <div className="bg-[#121A15] p-4 rounded-2xl border border-neutral-800/50 flex items-center justify-between">
+                        <span className="text-xs font-bold text-neutral-500">تاريخ الانضمام</span>
+                        <span className="text-xs font-black text-white">{new Date(selectedUser.created_at).toLocaleDateString("ar-EG")}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Learning Timeline */}
+                  <div className="flex flex-col">
+                    <h3 className="text-sm font-black text-emerald-500 mb-4 flex items-center gap-2">
+                      <History className="w-4 h-4" /> سجل التعلم (Timeline)
+                    </h3>
+                    <div className="flex-1 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar space-y-4 relative">
+                      <div className="absolute top-0 right-3 w-px h-full bg-neutral-800 z-0" />
+                      {selectedUser.enrollments.length > 0 ? selectedUser.enrollments.map((enr: any, idx: number) => (
+                        <div key={idx} className="relative z-10 flex items-start gap-4">
+                          <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center shrink-0 mt-1 shadow-lg shadow-emerald-500/10">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-black text-white">{enr.courses?.title}</p>
+                            <p className="text-[10px] text-neutral-500 font-medium">سجل في {new Date(enr.enrolled_at).toLocaleDateString("ar-EG")}</p>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="h-full flex flex-col items-center justify-center text-neutral-600 opacity-50 py-10">
+                          <Zap className="w-8 h-8 mb-2" />
+                          <p className="text-xs font-bold">لم يبدأ أي دورة بعد</p>
+                        </div>
                       )}
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-bold text-sm text-foreground truncate">{user.full_name || "بدون اسم"}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-2 mt-6 pt-6 border-t border-neutral-800/50">
+                      {!selectedUser.roles.includes("owner") && (
+                        <Button
+                          onClick={() => { toggleAdmin.mutate({ userId: selectedUser.user_id, isAdmin: selectedUser.roles.includes("admin") }); setSelectedUser(null); }}
+                          className={`h-11 rounded-xl font-bold text-xs ${selectedUser.roles.includes("admin") ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" : "bg-emerald-600 text-white"}`}
+                        >
+                          {selectedUser.roles.includes("admin") ? "سحب الإشراف" : "ترقية لمشرف"}
+                        </Button>
+                      )}
+                      <Button variant="destructive" className="h-11 rounded-xl font-bold text-xs bg-rose-600 text-white">إيقاف الحساب</Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${isOwner ? "bg-yellow-500/10 text-yellow-600" : isAdmin ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"}`}>
-                      {isOwner ? "مالك" : isAdmin ? "مشرف" : "مستخدم"}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setSelectedUser(user)}
-                      title="عرض البيانات"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    {!isOwner && (
-                      <Button
-                        variant={isAdmin ? "destructive" : "outline"}
-                        size="sm"
-                        className="gap-1.5 text-xs h-8"
-                        onClick={() => toggleAdmin.mutate({ userId: user.user_id, isAdmin })}
-                      >
-                        {isAdmin ? (
-                          <><ShieldX className="w-3.5 h-3.5" /> إزالة مشرف</>
-                        ) : (
-                          <><ShieldCheck className="w-3.5 h-3.5" /> ترقية لمشرف</>
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
       </div>
     </AdminLayout>
   );
