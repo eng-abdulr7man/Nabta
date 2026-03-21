@@ -2,10 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
-import { 
-  Plus, Pencil, Trash2, Eye, EyeOff, ListTree, 
-  Upload, X, Image, BookOpen, Loader2, Save, Layers, ChevronDown 
-} from "lucide-react";
+import { BookOpen, Users, Award, MessageSquare, TrendingUp, Star } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from "recharts";
 
 const CHART_COLORS = ["hsl(142,60%,45%)", "hsl(200,70%,50%)", "hsl(30,80%,55%)", "hsl(45,80%,50%)", "hsl(0,70%,55%)", "hsl(270,60%,55%)"];
