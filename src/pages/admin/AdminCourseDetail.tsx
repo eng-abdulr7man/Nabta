@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Pencil, Trash2, ChevronDown, ChevronUp, Video, 
-  FileText, Upload, X, ArrowRight, BookOpen, Layers, Save
+  FileText, Upload, X, ArrowRight, BookOpen, Layers, Save, Loader2 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCourse } from "@/hooks/useCourses";
