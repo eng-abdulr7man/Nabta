@@ -34,7 +34,6 @@ const AdminUsers = () => {
         const userEnrollments = (enrollments || []).filter((e: any) => e.user_id === p.user_id);
         const userRoles = (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role);
         
-        // نظام الرتب التلقائي بناءً على النشاط
         let badge = { label: "مستكشف", color: "text-blue-400", bg: "bg-blue-400/10" };
         if (userEnrollments.length >= 5) badge = { label: "خبير زراعي", color: "text-purple-400", bg: "bg-purple-400/10" };
         else if (userEnrollments.length >= 2) badge = { label: "طالب مثابر", color: "text-emerald-400", bg: "bg-emerald-400/10" };
@@ -45,16 +44,13 @@ const AdminUsers = () => {
           enrollments: userEnrollments,
           enrollmentCount: userEnrollments.length,
           badge,
-          // تحديد حالة الاتصال (نشط لو تم التحديث في آخر 10 دقائق)
           isOnline: new Date().getTime() - new Date(p.updated_at).getTime() < 600000
         };
       });
     },
   });
 
-  // 2. عمليات التعديل (Mutations)
-  
-  // تغيير رتبة المستخدم (مشرف/مستخدم)
+  // 2. العمليات (Mutations)
   const toggleAdmin = useMutation({
     mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
       if (isAdmin) await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
@@ -66,7 +62,6 @@ const AdminUsers = () => {
     }
   });
 
-  // 🛠️ المحرك الفعلي لإيقاف وتنشيط الحساب
   const suspendUser = useMutation({
     mutationFn: async ({ userId, currentStatus }: { userId: string; currentStatus: boolean }) => {
       const { error } = await supabase
@@ -76,7 +71,6 @@ const AdminUsers = () => {
       
       if (error) throw error;
 
-      // تسجيل العملية في سجل النشاطات
       await supabase.from("activity_log").insert({
         user_id: userId,
         action: !currentStatus ? "إيقاف حساب" : "تنشيط حساب",
@@ -92,7 +86,6 @@ const AdminUsers = () => {
     },
   });
 
-  // حذف المستخدمين
   const deleteUsers = useMutation({
     mutationFn: async (ids: string[]) => {
       const { error } = await supabase.from("profiles").delete().in("user_id", ids);
@@ -105,10 +98,12 @@ const AdminUsers = () => {
     }
   });
 
-  // 3. منطق البحث والفلترة
   const filtered = useMemo(() => {
     return (users || []).filter((u: any) => {
-      const matchesSearch = u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase());
+      const searchLower = search.toLowerCase();
+      const matchesSearch = u.full_name?.toLowerCase().includes(searchLower) || 
+                           u.email?.toLowerCase().includes(searchLower) ||
+                           u.phone?.includes(search); // أضفنا البحث برقم التليفون
       if (activeTab === "admins") return matchesSearch && (u.roles.includes("admin") || u.roles.includes("owner"));
       if (activeTab === "students") return matchesSearch && !u.roles.includes("admin") && !u.roles.includes("owner");
       if (activeTab === "online") return matchesSearch && u.isOnline;
@@ -158,9 +153,9 @@ const AdminUsers = () => {
           <div className="relative flex-1 w-full group">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600 group-focus-within:text-emerald-500 transition-colors" />
             <input 
-              type="text" placeholder="ابحث بالاسم أو البريد..." 
+              type="text" placeholder="ابحث بالاسم، البريد، أو رقم التليفون..." 
               value={search} onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[#0a0f0c] border border-neutral-800 rounded-2xl pr-12 pl-4 py-3 text-white text-sm focus:border-emerald-500/50 outline-none transition-all"
+              className="w-full bg-[#0a0f0c] border border-neutral-800 rounded-2xl pr-12 pl-4 py-3 text-white text-sm focus:border-emerald-500/50 outline-none transition-all shadow-inner"
             />
           </div>
         </div>
@@ -179,7 +174,6 @@ const AdminUsers = () => {
                   exit={{ opacity: 0, scale: 0.9 }}
                   className={`group relative bg-[#0a0f0c] border rounded-[2rem] p-5 transition-all duration-300 ${user.is_suspended ? 'border-rose-500/20 bg-rose-500/5 opacity-70' : 'border-neutral-800/60 hover:border-neutral-700'} ${selectedUsers.includes(user.user_id) ? 'ring-2 ring-emerald-500' : ''}`}
                 >
-                  {/* Bulk Select Checkbox */}
                   <div onClick={() => toggleSelectUser(user.user_id)} className={`absolute top-4 left-4 w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-all z-20 ${selectedUsers.includes(user.user_id) ? 'bg-emerald-500 border-emerald-500 text-black' : 'border-neutral-700 bg-black/20 opacity-0 group-hover:opacity-100'}`}>
                     {selectedUsers.includes(user.user_id) && <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={3} />}
                   </div>
@@ -197,8 +191,14 @@ const AdminUsers = () => {
                         <h3 className="font-black text-white truncate text-base">{user.full_name || "مستخدم نبتة"}</h3>
                         {user.roles.includes("owner") && <Crown className="w-3.5 h-3.5 text-yellow-500 shrink-0" />}
                       </div>
-                      <p className="text-[11px] text-neutral-500 font-medium truncate mb-2">{user.email}</p>
-                      <div className="flex gap-2">
+                      <p className="text-[11px] text-neutral-500 font-medium truncate flex items-center gap-1.5 mb-1">
+                        <Mail className="w-3 h-3" /> {user.email}
+                      </p>
+                      {/* 🔥 إظهار رقم التليفون في الكارت الرئيسي */}
+                      <p className={`text-[11px] font-bold flex items-center gap-1.5 ${user.phone ? 'text-emerald-500/80' : 'text-neutral-600'}`}>
+                        <Phone className="w-3 h-3" /> {user.phone || "بدون رقم تليفون"}
+                      </p>
+                      <div className="flex gap-2 mt-2">
                         <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${user.badge.bg} ${user.badge.color}`}>{user.badge.label}</span>
                         {user.is_suspended && <span className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase bg-rose-500/20 text-rose-500">موقوف</span>}
                       </div>
@@ -240,7 +240,7 @@ const AdminUsers = () => {
           )}
         </AnimatePresence>
 
-        {/* User Detail Modal */}
+        {/* 🌟 User Detail Modal (المُعدل لإظهار التليفون) 🌟 */}
         <AnimatePresence>
           {selectedUser && (
             <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
@@ -259,9 +259,21 @@ const AdminUsers = () => {
                         <Award className="w-3.5 h-3.5 inline ml-1.5" /> {selectedUser.badge.label}
                       </span>
                     </div>
-                    <div className="bg-[#121A15] p-4 rounded-2xl border border-neutral-800/50 space-y-3">
-                      <div className="flex justify-between text-xs"><span className="text-neutral-500 font-bold">آخر ظهور</span><span className="text-white font-black">{selectedUser.isOnline ? 'نشط الآن' : new Date(selectedUser.updated_at).toLocaleDateString("ar-EG")}</span></div>
-                      <div className="flex justify-between text-xs"><span className="text-neutral-500 font-bold">تاريخ الانضمام</span><span className="text-white font-black">{new Date(selectedUser.created_at).toLocaleDateString("ar-EG")}</span></div>
+                    
+                    {/* 🔥 عرض البيانات الإحصائية + رقم التليفون */}
+                    <div className="bg-[#121A15] p-4 rounded-2xl border border-neutral-800/50 space-y-3 text-right" dir="rtl">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-neutral-500 font-bold flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> رقم الهاتف:</span>
+                        <span className="text-emerald-400 font-black" dir="ltr">{selectedUser.phone || "غير متوفر"}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-neutral-500 font-bold flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> آخر ظهور:</span>
+                        <span className="text-white font-black">{selectedUser.isOnline ? 'نشط الآن' : new Date(selectedUser.updated_at).toLocaleDateString("ar-EG")}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-neutral-500 font-bold flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> تاريخ الانضمام:</span>
+                        <span className="text-white font-black">{new Date(selectedUser.created_at).toLocaleDateString("ar-EG")}</span>
+                      </div>
                     </div>
                   </div>
 
