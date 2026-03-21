@@ -1,22 +1,29 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, BookOpen, Users, MessageSquare, Settings, LogOut, Sprout, 
-  ChevronRight, GraduationCap, Menu, X, Activity, FileText, Youtube // ضفنا أيقونة اليوتيوب هنا
+  ChevronRight, GraduationCap, Menu, X, Activity, FileText, Youtube, 
+  ChevronLeft, Sparkles, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 
 const sidebarLinks = [
-  { label: "لوحة التحكم", path: "/admin", icon: LayoutDashboard },
-  { label: "الكورسات", path: "/admin/courses", icon: BookOpen },
-  { label: "استيراد يوتيوب", path: "/admin/youtube-import", icon: Youtube }, // <-- الزرار الجديد هنا
-  { label: "التخصصات", path: "/admin/specializations", icon: GraduationCap },
-  { label: "المستخدمين", path: "/admin/users", icon: Users },
-  { label: "الرسائل", path: "/admin/messages", icon: MessageSquare },
-  { label: "المقالات", path: "/admin/articles", icon: FileText },
-  { label: "سجل النشاطات", path: "/admin/activity", icon: Activity },
+  { group: "الرئيسية", items: [
+    { label: "لوحة التحكم", path: "/admin", icon: LayoutDashboard },
+    { label: "سجل النشاطات", path: "/admin/activity", icon: Activity },
+  ]},
+  { group: "المحتوى التعليمي", items: [
+    { label: "الكورسات", path: "/admin/courses", icon: BookOpen },
+    { label: "استيراد يوتيوب", path: "/admin/youtube-import", icon: Youtube },
+    { label: "التخصصات", path: "/admin/specializations", icon: GraduationCap },
+  ]},
+  { group: "الإدارة والتواصل", items: [
+    { label: "المستخدمين", path: "/admin/users", icon: Users },
+    { label: "المقالات", path: "/admin/articles", icon: FileText },
+    { label: "الرسائل", path: "/admin/messages", icon: MessageSquare },
+  ]}
 ];
 
 const AdminLayout = ({ children }) => {
@@ -32,45 +39,79 @@ const AdminLayout = ({ children }) => {
   };
 
   const Sidebar = ({ mobile = false }) => (
-    <div className={`flex flex-col h-full bg-card border-l border-border ${mobile ? "w-64" : collapsed ? "w-16" : "w-64"} transition-all duration-300 shadow-xl`}>
-      <div className="p-4 flex items-center gap-2 border-b border-border">
-        <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-          <Sprout className="w-4 h-4 text-emerald-500" />
+    <div className={`flex flex-col h-full bg-[#0a0f0c]/80 backdrop-blur-xl border-l border-white/5 ${mobile ? "w-72" : collapsed ? "w-20" : "w-64"} transition-all duration-500 ease-in-out z-50`}>
+      {/* Logo Section */}
+      <div className="p-6 flex items-center justify-between border-b border-white/5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
+            <Sprout className="w-6 h-6 text-white" />
+          </div>
+          {(!collapsed || mobile) && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col">
+              <span className="font-tajawal font-black text-white text-base leading-none">نبتة</span>
+              <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-1">Admin Panel</span>
+            </motion.div>
+          )}
         </div>
-        {(!collapsed || mobile) && (
-          <span className="font-tajawal font-bold text-sm text-foreground tracking-tight">نبتة | لوحة المشرف</span>
-        )}
       </div>
 
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-hide">
-        {sidebarLinks.map((link) => {
-          const Icon = link.icon;
-          const isActive = location.pathname === link.path;
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => mobile && setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-bold transition-all ${
-                isActive
-                  ? "bg-emerald-500/10 text-emerald-500 shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              }`}
-            >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-500" : ""}`} />
-              {(!collapsed || mobile) && <span>{link.label}</span>}
-            </Link>
-          );
-        })}
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-8 overflow-y-auto custom-scrollbar">
+        {sidebarLinks.map((group, gIdx) => (
+          <div key={gIdx} className="space-y-2">
+            {(!collapsed || mobile) && (
+              <h3 className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.2em] px-4 mb-4">
+                {group.group}
+              </h3>
+            )}
+            <div className="space-y-1">
+              {group.items.map((link, lIdx) => {
+                const Icon = link.icon;
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => mobile && setMobileOpen(false)}
+                    className={`group relative flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
+                      isActive 
+                        ? "text-emerald-400" 
+                        : "text-neutral-500 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeTab"
+                        className="absolute inset-0 bg-emerald-500/10 rounded-2xl border border-emerald-500/20"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <Icon className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-emerald-500" : ""}`} />
+                    {(!collapsed || mobile) && (
+                      <span className="text-sm font-bold relative z-10">{link.label}</span>
+                    )}
+                    {isActive && !collapsed && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-auto" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      <div className="p-3 border-t border-border space-y-1">
-        <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-bold text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors" onClick={() => mobile && setMobileOpen(false)}>
-          <ChevronRight className="w-4 h-4 shrink-0" />
-          {(!collapsed || mobile) && <span>العودة للموقع</span>}
+      {/* Bottom Actions */}
+      <div className="p-4 border-t border-white/5 space-y-2">
+        <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-neutral-500 hover:text-white hover:bg-white/5 transition-all">
+          <ChevronRight className="w-5 h-5" />
+          {(!collapsed || mobile) && <span>الخروج من الإدارة</span>}
         </Link>
-        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-500/10 transition-colors">
-          <LogOut className="w-4 h-4 shrink-0" />
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-rose-500 hover:bg-rose-500/10 transition-all"
+        >
+          <LogOut className="w-5 h-5" />
           {(!collapsed || mobile) && <span>تسجيل الخروج</span>}
         </button>
       </div>
@@ -78,57 +119,79 @@ const AdminLayout = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#050806] flex font-tajawal" dir="rtl">
+    <div className="min-h-screen bg-[#050806] flex font-tajawal text-white selection:bg-emerald-500/30" dir="rtl">
       {/* Desktop sidebar */}
-      <div className="hidden md:flex sticky top-0 h-screen">
+      <div className="hidden md:flex sticky top-0 h-screen z-50">
         <Sidebar />
       </div>
 
       {/* Mobile overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[100] md:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <motion.div 
-            initial={{ x: 300 }} 
-            animate={{ x: 0 }} 
-            exit={{ x: 300 }} 
-            className="absolute right-0 top-0 h-full shadow-2xl"
-          >
-            <Sidebar mobile />
-          </motion.div>
-        </div>
-      )}
+      <AnimatePresence>
+        {mobileOpen && (
+          <div className="fixed inset-0 z-[100] md:hidden">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+              onClick={() => setMobileOpen(false)} 
+            />
+            <motion.div 
+              initial={{ x: 300 }} animate={{ x: 0 }} exit={{ x: 300 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="absolute right-0 top-0 h-full shadow-2xl"
+            >
+              <Sidebar mobile />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen max-w-full overflow-hidden">
-        <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-card/50 backdrop-blur-md sticky top-0 z-40">
-          <div className="flex items-center gap-4">
-            <button className="md:hidden text-foreground p-2 hover:bg-secondary rounded-lg" onClick={() => setMobileOpen(true)}>
-              <Menu className="w-6 h-6" />
+        <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-[#0a0f0c]/50 backdrop-blur-xl sticky top-0 z-40">
+          <div className="flex items-center gap-6">
+            <button className="md:hidden p-2.5 bg-white/5 rounded-xl hover:bg-white/10 transition-colors" onClick={() => setMobileOpen(true)}>
+              <Menu className="w-6 h-6 text-emerald-500" />
             </button>
-            <button className="hidden md:block text-muted-foreground hover:text-foreground p-2 hover:bg-secondary rounded-lg transition-colors" onClick={() => setCollapsed(!collapsed)}>
-              <Menu className="w-5 h-5" />
+            <button className="hidden md:flex p-2 bg-white/5 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10 transition-all" onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <h2 className="text-sm font-black text-muted-foreground hidden sm:block">نظام إدارة المحتوى</h2>
+            <div className="hidden sm:flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <h2 className="text-[11px] font-black text-neutral-500 uppercase tracking-[0.2em]">النظام الإداري المركزي</h2>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="flex flex-col items-end hidden xs:flex">
-              <span className="text-xs font-black text-white">{profile?.full_name || "المدير العام"}</span>
-              <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Admin Access</span>
+              <span className="text-sm font-black text-white">{profile?.full_name || "المدير العام"}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">صلاحية كاملة</span>
+              </div>
             </div>
-            <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-black">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#121A15] to-[#1a251e] border border-white/10 flex items-center justify-center text-emerald-500 font-black shadow-lg shadow-black/40 text-lg"
+            >
               {profile?.full_name?.charAt(0) || "A"}
-            </div>
+            </motion.div>
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8 bg-[#050806] relative">
-          {/* تأثير توهج خلفي بسيط */}
-          <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full" />
+        <main className="flex-1 p-6 md:p-10 relative overflow-y-auto custom-scrollbar">
+          {/* تأثيرات إضاءة خلفية احترافية */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/5 blur-[150px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-500/5 blur-[130px] rounded-full" />
           </div>
-          {children}
+          
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {children}
+          </motion.div>
         </main>
       </div>
     </div>
