@@ -44,22 +44,42 @@ const AdminYoutubeImport = () => {
     return hours * 60 + minutes + (seconds > 30 ? 1 : 0);
   };
 
-  const generateAIDescription = async (courseName) => {
+ const generateAIDescription = async (courseName) => {
     setIsGenerating(true);
-    const prompt = `أنت خبير محتوى تعليمي. اكتب وصفاً تسويقياً لكورس بعنوان '${courseName}' في 5 أسطر احترافية باللغة العربية.`;
+    const prompt = `اكتب وصفاً تسويقياً لكورس بعنوان '${courseName}' في 5 أسطر احترافية باللغة العربية.`;
+    
     try {
+      console.log("جاري الاتصال بـ Gemini API..."); // رسالة تتبع
+      
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
+      
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
-    } catch (error) {
-      return `كورس تدريبي متخصص ومبسط في ${courseName}.`;
-    } finally { setIsGenerating(false); }
-  };
+      console.log("رد سيرفرات جوجل:", data); // هيطبع الرد هنا
 
+      if (!response.ok) {
+        throw new Error(data.error?.message || "مشكلة في الـ API Key أو السيرفر");
+      }
+
+      if (data.candidates && data.candidates[0].content.parts[0].text) {
+        return data.candidates[0].content.parts[0].text.trim();
+      } else {
+        throw new Error("جوجل مبعتتش نص مفيد");
+      }
+
+    } catch (error) {
+      console.error("تفاصيل الخطأ:", error.message);
+      // هيطلعلك إشعار بالخطأ عشان تبقى عارف
+      toast({ title: "فشل توليد الوصف", description: error.message, variant: "destructive" });
+      return `كورس تدريبي متخصص ومبسط في ${courseName}. (يرجى كتابة الوصف يدوياً)`;
+    } finally { 
+      setIsGenerating(false); 
+    }
+  };
+  
   const handleFetchPlaylist = async () => {
     const playlistId = extractPlaylistId(playlistUrl);
     if (!playlistId) return toast({ title: "الرابط غير صحيح", variant: "destructive" });
