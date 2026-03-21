@@ -67,7 +67,8 @@
     "vaul": "^0.9.9",
     "zod": "^3.25.76",
     "react-markdown": "^9.0.0",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "remark-breaks": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
