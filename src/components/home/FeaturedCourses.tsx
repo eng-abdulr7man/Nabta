@@ -560,7 +560,7 @@ const FeaturedCourses = () => {
           </span>
           
           <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-            الكورسات <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">المميزة</span>
+            أحدث <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">الكورسات</span>
           </h2>
           
           <p className="text-lg text-neutral-400 leading-relaxed">
