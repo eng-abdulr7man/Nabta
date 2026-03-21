@@ -3,15 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Youtube, ArrowRight, Loader2, LayoutGrid, Sparkles, 
-  Edit3, Clock, CheckCircle2, ChevronDown, TreePine, ListVideo 
+  Edit3, Clock, CheckCircle2, ChevronDown, TreePine, ListVideo, User 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// المفاتيح الخاصة بك - تأكد من صحتها
 const YOUTUBE_API_KEY = "AIzaSyAM5K8Aka_MvqfQNRmPITYExIIn9JmMWao";
-// مفتاح جروق - شغال في مصر وبدون حظر
 const GROQ_API_KEY = "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";
 
 const AdminYoutubeImport = () => {
@@ -24,7 +22,6 @@ const AdminYoutubeImport = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // جلب التخصصات عند التحميل
   useEffect(() => {
     const fetchSpecs = async () => {
       const { data } = await supabase.from("specializations").select("id, name").order("sort_order");
@@ -47,7 +44,6 @@ const AdminYoutubeImport = () => {
     return hours * 60 + minutes + (seconds > 30 ? 1 : 0);
   };
 
-  // توليد الوصف باستخدام Groq API (Llama 3.3)
   const generateAIDescription = async (courseName) => {
     setIsGenerating(true);
     const prompt = `أنت خبير محتوى تعليمي زراعي في منصة نبتة 🌱. اكتب وصفاً تسويقياً احترافياً ومبسطاً لكورس بعنوان '${courseName}' في 4 أسطر احترافية باللغة العربية فقط. بدون مقدمات.`;
@@ -60,7 +56,7 @@ const AdminYoutubeImport = () => {
           "Authorization": `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile", // موديل قوي وسريع جداً
+          model: "llama-3.3-70b-versatile",
           messages: [{ role: "user", content: prompt }]
         })
       });
@@ -84,14 +80,12 @@ const AdminYoutubeImport = () => {
 
     setIsLoading(true);
     try {
-      // 1. جلب بيانات البلاي ليست
       const resPlaylist = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${YOUTUBE_API_KEY}`);
       const dataPlaylist = await resPlaylist.json();
       if (!dataPlaylist.items?.length) throw new Error("لم يتم العثور على القائمة");
 
       const playlistInfo = dataPlaylist.items[0].snippet;
 
-      // 2. جلب الفيديوهات والوقت الخاص بكل فيديو
       const resItems = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}`);
       const dataItems = await resItems.json();
       const videoIds = dataItems.items.map(i => i.snippet.resourceId.videoId).join(',');
@@ -99,12 +93,11 @@ const AdminYoutubeImport = () => {
       const resDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${YOUTUBE_API_KEY}`);
       const dataDetails = await resDetails.json();
 
-      // 3. توليد الوصف بالذكاء الاصطناعي (Groq)
       const aiDescription = await generateAIDescription(playlistInfo.title);
 
       setPreviewData({
         title: playlistInfo.title,
-        instructor: playlistInfo.channelTitle, // اسم الدكتور = اسم القناة
+        instructor: playlistInfo.channelTitle,
         description: aiDescription,
         thumbnail: playlistInfo.thumbnails.high?.url || playlistInfo.thumbnails.default?.url,
         lessons: dataItems.items.map((item, index) => {
@@ -126,7 +119,6 @@ const AdminYoutubeImport = () => {
     if (!previewData || !selectedSpec) return toast({ title: "تنبيه", description: "اختر التخصص أولاً", variant: "destructive" });
     setIsLoading(true);
     try {
-      // 1. إضافة الكورس
       const { data: course, error: courseError } = await supabase.from("courses").insert([{
         title: previewData.title,
         description: previewData.description,
@@ -138,14 +130,12 @@ const AdminYoutubeImport = () => {
 
       if (courseError) throw courseError;
 
-      // 2. إضافة القسم الرئيسي
       const { data: section } = await supabase.from("sections").insert([{
         course_id: course.id,
         title: "محتوى الدورة التعليمي",
         sort_order: 1
       }]).select().single();
 
-      // 3. إضافة الدروس
       const lessonsToInsert = previewData.lessons.map(lesson => ({
         section_id: section.id,
         title: lesson.title,
@@ -168,12 +158,10 @@ const AdminYoutubeImport = () => {
   return (
     <div className="min-h-screen bg-[#050806] text-white p-4 md:p-8 font-tajawal overflow-x-hidden relative" dir="rtl">
       
-      {/* خلفية توهج خفيفة */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10" />
 
       <div className="max-w-7xl mx-auto space-y-10 relative">
         
-        {/* Header - Simple & Clean */}
         <div className="flex items-center gap-4 border-b border-neutral-800/60 pb-6 bg-[#0a0f0c] p-5 rounded-2xl border border-neutral-800/50 shadow-2xl">
           <Link to="/admin" className="p-3 bg-[#121A15] border border-neutral-800 rounded-xl text-neutral-400 hover:text-white transition-colors">
             <ArrowRight className="w-6 h-6" />
@@ -186,12 +174,10 @@ const AdminYoutubeImport = () => {
           </div>
         </div>
 
-        {/* 🌟 شريط الإدخال البسيط والمدمج 🌟 */}
         <div className="bg-[#0a0f0c] border border-neutral-800/80 rounded-3xl p-5 md:p-6 shadow-xl relative">
           <div className="absolute top-0 left-10 w-40 h-1 bg-emerald-600 rounded-full opacity-30" />
           <div className="flex flex-col md:flex-row gap-4 items-end">
             
-            {/* خانة الرابط */}
             <div className="flex-[2] w-full space-y-2">
               <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
                 <Youtube className="w-4 h-4 text-red-500" /> رابط قائمة التشغيل
@@ -206,7 +192,6 @@ const AdminYoutubeImport = () => {
               />
             </div>
 
-            {/* خانة التخصص */}
             <div className="flex-1 w-full space-y-2">
               <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
                 <TreePine className="w-4 h-4 text-emerald-500" /> التخصص (السكيمه)
@@ -226,7 +211,6 @@ const AdminYoutubeImport = () => {
               </div>
             </div>
 
-            {/* زر الجلب */}
             <div className="w-full md:w-auto">
               <Button 
                 onClick={handleFetchPlaylist} 
@@ -240,7 +224,6 @@ const AdminYoutubeImport = () => {
           </div>
         </div>
 
-        {/* 🌟 Preview Section - التنظيم الجديد كلياً 🌟 */}
         <AnimatePresence>
           {previewData && (
             <motion.div 
@@ -249,7 +232,6 @@ const AdminYoutubeImport = () => {
               className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
             >
               
-              {/* 1. كارت الصورة والإحصائيات على اليمين */}
               <div className="lg:col-span-1 space-y-6">
                 <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-5 shadow-2xl space-y-5 sticky top-6">
                   <div className="relative rounded-3xl overflow-hidden border border-neutral-800 group shadow-lg">
@@ -265,7 +247,6 @@ const AdminYoutubeImport = () => {
                     </div>
                   </div>
                   
-                  {/* كارت الطبيب/القناة */}
                   <div className="bg-[#121A15] p-4 rounded-2xl flex items-center gap-4 border border-neutral-800/50 shadow-inner">
                     <div className="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-500 font-black text-xl border border-emerald-500/20 shadow-md">
                       <User className="w-6 h-6" />
@@ -278,10 +259,8 @@ const AdminYoutubeImport = () => {
                 </div>
               </div>
 
-              {/* 2. كارت المحتوى الرئيسي على اليسار */}
               <div className="lg:col-span-2 flex flex-col gap-6">
                 
-                {/* العنوان والوصف */}
                 <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl -z-10" />
                   <h2 className="text-xl md:text-3xl font-black text-white leading-tight tracking-tight">{previewData.title}</h2>
@@ -302,7 +281,6 @@ const AdminYoutubeImport = () => {
                   </div>
                 </div>
 
-                {/* قائمة الدروس */}
                 <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-5">
                   <label className="text-neutral-400 text-xs font-black uppercase tracking-widest flex items-center gap-2 px-1"><ListVideo className="w-4 h-4 text-emerald-600" /> محتوى الدورة التدريبية</label>
                   
@@ -321,7 +299,6 @@ const AdminYoutubeImport = () => {
                   </div>
                 </div>
 
-                {/* أزرار الإجراءات */}
                 <div className="flex gap-4 pt-2 border-t border-neutral-800/50">
                   <Button onClick={() => setPreviewData(null)} variant="ghost" className="h-16 px-6 rounded-2xl text-neutral-500 bg-[#0a0f0c] border border-neutral-800 hover:bg-neutral-800 hover:text-white transition-all">
                     إلغاء الأمر
