@@ -101,25 +101,21 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
 
               {/* --- Student Protected Routes --- */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/my-courses" element={<MyCoursesPage />} />
-                <Route path="/favorites" element={<FavoritesPage />} />
-                <Route path="/courses/:id/learn" element={<LearnPage />} />
-              </Route>
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+              <Route path="/courses/:id/learn" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
               
               {/* --- Admin Protected Routes --- */}
-              <Route element={<ProtectedRoute adminOnly />}>
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/courses" element={<AdminCourses />} />
-                <Route path="/admin/courses/:id" element={<AdminCourseDetail />} />
-                <Route path="/admin/specializations" element={<AdminSpecializations />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/messages" element={<AdminMessages />} />
-                <Route path="/admin/activity" element={<AdminActivityLog />} />
-                <Route path="/admin/articles" element={<AdminArticles />} />
-                <Route path="/admin/youtube-import" element={<AdminYoutubeImport />} />
-              </Route>
+              <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />
+              <Route path="/admin/courses/:id" element={<ProtectedRoute adminOnly><AdminCourseDetail /></ProtectedRoute>} />
+              <Route path="/admin/specializations" element={<ProtectedRoute adminOnly><AdminSpecializations /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
+              <Route path="/admin/messages" element={<ProtectedRoute adminOnly><AdminMessages /></ProtectedRoute>} />
+              <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
+              <Route path="/admin/articles" element={<ProtectedRoute adminOnly><AdminArticles /></ProtectedRoute>} />
+              <Route path="/admin/youtube-import" element={<ProtectedRoute adminOnly><AdminYoutubeImport /></ProtectedRoute>} />
               
               {/* --- 404 --- */}
               <Route path="*" element={<NotFound />} />
