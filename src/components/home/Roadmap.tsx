@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { 
   Zap, Sprout, BookOpenCheck, Trophy, 
-  ChevronLeft, Sparkles, ArrowLeft // ✅ ضفنا ArrowLeft هنا
+  ChevronLeft, ArrowLeft 
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button"; // ✅ ضفنا الـ Button هنا
+import { Button } from "@/components/ui/button";
 
 // بيانات الخريطة الزراعية المهنية
 const journeySteps = [
@@ -48,19 +48,8 @@ const Roadmap = () => {
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         
-        {/* رأس القسم بتصميم Typography فخم */}
-         <div className="text-right mb-24 max-w-2xl md:mr-0 mr-auto text-center md:text-right">
-          {/* <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-3 mb-5 justify-center md:justify-start"
-          > */}
-            <div className="h-[2px] w-14 bg-gradient-to-r from-emerald-500 to-transparent" /> 
-            <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em]">
-              دليلك نحو الاحتراف
-            </span> 
-          </motion.div>
+        {/* رأس القسم */}
+        <div className="text-right mb-24 max-w-2xl md:mr-0 mr-auto text-center md:text-right space-y-3">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -68,18 +57,17 @@ const Roadmap = () => {
             transition={{ delay: 0.1 }}
             className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-[1.3] tracking-tight"
           >
-            رحلة نمو <span className="text-emerald-400 relative">مسارك <Sparkles className="absolute -top-6 -left-8 w-6 h-6 text-yellow-500/80 animate-pulse" /></span> المهني
+            رحلة نمو <span className="text-emerald-400">مسارك</span> المهني
           </motion.h2>
           <p className="text-xl text-neutral-400 mt-6 leading-relaxed max-w-xl md:mr-0 mr-auto font-medium">
              ارسم خريطة مستقبلك في هندسة الزراعة المستدامة والحديثة معنا، خطوة بخطوة.
           </p>
         </div>
 
-        {/* شبكة الكروت بتصميم انسيابي ومتصل */}
+        {/* شبكة الكروت بتصميم انسيابي */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
           
-          {/* خط الربط الانسيابي المتدرج (للشاشات الكبيرة) */}
-          <div className="absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-neutral-800 to-transparent hidden lg:block -translate-y-1/2" />
+          {/* ✅ شيلنا خط الربط الأفقي اللي كان في الخلفية هنا */}
 
           {journeySteps.map((step, idx) => {
             const Icon = step.icon;
@@ -121,7 +109,7 @@ const Roadmap = () => {
                   </div>
                 </div>
 
-                {/* سهم الربط الانسيابي (يتحرك مع الـ Hover) */}
+                {/* سهم الربط بين الكروت (يتحرك مع الـ Hover) */}
                 {idx < journeySteps.length - 1 && (
                   <div className="hidden lg:flex absolute top-1/2 -left-6 z-20 items-center justify-center">
                     <ChevronLeft className="w-6 h-6 text-white/10 group-hover:text-emerald-500 transition-all group-hover:translate-x-[-10px] group-hover:scale-110" />
@@ -132,7 +120,7 @@ const Roadmap = () => {
           })}
         </div>
 
-        {/* زرار الـ CTA الأخير المدمج في الديزاين */}
+        {/* زرار الـ CTA الأخير */}
         <div className="mt-20 text-center">
            <Link to="/courses">
               <Button size="lg" variant="outline" className="bg-[#121A15] border-neutral-800 hover:border-emerald-500/30 text-white px-10 h-16 rounded-2xl text-lg font-black gap-3 shadow-xl backdrop-blur-md transition-all active:scale-95 group">
