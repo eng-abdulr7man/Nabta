@@ -38,6 +38,7 @@ const AdminYoutubeImport = () => {
 
   const parseYouTubeDuration = (durationStr) => {
     const match = durationStr.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 0;
     const hours = parseInt(match[1] || 0);
     const minutes = parseInt(match[2] || 0);
     const seconds = parseInt(match[3] || 0);
@@ -74,34 +75,63 @@ const AdminYoutubeImport = () => {
     }
   };
 
+  // 🔥 الدالة السحرية بعد التعديل لسحب القائمة كاملة 🔥
   const handleFetchPlaylist = async () => {
     const playlistId = extractPlaylistId(playlistUrl);
     if (!playlistId) return toast({ title: "الرابط غير صحيح", variant: "destructive" });
 
     setIsLoading(true);
     try {
+      // 1. جلب بيانات القائمة الأساسية
       const resPlaylist = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${YOUTUBE_API_KEY}`);
       const dataPlaylist = await resPlaylist.json();
       if (!dataPlaylist.items?.length) throw new Error("لم يتم العثور على القائمة");
 
       const playlistInfo = dataPlaylist.items[0].snippet;
 
-      const resItems = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}`);
-      const dataItems = await resItems.json();
-      const videoIds = dataItems.items.map(i => i.snippet.resourceId.videoId).join(',');
+      // 2. حلقة تكرارية (Loop) لجلب كل الفيديوهات من القائمة مهما كان عددها
+      let allPlaylistItems = [];
+      let nextPageToken = "";
 
-      const resDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${YOUTUBE_API_KEY}`);
-      const dataDetails = await resDetails.json();
+      do {
+        const pageTokenParam = nextPageToken ? `&pageToken=${nextPageToken}` : "";
+        const resItems = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${pageTokenParam}`);
+        const dataItems = await resItems.json();
+        
+        if (dataItems.items) {
+          allPlaylistItems = [...allPlaylistItems, ...dataItems.items];
+        }
+        
+        nextPageToken = dataItems.nextPageToken; // لو مفيش فيديوهات تانية، ده هيكون null واللوب تقف
+      } while (nextPageToken);
 
+      if (allPlaylistItems.length === 0) throw new Error("قائمة التشغيل فارغة");
+
+      // 3. تقسيم الـ IDs لحزم (كل حزمة 50) عشان نجيب مدة الفيديوهات بدون ما الـ API يعترض
+      let allVideoDetails = [];
+      for (let i = 0; i < allPlaylistItems.length; i += 50) {
+        const chunk = allPlaylistItems.slice(i, i + 50);
+        const videoIds = chunk.map(item => item.snippet.resourceId.videoId).join(',');
+
+        const resDetails = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${YOUTUBE_API_KEY}`);
+        const dataDetails = await resDetails.json();
+
+        if (dataDetails.items) {
+          allVideoDetails = [...allVideoDetails, ...dataDetails.items];
+        }
+      }
+
+      // 4. توليد الوصف بالذكاء الاصطناعي
       const aiDescription = await generateAIDescription(playlistInfo.title);
 
+      // 5. تجميع البيانات النهائية
       setPreviewData({
         title: playlistInfo.title,
         instructor: playlistInfo.channelTitle,
         description: aiDescription,
         thumbnail: playlistInfo.thumbnails.high?.url || playlistInfo.thumbnails.default?.url,
-        lessons: dataItems.items.map((item, index) => {
-          const detail = dataDetails.items.find(d => d.id === item.snippet.resourceId.videoId);
+        lessons: allPlaylistItems.map((item, index) => {
+          const detail = allVideoDetails.find(d => d.id === item.snippet.resourceId.videoId);
           return {
             title: item.snippet.title,
             video_id: item.snippet.resourceId.videoId,
@@ -110,9 +140,14 @@ const AdminYoutubeImport = () => {
           };
         }),
       });
+      
+      toast({ title: "تم الجلب", description: `تم سحب ${allPlaylistItems.length} فيديو بنجاح.` });
+      
     } catch (error) {
       toast({ title: "فشل جلب البيانات", description: error.message, variant: "destructive" });
-    } finally { setIsLoading(false); }
+    } finally { 
+      setIsLoading(false); 
+    }
   };
 
   const handleImportCourse = async () => {
@@ -145,7 +180,9 @@ const AdminYoutubeImport = () => {
         content: `درس مستورد بمدة ${lesson.duration} دقيقة.`
       }));
 
+      // إذا كان عدد الدروس كبير (أكثر من 100 مثلاً)، يفضل إدخالهم على دفعات لتجنب حمل زائد على السيرفر
       await supabase.from("lessons").insert(lessonsToInsert);
+      
       toast({ title: "نجاح!", description: "تم استيراد ونشر الكورس بنجاح على منصة نبتة 🌱" });
       navigate("/admin/courses");
     } catch (e) { 
