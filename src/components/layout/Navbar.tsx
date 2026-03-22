@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ✅ ضفنا "أدوات زراعية" هنا عشان تظهر في كل مكان (ديسك توب وموبايل)
+// ✅ ضفنا "المتجر الزراعي" و "أدوات نبتة" في القائمة
 const navLinks = [
   { label: "الرئيسية", path: "/" },
+  { label: "المتجر الزراعي", path: "/marketplace" }, // <-- ضفنا المتجر هنا
   { label: "الكورسات", path: "/courses" },
   { label: "التخصصات", path: "/specializations" },
-  { label: "أدوات زراعية", path: "/tools" }, // <-- التعديل هنا
+  { label: "أدوات نبتة", path: "/tools" }, // <-- دي الحاسبات والذكاء الاصطناعي
   { label: "تواصل معنا", path: "/contact" },
 ];
 
