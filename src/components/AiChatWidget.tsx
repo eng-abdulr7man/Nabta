@@ -91,14 +91,16 @@ const AiChatWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-[200] font-tajawal">
+    // 1. التعديل هنا: استخدام bottom-24 للموبايل، و md:bottom-6 للكمبيوتر
+    <div className="fixed bottom-24 md:bottom-6 left-4 md:left-6 z-[200] font-tajawal">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-20 left-0 w-[350px] md:w-[400px] h-[550px] bg-[#0a0f0c] border border-emerald-500/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
+            // 2. التعديل هنا: تقليل المسافة بين النافذة والزرار في الموبايل (bottom-16) وضبط الارتفاع (h-[75vh] max-h-[550px])
+            className="absolute bottom-16 md:bottom-20 left-0 w-[350px] md:w-[400px] h-[75vh] max-h-[550px] bg-[#0a0f0c] border border-emerald-500/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-[#121A15] border-b border-white/5 p-4 flex items-center justify-between">
@@ -171,12 +173,11 @@ const AiChatWidget = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center shadow-2xl text-white"
+        className="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center shadow-2xl text-white relative z-10"
       >
         <MessageCircle className="w-6 h-6" />
       </motion.button>
     </div>
   );
-};
 
 export default AiChatWidget;
