@@ -38,18 +38,18 @@ const AiChatWidget = () => {
     scrollToBottom();
   }, [messages]);
 
- const handleSendMessage = async () => {
+  const handleSendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: "user", content: input };
     
-    // 1. تحديث الشاشة فوراً
+    // 1. تحديث الشاشة فوراً برسالة المستخدم
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      // 2. تجهيز الرسايل اللي هتتبعت للـ API
+      // 2. تجهيز الرسايل اللي هتتبعت للـ API (بدون رسالة الترحيب عشان ميضربش Error 400)
       const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
       
       const apiMessages = [
@@ -65,8 +65,8 @@ const AiChatWidget = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // ✅ التعديل هنا: استخدمنا الموديل الأحدث والأسرع
-          model: "llama-3.1-70b-versatile", 
+          // ✅ استخدمنا موديل Mixtral لأنه الأكثر استقراراً ولا يتم حذفه
+          model: "mixtral-8x7b-32768", 
           messages: apiMessages,
           temperature: 0.7,
           max_tokens: 1024,
@@ -75,7 +75,8 @@ const AiChatWidget = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Groq API Error:", errorData);
+        // ✅ خلينا الخطأ يطبع كنص عشان نقدر نقراه بوضوح لو ظهر تاني
+        console.error("Groq API Error Details:", JSON.stringify(errorData, null, 2));
         throw new Error("API Error");
       }
 
@@ -86,7 +87,7 @@ const AiChatWidget = () => {
           role: "assistant",
           content: data.choices[0].message.content,
         };
-        // 3. إضافة الرد للشاشة
+        // 3. إضافة رد الذكاء الاصطناعي للشاشة
         setMessages((prev) => [...prev, botMessage]);
       }
     } catch (error) {
