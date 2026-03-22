@@ -196,7 +196,7 @@ const Marketplace = () => {
                     <div className="flex items-center justify-between border-t border-white/5 pt-6 mt-auto">
                       <span className="text-emerald-400 font-black text-3xl tracking-tighter tabular-nums">{p.price}</span>
                       <a 
-                        href={`https://wa.me/201234567890?text=أريد طلب: ${p.name}`}
+                        href={`https://wa.me/201019715490?text=أريد طلب: ${p.name}`}
                         className="flex items-center gap-2.5 bg-white/5 hover:bg-emerald-600 text-white px-6 py-3.5 rounded-2xl border border-white/10 transition-all text-sm font-bold shadow-lg"
                       >
                         <MessageCircle className="w-5 h-5" /> اطلب الآن
