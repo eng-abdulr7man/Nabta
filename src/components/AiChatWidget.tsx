@@ -10,26 +10,26 @@ interface Message {
   content: string;
 }
 
+const WELCOME_MESSAGE = "أهلاً بك في نبتة! 🌱 أنا مستشارك الزراعي الذكي. إزاي أقدر أساعدك في مزرعتك أو محصولك النهاردة؟";
+
+// التعليمات دي هتتبعت للسيرفر بس ومش هتتعرض للمستخدم
+const SYSTEM_PROMPT: Message = {
+  role: "system",
+  content: `أنت مستشار زراعي خبير في أكاديمية 'نبتة'. مهمتك مساعدة المهندسين والمزارعين. 
+  قاعدتك الأساسية: لا تقدم الحل فوراً. عندما يطرح المستخدم مشكلة، اسأله أولاً عن البيانات اللازمة للتشخيص (مثل: نوع المحصول، عمر النبات، نوع التربة، والري). اسأل سؤالاً أو اثنين كحد أقصى في كل مرة. 
+  بمجرد حصولك على المعلومات، قدم نصيحة زراعية دقيقة وعملية بخطوات واضحة. استخدم لهجة احترافية وودودة.`
+};
+
 const AiChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
+  // الـ State هنا فيها رسايل المستخدم والردود بس (بدون الـ system prompt)
   const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "system",
-      content: `أنت مستشار زراعي خبير في أكاديمية 'نبتة'. مهمتك مساعدة المهندسين والمزارعين. 
-      قاعدتك الأساسية: لا تقدم الحل فوراً. عندما يطرح المستخدم مشكلة، اسأله أولاً عن البيانات اللازمة للتشخيص (مثل: نوع المحصول، عمر النبات، نوع التربة، والري). اسأل سؤالاً أو اثنين كحد أقصى في كل مرة. 
-      بمجرد حصولك على المعلومات، قدم نصيحة زراعية دقيقة وعملية بخطوات واضحة. استخدم لهجة احترافية وودودة.`
-    },
-    // دي رسالة الترحيب اللي هنستثنيها من الإرسال للـ API عشان ميضربش Error 400
-    {
-      role: "assistant",
-      content: "أهلاً بك في نبتة! 🌱 أنا مستشارك الزراعي الذكي. إزاي أقدر أساعدك في مزرعتك أو محصولك النهاردة؟"
-    }
+    { role: "assistant", content: WELCOME_MESSAGE }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // النزول لأسفل الشات تلقائياً
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -42,15 +42,22 @@ const AiChatWidget = () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: "user", content: input };
+    
+    // 1. تحديث الشاشة فوراً برسالة المستخدم
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      // 🌟 التريكاية هنا: بنفلتر الرسائل ونشيل رسالة الترحيب (رقم 1 في المصفوفة)
-      // عشان الـ API بتاع Groq دقيق جداً في ترتيب المحادثة
-      const apiMessages = messages.filter((_, index) => index !== 1);
+      // 2. تجهيز الرسايل اللي هتتبعت للـ API (بدون رسالة الترحيب عشان ميضربش Error 400)
+      const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
       
+      const apiMessages = [
+        SYSTEM_PROMPT,
+        ...chatHistory,
+        userMessage
+      ];
+
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -58,18 +65,17 @@ const AiChatWidget = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama-3.1-70b-versatile", // ✅ الموديل الأحدث والأكثر استقراراً
-          messages: [...apiMessages, userMessage],
+          model: "llama3-70b-8192", // الموديل الأكثر استقراراً ودعماً للغة العربية
+          messages: apiMessages,
           temperature: 0.7,
           max_tokens: 1024,
         }),
       });
 
       if (!response.ok) {
-        // لو في خطأ هنطبعه في الكونسول عشان نعرف نصطاده
         const errorData = await response.json();
-        console.error("Groq API Error Details:", errorData);
-        throw new Error(`API responded with status ${response.status}`);
+        console.error("Groq API Error:", errorData);
+        throw new Error("API Error");
       }
 
       const data = await response.json();
@@ -79,6 +85,7 @@ const AiChatWidget = () => {
           role: "assistant",
           content: data.choices[0].message.content,
         };
+        // 3. إضافة رد الذكاء الاصطناعي للشاشة
         setMessages((prev) => [...prev, botMessage]);
       }
     } catch (error) {
@@ -131,7 +138,7 @@ const AiChatWidget = () => {
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
-              {messages.filter(m => m.role !== "system").map((msg, idx) => (
+              {messages.map((msg, idx) => (
                 <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                   <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center ${msg.role === "user" ? "bg-blue-600/20 text-blue-400" : "bg-emerald-600/20 text-emerald-400"}`}>
                     {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -141,7 +148,6 @@ const AiChatWidget = () => {
                       ? "bg-blue-600 text-white rounded-tr-sm" 
                       : "bg-[#121A15] text-neutral-200 border border-white/5 rounded-tl-sm"
                   }`}>
-                    {/* لتنسيق الأسطر في ردود الذكاء الاصطناعي */}
                     {msg.content.split('\n').map((line, i) => (
                       <span key={i}>{line}<br/></span>
                     ))}
