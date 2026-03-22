@@ -134,12 +134,14 @@ const HeroDarkSection = () => {
       </AnimatePresence>
 
       {/* --- قسم الهيرو الرئيسي (Hero Section) --- */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-[#090D0A] text-white py-16 lg:py-0">
+      {/* التعديلات هنا: pt-32 pb-16 lg:pt-40 lg:pb-20 لضبط المسافات من أعلى وأسفل */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-[#090D0A] text-white pt-32 pb-16 lg:pt-40 lg:pb-20">
         
         <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/20 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-green-900/10 blur-[100px] pointer-events-none" />
 
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        {/* التعديلات هنا: mt-8 lg:mt-12 لإبعاد المحتوى عن الناف بار */}
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 mt-8 lg:mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
             
             {/* النص والمحتوى (يمين) */}
