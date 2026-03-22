@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import SupportPage from "./pages/Support";
+import AiChatWidget from "@/components/AiChatWidget";
 
 // --- Lazy Load Pages ---
 const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
@@ -28,7 +29,7 @@ const MyCoursesPage = lazy(() => import("./pages/MyCoursesPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 
-// ✅ ضفنا استدعاء صفحة خريطة الطريق هنا
+// ✅ استدعاء صفحة خريطة الطريق
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
 
 // Admin Pages
@@ -73,6 +74,10 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner position="top-center" /> 
+      
+      {/* 🌟 ضفنا المستشار الذكي هنا عشان يظهر فوق كل الصفحات 🌟 */}
+      <AiChatWidget />
+      
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
@@ -84,10 +89,7 @@ const App = () => (
               <Route path="/courses" element={<CoursesPage />} />
               <Route path="/courses/:id" element={<CourseDetailPage />} />
               <Route path="/specializations" element={<SpecializationsPage />} />
-              
-              {/* ✅ ضفنا مسار خريطة الطريق هنا */}
               <Route path="/roadmap" element={<RoadmapPage />} />
-              
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/contact" element={<ContactPage />} />
