@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import SupportPage from "./pages/Support";
 import AiChatWidget from "@/components/AiChatWidget";
+import Marketplace from "./components/shop/Marketplace";
 
 // --- Lazy Load Pages ---
 const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
@@ -103,6 +104,7 @@ const App = () => (
               <Route path="/help" element={<HelpPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/tools" element={<ToolsPage />} />
+              <Route path="/marketplace" element={<Marketplace />} />
 
               {/* --- Student Protected Routes --- */}
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
