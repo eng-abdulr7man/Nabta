@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from "lucide-react";
 
-// ⚠️ تحذير: في النسخة النهائية يجب نقل هذا المفتاح لملف .env أو Backend
+// ⚠️ تحذير: في النسخة النهائية للمشروع، لازم ننقل المفتاح ده لملف .env في الباك إند
 const GROQ_API_KEY = "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";
 
 interface Message {
@@ -19,6 +19,7 @@ const AiChatWidget = () => {
       قاعدتك الأساسية: لا تقدم الحل فوراً. عندما يطرح المستخدم مشكلة، اسأله أولاً عن البيانات اللازمة للتشخيص (مثل: نوع المحصول، عمر النبات، نوع التربة، والري). اسأل سؤالاً أو اثنين كحد أقصى في كل مرة. 
       بمجرد حصولك على المعلومات، قدم نصيحة زراعية دقيقة وعملية بخطوات واضحة. استخدم لهجة احترافية وودودة.`
     },
+    // دي رسالة الترحيب اللي هنستثنيها من الإرسال للـ API عشان ميضربش Error 400
     {
       role: "assistant",
       content: "أهلاً بك في نبتة! 🌱 أنا مستشارك الزراعي الذكي. إزاي أقدر أساعدك في مزرعتك أو محصولك النهاردة؟"
@@ -46,6 +47,10 @@ const AiChatWidget = () => {
     setIsLoading(true);
 
     try {
+      // 🌟 التريكاية هنا: بنفلتر الرسائل ونشيل رسالة الترحيب (رقم 1 في المصفوفة)
+      // عشان الـ API بتاع Groq دقيق جداً في ترتيب المحادثة
+      const apiMessages = messages.filter((_, index) => index !== 1);
+      
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -53,12 +58,19 @@ const AiChatWidget = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama3-70b-8192", // موديل قوي جداً وسريع وبيدعم عربي كويس
-          messages: [...messages, userMessage],
+          model: "llama-3.1-70b-versatile", // ✅ الموديل الأحدث والأكثر استقراراً
+          messages: [...apiMessages, userMessage],
           temperature: 0.7,
           max_tokens: 1024,
         }),
       });
+
+      if (!response.ok) {
+        // لو في خطأ هنطبعه في الكونسول عشان نعرف نصطاده
+        const errorData = await response.json();
+        console.error("Groq API Error Details:", errorData);
+        throw new Error(`API responded with status ${response.status}`);
+      }
 
       const data = await response.json();
       
@@ -73,7 +85,7 @@ const AiChatWidget = () => {
       console.error("Error communicating with Groq:", error);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "عذراً، حدث خطأ في الاتصال بالشبكة. يرجى المحاولة مرة أخرى." }
+        { role: "assistant", content: "عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى." }
       ]);
     } finally {
       setIsLoading(false);
