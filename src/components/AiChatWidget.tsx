@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from "lucide-react";
 
-// ⚠️ تحذير: في النسخة النهائية للمشروع، لازم ننقل المفتاح ده لملف .env في الباك إند
+// ⚠️ المفتاح بتاعك آمن هنا حالياً، بس زي ما اتفقنا لازم يتشال في الـ Production
 const GROQ_API_KEY = "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";
 
 interface Message {
@@ -10,19 +10,21 @@ interface Message {
   content: string;
 }
 
-const WELCOME_MESSAGE = "أهلاً بك في نبتة! 🌱 أنا مستشارك الزراعي الذكي. إزاي أقدر أساعدك في مزرعتك أو محصولك النهاردة؟";
+const WELCOME_MESSAGE = "أهلاً يا هندسة! 🌱 أنا الموديل اللي كنت شغال معاك في الأول، ورجعتلك تاني عشان نطلع أحلى وصف لكورسات 'نبتة'. اؤمرني محتاج وصف لأي كورس؟";
 
-// التعليمات دي هتتبعت للسيرفر بس ومش هتتعرض للمستخدم
 const SYSTEM_PROMPT: Message = {
   role: "system",
-  content: `أنت مستشار زراعي خبير في أكاديمية 'نبتة'. مهمتك مساعدة المهندسين والمزارعين. 
-  قاعدتك الأساسية: لا تقدم الحل فوراً. عندما يطرح المستخدم مشكلة، اسأله أولاً عن البيانات اللازمة للتشخيص (مثل: نوع المحصول، عمر النبات، نوع التربة، والري). اسأل سؤالاً أو اثنين كحد أقصى في كل مرة. 
-  بمجرد حصولك على المعلومات، قدم نصيحة زراعية دقيقة وعملية بخطوات واضحة. استخدم لهجة احترافية وودودة.`
+  content: `أنت خبير محتوى تعليمي في أكاديمية نبتة. 
+  استخدم خبرتك في الزراعة لكتابة وصف احترافي للكورسات. 
+  يجب أن يتضمن الوصف: 
+  1. مقدمة جذابة. 
+  2. محاور الكورس (ماذا ستتعلم). 
+  3. الفئة المستهدفة.
+  اجعل الأسلوب مهني ومصري بسيط.`
 };
 
 const AiChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  // الـ State هنا فيها رسايل المستخدم والردود بس (بدون الـ system prompt)
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: WELCOME_MESSAGE }
   ]);
@@ -42,22 +44,14 @@ const AiChatWidget = () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: "user", content: input };
-    
-    // 1. تحديث الشاشة فوراً برسالة المستخدم
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      // 2. تجهيز الرسايل اللي هتتبعت للـ API (بدون رسالة الترحيب عشان ميضربش Error 400)
+      // بنفلتر أي رسايل ترحيب قديمة ونبعت بس الـ System والـ User عشان الـ 400
       const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
       
-      const apiMessages = [
-        SYSTEM_PROMPT,
-        ...chatHistory,
-        userMessage
-      ];
-
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -65,9 +59,9 @@ const AiChatWidget = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // ✅ استخدمنا موديل Mixtral لأنه الأكثر استقراراً ولا يتم حذفه
-          model: "mixtral-8x7b-32768", 
-          messages: apiMessages,
+          // ✅ رجعنا للموديل اللي إنت عايزه واللي كان شغال طلقة
+          model: "llama-3.1-70b-versatile", 
+          messages: [SYSTEM_PROMPT, ...chatHistory, userMessage],
           temperature: 0.7,
           max_tokens: 1024,
         }),
@@ -75,8 +69,7 @@ const AiChatWidget = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        // ✅ خلينا الخطأ يطبع كنص عشان نقدر نقراه بوضوح لو ظهر تاني
-        console.error("Groq API Error Details:", JSON.stringify(errorData, null, 2));
+        console.error("Groq API Error:", JSON.stringify(errorData, null, 2));
         throw new Error("API Error");
       }
 
@@ -87,14 +80,13 @@ const AiChatWidget = () => {
           role: "assistant",
           content: data.choices[0].message.content,
         };
-        // 3. إضافة رد الذكاء الاصطناعي للشاشة
         setMessages((prev) => [...prev, botMessage]);
       }
     } catch (error) {
-      console.error("Error communicating with Groq:", error);
+      console.error("Chat Error:", error);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى." }
+        { role: "assistant", content: "حصلت مشكلة بسيطة في الربط، جرب تبعت تاني يا هندسة." }
       ]);
     } finally {
       setIsLoading(false);
@@ -116,8 +108,7 @@ const AiChatWidget = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="absolute bottom-20 left-0 w-[350px] md:w-[400px] h-[550px] bg-[#0a0f0c] border border-emerald-500/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
+            className="absolute bottom-20 left-0 w-[350px] md:w-[450px] h-[600px] bg-[#0a0f0c] border border-emerald-500/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-[#121A15] border-b border-white/5 p-4 flex items-center justify-between">
@@ -125,83 +116,64 @@ const AiChatWidget = () => {
                 <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
                   <Sparkles className="w-5 h-5 text-emerald-400" />
                 </div>
-                <div>
-                  <h3 className="text-white font-bold">المستشار الذكي</h3>
-                  <p className="text-xs text-emerald-500 flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    متصل الآن
-                  </p>
-                </div>
+                <h3 className="text-white font-bold text-sm">نبتة AI - خبير المحتوى</h3>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-neutral-400 hover:text-white transition-colors p-1">
+              <button onClick={() => setIsOpen(false)} className="text-neutral-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Messages Area */}
+            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                   <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center ${msg.role === "user" ? "bg-blue-600/20 text-blue-400" : "bg-emerald-600/20 text-emerald-400"}`}>
                     {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                   </div>
-                  <div className={`max-w-[75%] p-3 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === "user" 
-                      ? "bg-blue-600 text-white rounded-tr-sm" 
-                      : "bg-[#121A15] text-neutral-200 border border-white/5 rounded-tl-sm"
+                  <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${
+                    msg.role === "user" ? "bg-blue-600 text-white rounded-tr-none" : "bg-[#121A15] text-neutral-200 border border-white/5 rounded-tl-none"
                   }`}>
-                    {msg.content.split('\n').map((line, i) => (
-                      <span key={i}>{line}<br/></span>
-                    ))}
+                    {msg.content.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}
                   </div>
                 </div>
               ))}
               {isLoading && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center">
-                    <Bot className="w-4 h-4" />
-                  </div>
-                  <div className="bg-[#121A15] border border-white/5 p-4 rounded-2xl rounded-tl-sm flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
-                    <span className="text-xs text-neutral-400">يحلل البيانات...</span>
-                  </div>
+                <div className="flex items-center gap-2 text-emerald-500 text-xs p-4">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  جاري صياغة الوصف...
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 bg-[#121A15] border-t border-white/5">
-              <div className="relative flex items-center">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="اسأل مستشارك الزراعي..."
-                  className="w-full bg-[#0a0f0c] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white text-sm resize-none focus:outline-none focus:border-emerald-500 h-[50px] overflow-hidden transition-colors"
-                  rows={1}
-                />
-                <button 
-                  onClick={handleSendMessage}
-                  disabled={isLoading || !input.trim()}
-                  className="absolute left-2 w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
+            {/* Input */}
+            <div className="p-4 bg-[#121A15] border-t border-white/5 flex gap-2">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="اسم الكورس إيه؟"
+                className="flex-1 bg-[#0a0f0c] border border-white/10 rounded-xl p-3 text-white text-sm resize-none h-[50px] outline-none focus:border-emerald-500/50"
+              />
+              <button 
+                onClick={handleSendMessage}
+                disabled={isLoading || !input.trim()}
+                className="bg-emerald-600 p-3 rounded-xl text-white hover:bg-emerald-500 disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Floating Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.4)] text-white hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] transition-all"
+        className="w-16 h-16 rounded-full bg-emerald-600 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.4)] text-white"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        <MessageCircle />
       </motion.button>
     </div>
   );
