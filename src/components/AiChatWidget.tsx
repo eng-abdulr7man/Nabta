@@ -179,5 +179,6 @@ const AiChatWidget = () => {
       </motion.button>
     </div>
   );
+}; // <--- القفلة اللي كانت ناقصة هنا يا هندسة
 
 export default AiChatWidget;
