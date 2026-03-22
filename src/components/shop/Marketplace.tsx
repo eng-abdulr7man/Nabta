@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Trash2, ShoppingBag, MessageCircle, 
-  Loader2, Camera, Filter, X, Leaf, Sprout, Droplets, Bug
+  Loader2, Camera, Filter, X, Leaf, Sprout, Droplets, Bug, LayoutGrid // <--- ضيف دي هنا
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
