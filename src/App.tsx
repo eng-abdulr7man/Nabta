@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
@@ -29,8 +30,6 @@ const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
 const MyCoursesPage = lazy(() => import("./pages/MyCoursesPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
-
-// ✅ استدعاء صفحة خريطة الطريق
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
 
 // Admin Pages
@@ -70,16 +69,39 @@ const Loading = () => (
   </div>
 );
 
+// 🌟 مكون جديد وظيفته التقاط حدث "استعادة كلمة المرور" من الـ URL 🌟
+const AuthListener = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        // إذا كان الحدث هو استعادة باسوورد، وجهه مباشرة للصفحة المخصصة
+        navigate("/reset-password", { replace: true });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  return null; // لا يعرض أي شيء في الواجهة
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner position="top-center" /> 
       
-      {/* 🌟 ضفنا المستشار الذكي هنا عشان يظهر فوق كل الصفحات 🌟 */}
+      {/* المستشار الذكي */}
       <AiChatWidget />
       
       <BrowserRouter>
+        {/* 🌟 وضعنا المكون هنا ليكون داخل سياق الراوتر 🌟 */}
+        <AuthListener />
+        
         <ScrollToTop />
         <AuthProvider>
           <Suspense fallback={<Loading />}>
