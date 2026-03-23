@@ -7,7 +7,7 @@ import {
   Shield, ShieldCheck, ShieldX, Users, Search, Eye, 
   UserX, UserCheck, X, Mail, Phone, Calendar, 
   BookOpen, Filter, UserCog, GraduationCap, Crown,
-  CheckCircle2, Trash2, Send, History, Award, Zap, Clock
+  CheckCircle2, Trash2, Send, History, Award, Zap, Clock, Key
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo } from "react";
@@ -98,12 +98,30 @@ const AdminUsers = () => {
     }
   });
 
+  // 🔥 إضافة وظيفة إرسال رابط إعادة تعيين كلمة المرور 🔥
+  const sendPasswordReset = useMutation({
+    mutationFn: async (email: string) => {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "تم إرسال رابط إعادة تعيين كلمة المرور بنجاح ✅" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "حدث خطأ أثناء إرسال الرابط", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    }
+  });
+
   const filtered = useMemo(() => {
     return (users || []).filter((u: any) => {
       const searchLower = search.toLowerCase();
       const matchesSearch = u.full_name?.toLowerCase().includes(searchLower) || 
-                           u.email?.toLowerCase().includes(searchLower) ||
-                           u.phone?.includes(search); // أضفنا البحث برقم التليفون
+                             u.email?.toLowerCase().includes(searchLower) ||
+                             u.phone?.includes(search);
       if (activeTab === "admins") return matchesSearch && (u.roles.includes("admin") || u.roles.includes("owner"));
       if (activeTab === "students") return matchesSearch && !u.roles.includes("admin") && !u.roles.includes("owner");
       if (activeTab === "online") return matchesSearch && u.isOnline;
@@ -194,7 +212,6 @@ const AdminUsers = () => {
                       <p className="text-[11px] text-neutral-500 font-medium truncate flex items-center gap-1.5 mb-1">
                         <Mail className="w-3 h-3" /> {user.email}
                       </p>
-                      {/* 🔥 إظهار رقم التليفون في الكارت الرئيسي */}
                       <p className={`text-[11px] font-bold flex items-center gap-1.5 ${user.phone ? 'text-emerald-500/80' : 'text-neutral-600'}`}>
                         <Phone className="w-3 h-3" /> {user.phone || "بدون رقم تليفون"}
                       </p>
@@ -240,7 +257,7 @@ const AdminUsers = () => {
           )}
         </AnimatePresence>
 
-        {/* 🌟 User Detail Modal (المُعدل لإظهار التليفون) 🌟 */}
+        {/* 🌟 User Detail Modal 🌟 */}
         <AnimatePresence>
           {selectedUser && (
             <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
@@ -260,7 +277,6 @@ const AdminUsers = () => {
                       </span>
                     </div>
                     
-                    {/* 🔥 عرض البيانات الإحصائية + رقم التليفون */}
                     <div className="bg-[#121A15] p-4 rounded-2xl border border-neutral-800/50 space-y-3 text-right" dir="rtl">
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-neutral-500 font-bold flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> رقم الهاتف:</span>
@@ -286,16 +302,31 @@ const AdminUsers = () => {
                         </div>
                       )) : <p className="text-xs text-neutral-600 text-center py-10">لا يوجد سجل تعلم</p>}
                     </div>
-                    <div className="grid grid-cols-2 gap-2 mt-6">
-                      {!selectedUser.roles.includes("owner") && (
-                        <Button onClick={() => { toggleAdmin.mutate({ userId: selectedUser.user_id, isAdmin: selectedUser.roles.includes("admin") }); setSelectedUser(null); }} className={`h-11 rounded-xl font-bold text-xs ${selectedUser.roles.includes("admin") ? "bg-rose-500/10 text-rose-500 border-rose-500/20" : "bg-emerald-600 text-white"}`}>
-                          {selectedUser.roles.includes("admin") ? "سحب الإشراف" : "ترقية لمشرف"}
+
+                    <div className="flex flex-col gap-2 mt-6">
+                      {/* أزرار الإشراف والإيقاف */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {!selectedUser.roles.includes("owner") && (
+                          <Button onClick={() => { toggleAdmin.mutate({ userId: selectedUser.user_id, isAdmin: selectedUser.roles.includes("admin") }); setSelectedUser(null); }} className={`h-11 rounded-xl font-bold text-xs ${selectedUser.roles.includes("admin") ? "bg-rose-500/10 text-rose-500 border-rose-500/20" : "bg-emerald-600 text-white"}`}>
+                            {selectedUser.roles.includes("admin") ? "سحب الإشراف" : "ترقية لمشرف"}
+                          </Button>
+                        )}
+                        <Button onClick={() => { suspendUser.mutate({ userId: selectedUser.user_id, currentStatus: !!selectedUser.is_suspended }); setSelectedUser(null); }} className={`h-11 rounded-xl font-bold text-xs ${selectedUser.is_suspended ? "bg-emerald-600" : "bg-rose-600"} text-white ${selectedUser.roles.includes("owner") ? "col-span-2" : ""}`}>
+                          {selectedUser.is_suspended ? "تنشيط الحساب" : "إيقاف الحساب"}
                         </Button>
-                      )}
-                      <Button onClick={() => { suspendUser.mutate({ userId: selectedUser.user_id, currentStatus: !!selectedUser.is_suspended }); setSelectedUser(null); }} className={`h-11 rounded-xl font-bold text-xs ${selectedUser.is_suspended ? "bg-emerald-600" : "bg-rose-600"} text-white`}>
-                        {selectedUser.is_suspended ? "تنشيط الحساب" : "إيقاف الحساب"}
+                      </div>
+
+                      {/* 🔥 الزر الجديد لإعادة تعيين كلمة المرور 🔥 */}
+                      <Button 
+                        onClick={() => sendPasswordReset.mutate(selectedUser.email)} 
+                        disabled={sendPasswordReset.isPending}
+                        className="h-11 rounded-xl font-bold text-xs bg-[#121A15] hover:bg-neutral-800 text-white border border-neutral-800 flex items-center gap-2 transition-colors w-full"
+                      >
+                        <Key className="w-4 h-4 text-emerald-500" />
+                        {sendPasswordReset.isPending ? "جاري الإرسال..." : "إرسال رابط إعادة تعيين الباسوورد"}
                       </Button>
                     </div>
+
                   </div>
                 </div>
               </motion.div>
