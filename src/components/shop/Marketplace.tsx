@@ -436,6 +436,7 @@ const Marketplace = () => {
         </AnimatePresence>
 
         {/* 👁️ Modal تفاصيل المنتج (التصميم البريميوم الجديد) */}
+      {/* 👁️ Modal تفاصيل المنتج (التصميم البريميوم المظبوط) */}
         <AnimatePresence>
           {selectedProduct && (
             <motion.div 
@@ -444,74 +445,72 @@ const Marketplace = () => {
               onClick={() => setSelectedProduct(null)}
             >
               <motion.div 
-                initial={{ scale: 0.9, y: 30, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.9, y: 30, opacity: 0 }}
+                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-[#0a0f0c] w-full max-w-5xl rounded-[2rem] border border-white/10 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col md:flex-row"
+                // السر هنا: max-h-[90vh] و overflow-hidden عشان المودال ميهربش برا الشاشة
+                className="bg-[#0a0f0c] w-full max-w-4xl max-h-[90vh] md:max-h-[85vh] rounded-[2rem] border border-white/10 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col md:flex-row"
               >
                 {/* زر إغلاق زجاجي */}
                 <button 
                   onClick={() => setSelectedProduct(null)} 
-                  className="absolute top-4 left-4 z-50 flex items-center justify-center w-10 h-10 bg-black/40 hover:bg-red-500/80 backdrop-blur-md rounded-full text-white transition-all duration-300 border border-white/10"
+                  className="absolute top-4 left-4 z-50 flex items-center justify-center w-10 h-10 bg-black/50 hover:bg-red-500/90 backdrop-blur-md rounded-full text-white transition-all duration-300 border border-white/10"
                 >
                   <X size={20}/>
                 </button>
                 
-                {/* قسم الصورة المؤطرة الفخمة */}
-                <div className="md:w-1/2 relative h-72 md:h-auto bg-[#050806] p-4 md:p-6 flex items-center justify-center">
-                   <div className="w-full h-full relative rounded-[1.5rem] overflow-hidden border border-white/5 group shadow-inner">
+                {/* 🖼️ قسم الصورة في فريم محكم */}
+                <div className="w-full md:w-[45%] h-64 md:h-auto bg-[#050806] p-6 flex items-center justify-center shrink-0 border-b md:border-b-0 md:border-l border-white/5">
+                   <div className="relative w-full max-w-[280px] aspect-[4/5] rounded-[1.5rem] overflow-hidden border border-white/10 shadow-inner bg-black/50 p-2">
                       {selectedProduct.image_url ? (
-                        <img src={selectedProduct.image_url} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+                        // استخدام object-contain عشان الصورة تلم جوا الفريم
+                        <img src={selectedProduct.image_url} className="w-full h-full object-contain filter drop-shadow-2xl" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-neutral-800 bg-neutral-900/50"><ShoppingBag size={80} /></div>
+                        <div className="w-full h-full flex items-center justify-center text-neutral-800"><ShoppingBag size={80} /></div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                    </div>
                 </div>
 
-                {/* قسم التفاصيل */}
-                <div className="md:w-1/2 p-6 md:p-10 flex flex-col bg-gradient-to-br from-[#0a0f0c] to-[#0f1712]">
+                {/* 📝 قسم التفاصيل مع سكرول بار للوصف */}
+                <div className="w-full md:w-[55%] p-6 md:p-8 flex flex-col bg-gradient-to-br from-[#0a0f0c] to-[#0f1712] overflow-hidden">
                   
-                  {/* الشارات */}
-                  <div className="flex flex-wrap items-center gap-3 mb-6">
-                      <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl text-sm font-bold border border-emerald-500/20">
-                        <LayoutGrid size={16} /> 
-                        {selectedProduct.category}
+                  {/* الشارات والاسم (جزء ثابت فوق) */}
+                  <div className="shrink-0 mb-4">
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                          <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-emerald-500/20">
+                            <LayoutGrid size={14} /> {selectedProduct.category}
+                          </div>
+                          <div className="flex items-center gap-1.5 bg-white/5 text-neutral-300 px-3 py-1.5 rounded-lg text-xs font-bold border border-white/5">
+                            <CheckCircle2 size={14} className="text-emerald-500" /> متوفر
+                          </div>
                       </div>
-                      <div className="flex items-center gap-1.5 bg-white/5 text-neutral-300 px-4 py-2 rounded-xl text-sm font-bold border border-white/5">
-                        <CheckCircle2 size={16} className="text-emerald-500" />
-                        متوفر في المخزن
-                      </div>
+                      <h2 className="text-2xl md:text-4xl font-black text-white leading-tight">{selectedProduct.name}</h2>
                   </div>
-
-                  {/* الاسم والوصف */}
-                  <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">{selectedProduct.name}</h2>
                   
-                  <div className="prose prose-invert max-w-none mb-8 flex-1">
-                     <p className="text-neutral-400 text-lg leading-relaxed whitespace-pre-wrap">
+                  {/* منطقة الوصف (فيها السكرول) */}
+                  <div className="flex-1 overflow-y-auto pr-2 my-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-emerald-500/20 hover:[&::-webkit-scrollbar-thumb]:bg-emerald-500/50 [&::-webkit-scrollbar-thumb]:rounded-full transition-all">
+                     <p className="text-neutral-400 text-sm md:text-base leading-relaxed whitespace-pre-wrap">
                        {selectedProduct.description || "لا يوجد وصف إضافي لهذا المنتج."}
                      </p>
                   </div>
                   
-                  {/* السعر وزر الطلب الساحر */}
-                  <div className="mt-auto pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                  {/* السعر وزر الطلب (جزء ثابت تحت) */}
+                  <div className="shrink-0 mt-4 pt-5 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <span className="block text-sm text-neutral-500 mb-2 font-medium">سعر المنتج</span>
-                      <div className="flex items-baseline gap-1">
-                          <span className="text-emerald-400 font-black text-5xl tabular-nums tracking-tighter">{selectedProduct.price}</span>
-                      </div>
+                      <span className="block text-xs text-neutral-500 mb-1 font-medium">سعر المنتج</span>
+                      <span className="text-emerald-400 font-black text-3xl md:text-4xl tabular-nums tracking-tighter">{selectedProduct.price}</span>
                     </div>
                     
                     <a 
                       href={`https://wa.me/201019715490?text=أريد طلب: ${selectedProduct.name}`}
                       target="_blank" rel="noopener noreferrer"
-                      className="group relative flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-2xl transition-all font-bold text-lg w-full sm:w-auto overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]"
+                      className="group relative flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3.5 rounded-xl transition-all font-bold text-base w-full sm:w-auto overflow-hidden shadow-lg shadow-emerald-900/30"
                     >
-                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                      <MessageCircle className="w-6 h-6 relative z-10" /> 
-                      <span className="relative z-10">طلب عبر واتساب</span>
+                      <MessageCircle className="w-5 h-5 relative z-10" /> 
+                      <span className="relative z-10">اطلب عبر واتساب</span>
                     </a>
                   </div>
+
                 </div>
               </motion.div>
             </motion.div>
