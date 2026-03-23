@@ -33,16 +33,30 @@ const Marketplace = () => {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false);
 
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-  const [editCategoryName, setEditCategoryName] = useState("");
-
+  // حالات إضافة أو تعديل منتج
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+
+  // حالات إدارة الأقسام
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [editCategoryName, setEditCategoryName] = useState("");
+
+  // 1. قفل السكرول بتاع الموقع لما أي مودال يفتح
+  useEffect(() => {
+    if (isModalOpen || selectedProduct || isManageCategoriesOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    // تنظيف لما المكون يتمسح
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isModalOpen, selectedProduct, isManageCategoriesOpen]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -61,7 +75,7 @@ const Marketplace = () => {
         dbId: cat.id, id: cat.name, label: cat.name, icon: categoryIcons[cat.name] || LayoutGrid 
       }));
       setDbCategories([{ id: "all", label: "الكل", icon: LayoutGrid }, ...formattedCats]);
-      if (data.length > 0) setNewCategory(data[0].name);
+      if (data.length > 0 && !editingProductId) setNewCategory(data[0].name);
     }
   };
 
@@ -95,18 +109,59 @@ const Marketplace = () => {
     setUploading(false);
   };
 
-  const addProduct = async () => {
+  // فتح فورم الإضافة لمنتج جديد
+  const openAddModal = () => {
+    setEditingProductId(null);
+    setNewName("");
+    setNewPrice("");
+    setNewDescription("");
+    setImageUrl("");
+    if (dbCategories.length > 1) setNewCategory(dbCategories[1].id);
+    setIsModalOpen(true);
+  };
+
+  // فتح فورم التعديل لمنتج موجود
+  const openEditModal = (product: any) => {
+    setEditingProductId(product.id);
+    setNewName(product.name);
+    setNewPrice(product.price);
+    setNewCategory(product.category);
+    setNewDescription(product.description || "");
+    setImageUrl(product.image_url || "");
+    setIsModalOpen(true);
+  };
+
+  // دالة موحدة لحفظ المنتج (إضافة أو تعديل)
+  const handleSaveProduct = async () => {
     if (!newName || !newPrice) return toast.error("يا هندسة كمل البيانات ناقصة!");
-    const { error } = await supabase.from("products").insert([{ name: newName, price: newPrice, category: newCategory, description: newDescription, image_url: imageUrl }]);
-    if (error) toast.error("حدث خطأ أثناء الإضافة");
-    else {
-      toast.success("تم النشر بنجاح! 🚀");
-      setNewName(""); setNewPrice(""); setImageUrl(""); setNewDescription("");
-      setIsModalOpen(false); fetchProducts();
+    
+    if (editingProductId) {
+      // تعديل
+      const { error } = await supabase.from("products").update({ 
+        name: newName, price: newPrice, category: newCategory, description: newDescription, image_url: imageUrl 
+      }).eq("id", editingProductId);
+      
+      if (error) toast.error("حدث خطأ أثناء التعديل");
+      else {
+        toast.success("تم التعديل بنجاح! ✏️");
+        setIsModalOpen(false); fetchProducts();
+      }
+    } else {
+      // إضافة
+      const { error } = await supabase.from("products").insert([
+        { name: newName, price: newPrice, category: newCategory, description: newDescription, image_url: imageUrl }
+      ]);
+      
+      if (error) toast.error("حدث خطأ أثناء الإضافة");
+      else {
+        toast.success("تم النشر بنجاح! 🚀");
+        setIsModalOpen(false); fetchProducts();
+      }
     }
   };
 
   const deleteProduct = async (id: string) => {
+    if (!window.confirm("متأكد إنك عايز تمسح المنتج ده؟")) return;
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (!error) { toast.success("تم مسح المنتج"); fetchProducts(); }
   };
@@ -144,8 +199,8 @@ const Marketplace = () => {
   };
 
   return (
-    // تقليل الـ padding العُلوي في الموبايل pt-20 بدل pt-28
-    <div className="min-h-screen bg-[#050806] text-white font-tajawal pt-20 md:pt-28 pb-16 md:pb-20 relative overflow-hidden" dir="rtl">
+    // تم تغيير overflow-hidden إلى overflow-x-hidden لضمان عمل السكرول
+    <div className="min-h-screen bg-[#050806] text-white font-tajawal pt-20 md:pt-28 pb-16 md:pb-20 relative overflow-x-hidden" dir="rtl">
       <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
       <div className="absolute top-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-emerald-900/10 blur-[100px] md:blur-[120px] rounded-full pointer-events-none" />
 
@@ -163,8 +218,7 @@ const Marketplace = () => {
           {isAdmin && (
             <motion.button 
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-              onClick={() => setIsModalOpen(true)}
-              // الزرار هياخد 100% عرض في الموبايل
+              onClick={openAddModal}
               className="w-full md:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 md:px-8 py-3.5 md:py-4 rounded-xl md:rounded-full font-bold text-sm md:text-base shadow-lg shadow-emerald-900/20 transition-all mt-2 md:mt-0"
             >
               <Plus className="w-5 h-5" /> إضافة صنف جديد
@@ -186,7 +240,7 @@ const Marketplace = () => {
           />
         </div>
 
-        {/* ---------------- الفلاتر (سلسة جداً عالموبايل) ---------------- */}
+        {/* ---------------- الفلاتر ---------------- */}
         <div className="flex flex-nowrap items-center gap-2 md:gap-3 mb-8 md:mb-12 pb-2 overflow-x-auto no-scrollbar scroll-smooth">
           <div className="flex-shrink-0 flex items-center gap-1.5 bg-[#0a0f0c] px-3 md:px-4 py-2 md:py-2.5 rounded-xl border border-white/5 shadow-inner">
             <Filter className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500" />
@@ -239,7 +293,6 @@ const Marketplace = () => {
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
                   className="group bg-[#0a0f0c] rounded-[1.5rem] md:rounded-[2.5rem] border border-white/5 overflow-hidden hover:border-emerald-500/30 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/5 transition-all relative flex flex-col"
                 >
-                  {/* الصورة للموبايل أصغر شوية h-52 */}
                   <div className="h-52 md:h-64 bg-neutral-900 relative overflow-hidden cursor-pointer" onClick={() => setSelectedProduct(p)}>
                     {p.image_url ? (
                       <>
@@ -277,10 +330,17 @@ const Marketplace = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* أزرار الحذف والتعديل للأدمن */}
                   {isAdmin && (
-                    <button onClick={()=>deleteProduct(p.id)} className="absolute top-3 left-3 p-2 bg-red-500/90 hover:bg-red-600 rounded-full text-white opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity z-20 shadow-lg">
-                      <Trash2 size={14}/>
-                    </button>
+                    <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={(e)=>{ e.stopPropagation(); deleteProduct(p.id); }} className="p-2 bg-red-500/90 hover:bg-red-600 rounded-full text-white shadow-lg">
+                        <Trash2 size={14}/>
+                      </button>
+                      <button onClick={(e)=>{ e.stopPropagation(); openEditModal(p); }} className="p-2 bg-blue-500/90 hover:bg-blue-600 rounded-full text-white shadow-lg">
+                        <Edit2 size={14}/>
+                      </button>
+                    </div>
                   )}
                 </motion.div>
               ))}
@@ -288,9 +348,7 @@ const Marketplace = () => {
           </div>
         )}
 
-        {/* ========================================================= */}
         {/* ======================= MODALS ========================== */}
-        {/* ========================================================= */}
 
         {/* ⚙️ Modal إدارة الأقسام */}
         <AnimatePresence>
@@ -311,7 +369,6 @@ const Marketplace = () => {
                     placeholder="اسم القسم الجديد..." 
                     value={newCategoryName} 
                     onChange={e => setNewCategoryName(e.target.value)} 
-                    // text-base بيمنع زووم الآيفون التلقائي
                     className="flex-1 bg-black/40 px-3 py-2.5 rounded-lg border border-white/5 outline-none focus:border-emerald-500 text-white text-base" 
                   />
                   <button onClick={addCategory} className="bg-emerald-600 px-4 py-2.5 rounded-lg text-white font-bold hover:bg-emerald-500 transition-all text-sm">إضافة</button>
@@ -350,7 +407,7 @@ const Marketplace = () => {
           )}
         </AnimatePresence>
 
-        {/* 🛠️ Modal إضافة منتج */}
+        {/* 🛠️ Modal إضافة / تعديل منتج */}
         <AnimatePresence>
           {isModalOpen && isAdmin && (
             <motion.div 
@@ -362,7 +419,12 @@ const Marketplace = () => {
                 className="bg-[#0a0f0c] w-full max-w-xl rounded-[1.5rem] md:rounded-[2.5rem] border border-emerald-500/20 p-5 md:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto no-scrollbar"
               >
                 <button onClick={() => setIsModalOpen(false)} className="absolute top-4 left-4 text-neutral-500 hover:text-white bg-white/5 p-1.5 rounded-full z-10"><X size={18}/></button>
-                <h3 className="text-white font-bold mb-6 flex items-center gap-2 text-lg md:text-2xl"> <Plus className="text-emerald-500 w-5 h-5 md:w-6 md:h-6" /> إضافة صنف جديد</h3>
+                
+                {/* تغيير العنوان حسب الحالة (إضافة أو تعديل) */}
+                <h3 className="text-white font-bold mb-6 flex items-center gap-2 text-lg md:text-2xl"> 
+                  {editingProductId ? <Edit2 className="text-blue-500 w-5 h-5 md:w-6 md:h-6" /> : <Plus className="text-emerald-500 w-5 h-5 md:w-6 md:h-6" />} 
+                  {editingProductId ? "تعديل بيانات المنتج" : "إضافة صنف جديد"}
+                </h3>
                 
                 <div className="space-y-3 md:space-y-4">
                   <div className="relative h-32 md:h-40 bg-black/40 border-2 border-dashed border-white/10 rounded-xl md:rounded-2xl flex items-center justify-center overflow-hidden">
@@ -385,14 +447,17 @@ const Marketplace = () => {
                   </select>
                   
                   <textarea placeholder="وصف سريع..." value={newDescription} onChange={e=>setNewDescription(e.target.value)} className="w-full bg-black/40 p-3 md:p-4 rounded-lg md:rounded-xl border border-white/5 outline-none focus:border-emerald-500 h-20 md:h-24 resize-none text-base" />
-                  <button onClick={addProduct} className="w-full bg-emerald-600 py-3 md:py-4 rounded-xl text-white font-bold hover:bg-emerald-500 transition-all text-base md:text-lg shadow-lg">نشر الآن</button>
+                  
+                  <button onClick={handleSaveProduct} className={`w-full py-3 md:py-4 rounded-xl text-white font-bold transition-all text-base md:text-lg shadow-lg ${editingProductId ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500'}`}>
+                    {editingProductId ? "حفظ التعديلات" : "نشر الآن"}
+                  </button>
                 </div>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* 👁️ Modal تفاصيل المنتج (التصميم المظبوط للموبايل والديسك توب) */}
+        {/* 👁️ Modal تفاصيل المنتج */}
         <AnimatePresence>
           {selectedProduct && (
             <motion.div 
@@ -413,7 +478,6 @@ const Marketplace = () => {
                   <X size={18}/>
                 </button>
                 
-                {/* قسم الصورة */}
                 <div className="w-full md:w-[45%] h-48 sm:h-56 md:h-auto bg-[#050806] p-4 md:p-6 flex items-center justify-center shrink-0 border-b md:border-b-0 md:border-l border-white/5">
                    <div className="relative w-full h-full max-w-[220px] md:max-w-[280px] aspect-[4/5] rounded-[1rem] md:rounded-[1.5rem] overflow-hidden border border-white/10 shadow-inner bg-black/50 p-2 md:p-4">
                       {selectedProduct.image_url ? (
@@ -424,7 +488,6 @@ const Marketplace = () => {
                    </div>
                 </div>
 
-                {/* قسم التفاصيل */}
                 <div className="w-full md:w-[55%] p-5 md:p-8 flex flex-col bg-gradient-to-br from-[#0a0f0c] to-[#0f1712] overflow-hidden">
                   
                   <div className="shrink-0 mb-3 md:mb-4">
@@ -439,7 +502,6 @@ const Marketplace = () => {
                       <h2 className="text-2xl md:text-4xl font-black text-white leading-tight">{selectedProduct.name}</h2>
                   </div>
                   
-                  {/* سكرول الوصف بيشتغل بامتياز ع الموبايل */}
                   <div className="flex-1 overflow-y-auto pr-1 my-1 md:my-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-emerald-500/30">
                      <p className="text-neutral-400 text-sm md:text-base leading-relaxed whitespace-pre-wrap">
                        {selectedProduct.description || "لا يوجد وصف إضافي."}
