@@ -49,6 +49,9 @@ Nabta is a modern educational platform focused on agricultural and biological sc
 
 ---
 
+## 📁 Project Structure
+
+``` bash
 Nabta/
 │
 ├── public/                 # Static public assets
@@ -90,7 +93,7 @@ Nabta/
 ├── components.json         # shadcn/ui configuration
 │
 └── index.html              # Main HTML template
-
+```
 ---
 
 ## ⚙️ Installation
