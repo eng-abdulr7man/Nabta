@@ -95,15 +95,13 @@ const App = () => (
       <Toaster />
       <Sonner position="top-center" /> 
       
-      {/* المستشار الذكي */}
-      <AiChatWidget />
-      
       <BrowserRouter>
-        {/* 🌟 وضعنا المكون هنا ليكون داخل سياق الراوتر 🌟 */}
-        <AuthListener />
-        
-        <ScrollToTop />
         <AuthProvider>
+          {/* 🌟 التعديل هنا: نقلنا المساعد الذكي و الـ Listener جوه الـ AuthProvider والراوتر 🌟 */}
+          <AuthListener />
+          <AiChatWidget />
+          <ScrollToTop />
+          
           <Suspense fallback={<Loading />}>
             <Routes>
               {/* --- Public Routes --- */}
