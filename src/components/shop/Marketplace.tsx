@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Trash2, ShoppingBag, MessageCircle, 
-  Loader2, Camera, Filter, X, Leaf, Sprout, Droplets, Bug, LayoutGrid, Search, Eye, Settings, Edit2, Check
+  Loader2, Camera, Filter, X, Leaf, Sprout, Droplets, Bug, LayoutGrid, Search, Eye, Settings, Edit2, Check, CheckCircle2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -73,7 +73,7 @@ const Marketplace = () => {
       
     if (!error && data) {
       const formattedCats = data.map(cat => ({
-        dbId: cat.id, // احتفظنا بالـ ID الحقيقي من الداتابيس للتعديل والحذف
+        dbId: cat.id,
         id: cat.name,
         label: cat.name,
         icon: categoryIcons[cat.name] || LayoutGrid 
@@ -153,8 +153,7 @@ const Marketplace = () => {
     if (!error) { toast.success("تم مسح المنتج"); fetchProducts(); }
   };
 
-  // --- عمليات إدارة الأقسام ---
-  
+  // عمليات إدارة الأقسام
   const addCategory = async () => {
     if(!newCategoryName.trim()) return toast.error("أدخل اسم القسم أولاً!");
     const { error } = await supabase.from("categories").insert([{ name: newCategoryName.trim() }]);
@@ -174,7 +173,6 @@ const Marketplace = () => {
       toast.error("حدث خطأ أثناء مسح القسم.");
     } else {
       toast.success("تم مسح القسم.");
-      // لو كان الفلتر النشط هو القسم المحذوف، نرجعه لـ "الكل"
       if (activeCategory === name) setActiveCategory("all");
       fetchCategories();
     }
@@ -182,20 +180,15 @@ const Marketplace = () => {
 
   const updateCategory = async (id: string, oldName: string) => {
     if (!editCategoryName.trim()) return toast.error("الاسم الجديد فارغ!");
-    
-    // 1. تحديث اسم القسم في جدول الأقسام
     const { error: catError } = await supabase.from("categories").update({ name: editCategoryName.trim() }).eq("id", id);
-    
     if (catError) {
       toast.error("حدث خطأ، ممكن الاسم يكون مستخدم.");
     } else {
-      // 2. تحديث كل المنتجات اللي كانت مربوطة بالقسم ده للاسم الجديد
       await supabase.from("products").update({ category: editCategoryName.trim() }).eq("category", oldName);
-      
       toast.success("تم تعديل القسم وتحديث منتجاته بنجاح ✨");
       setEditingCategoryId(null);
       fetchCategories();
-      fetchProducts(); // تحديث المنتجات عشان تظهر بالقسم الجديد
+      fetchProducts(); 
     }
   };
 
@@ -262,7 +255,6 @@ const Marketplace = () => {
             </button>
           ))}
 
-          {/* زر إدارة الأقسام للأدمن */}
           {isAdmin && (
              <button
               onClick={() => setIsManageCategoriesOpen(true)}
@@ -274,7 +266,7 @@ const Marketplace = () => {
           )}
         </div>
 
-        {/* 🛒 شبكة المنتجات (نفس الكود السابق بالظبط) */}
+        {/* 🛒 شبكة المنتجات */}
         {loading ? (
           <div className="text-center py-40 text-neutral-600 flex flex-col items-center gap-4">
             <Loader2 className="animate-spin w-12 h-12 text-emerald-500" />
@@ -283,7 +275,7 @@ const Marketplace = () => {
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-32 bg-[#0a0f0c] rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-6 shadow-2xl">
             <ShoppingBag className="w-20 h-20 text-neutral-800" />
-            <p className="text-neutral-500 text-xl font-medium">لا توجد منتجات مطابقة لبحثك.</p>
+            <p className="text-neutral-500 text-xl font-medium">لا توجد منتجات مطابقة לבحثك.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -343,7 +335,7 @@ const Marketplace = () => {
           </div>
         )}
 
-        {/* ⚙️ Modal إدارة الأقسام (إضافة - تعديل - حذف) */}
+        {/* ⚙️ Modal إدارة الأقسام */}
         <AnimatePresence>
           {isManageCategoriesOpen && isAdmin && (
             <motion.div 
@@ -357,7 +349,6 @@ const Marketplace = () => {
                 <button onClick={() => setIsManageCategoriesOpen(false)} className="absolute top-6 left-6 text-neutral-600 hover:text-white"><X /></button>
                 <h3 className="text-white font-bold mb-6 flex items-center gap-2 text-2xl"> <Settings className="text-emerald-500" /> إدارة الأقسام</h3>
                 
-                {/* قسم الإضافة */}
                 <div className="flex gap-2 mb-8 border-b border-white/10 pb-6">
                   <input 
                     placeholder="اسم القسم الجديد..." 
@@ -368,13 +359,10 @@ const Marketplace = () => {
                   <button onClick={addCategory} className="bg-emerald-600 px-6 py-3 rounded-xl text-white font-bold hover:bg-emerald-500 transition-all shadow-lg text-sm">إضافة</button>
                 </div>
 
-                {/* قائمة الأقسام للتعديل والحذف */}
                 <div className="flex-1 overflow-y-auto pr-2 space-y-3 no-scrollbar">
                   {dbCategories.filter(c => c.id !== 'all').map((cat) => (
                     <div key={cat.dbId} className="flex items-center justify-between bg-[#121A15]/50 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
-                      
                       {editingCategoryId === cat.dbId ? (
-                        // وضع التعديل
                         <div className="flex items-center gap-2 w-full">
                           <input 
                             value={editCategoryName} 
@@ -386,41 +374,26 @@ const Marketplace = () => {
                           <button onClick={() => setEditingCategoryId(null)} className="p-2 bg-neutral-800 rounded-lg text-neutral-400 hover:text-white"><X size={16}/></button>
                         </div>
                       ) : (
-                        // وضع العرض
                         <>
                           <div className="flex items-center gap-3 text-white font-medium">
                             <cat.icon className="w-4 h-4 text-emerald-500" />
                             {cat.label}
                           </div>
                           <div className="flex gap-2">
-                            <button 
-                              onClick={() => { setEditingCategoryId(cat.dbId); setEditCategoryName(cat.label); }}
-                              className="p-2 text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
-                            >
-                              <Edit2 size={16}/>
-                            </button>
-                            <button 
-                              onClick={() => deleteCategory(cat.dbId, cat.label)}
-                              className="p-2 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                            >
-                              <Trash2 size={16}/>
-                            </button>
+                            <button onClick={() => { setEditingCategoryId(cat.dbId); setEditCategoryName(cat.label); }} className="p-2 text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"><Edit2 size={16}/></button>
+                            <button onClick={() => deleteCategory(cat.dbId, cat.label)} className="p-2 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 size={16}/></button>
                           </div>
                         </>
                       )}
                     </div>
                   ))}
-                  {dbCategories.length <= 1 && (
-                     <p className="text-center text-neutral-500 text-sm mt-4">لا توجد أقسام مضافة بعد.</p>
-                  )}
                 </div>
-
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* 🛠️ Modal إضافة منتج (بدون تغيير) */}
+        {/* 🛠️ Modal إضافة منتج */}
         <AnimatePresence>
           {isModalOpen && isAdmin && (
             <motion.div 
@@ -462,49 +435,81 @@ const Marketplace = () => {
           )}
         </AnimatePresence>
 
-        {/* 👁️ Modal تفاصيل المنتج (بدون تغيير) */}
+        {/* 👁️ Modal تفاصيل المنتج (التصميم البريميوم الجديد) */}
         <AnimatePresence>
           {selectedProduct && (
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 md:p-8 font-tajawal text-right" dir="rtl"
+              className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 font-tajawal text-right" dir="rtl"
               onClick={() => setSelectedProduct(null)}
             >
               <motion.div 
-                initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+                initial={{ scale: 0.9, y: 30, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.9, y: 30, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-[#0a0f0c] w-full max-w-4xl rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row"
+                className="bg-[#0a0f0c] w-full max-w-5xl rounded-[2rem] border border-white/10 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col md:flex-row"
               >
-                <button onClick={() => setSelectedProduct(null)} className="absolute top-4 left-4 z-20 p-2 bg-black/50 hover:bg-black rounded-full text-white transition-all backdrop-blur-md"><X size={20}/></button>
+                {/* زر إغلاق زجاجي */}
+                <button 
+                  onClick={() => setSelectedProduct(null)} 
+                  className="absolute top-4 left-4 z-50 flex items-center justify-center w-10 h-10 bg-black/40 hover:bg-red-500/80 backdrop-blur-md rounded-full text-white transition-all duration-300 border border-white/10"
+                >
+                  <X size={20}/>
+                </button>
                 
-                <div className="md:w-1/2 h-64 md:h-auto bg-neutral-900 relative">
-                  {selectedProduct.image_url ? (
-                    <img src={selectedProduct.image_url} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-neutral-800"><ShoppingBag size={80} /></div>
-                  )}
+                {/* قسم الصورة المؤطرة الفخمة */}
+                <div className="md:w-1/2 relative h-72 md:h-auto bg-[#050806] p-4 md:p-6 flex items-center justify-center">
+                   <div className="w-full h-full relative rounded-[1.5rem] overflow-hidden border border-white/5 group shadow-inner">
+                      {selectedProduct.image_url ? (
+                        <img src={selectedProduct.image_url} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-neutral-800 bg-neutral-900/50"><ShoppingBag size={80} /></div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                   </div>
                 </div>
 
-                <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center bg-gradient-to-l from-[#0a0f0c] to-[#121A15]">
-                  <div className="inline-block bg-emerald-600/20 text-emerald-400 px-4 py-1.5 rounded-full text-sm font-bold mb-4 w-fit border border-emerald-500/20">
-                    {selectedProduct.category}
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{selectedProduct.name}</h2>
-                  <p className="text-neutral-400 text-base md:text-lg mb-8 leading-relaxed whitespace-pre-wrap">
-                    {selectedProduct.description || "لا يوجد وصف إضافي لهذا المنتج."}
-                  </p>
+                {/* قسم التفاصيل */}
+                <div className="md:w-1/2 p-6 md:p-10 flex flex-col bg-gradient-to-br from-[#0a0f0c] to-[#0f1712]">
                   
-                  <div className="mt-auto pt-6 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  {/* الشارات */}
+                  <div className="flex flex-wrap items-center gap-3 mb-6">
+                      <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl text-sm font-bold border border-emerald-500/20">
+                        <LayoutGrid size={16} /> 
+                        {selectedProduct.category}
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-white/5 text-neutral-300 px-4 py-2 rounded-xl text-sm font-bold border border-white/5">
+                        <CheckCircle2 size={16} className="text-emerald-500" />
+                        متوفر في المخزن
+                      </div>
+                  </div>
+
+                  {/* الاسم والوصف */}
+                  <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">{selectedProduct.name}</h2>
+                  
+                  <div className="prose prose-invert max-w-none mb-8 flex-1">
+                     <p className="text-neutral-400 text-lg leading-relaxed whitespace-pre-wrap">
+                       {selectedProduct.description || "لا يوجد وصف إضافي لهذا المنتج."}
+                     </p>
+                  </div>
+                  
+                  {/* السعر وزر الطلب الساحر */}
+                  <div className="mt-auto pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                     <div>
-                      <span className="block text-sm text-neutral-500 mb-1">سعر المنتج</span>
-                      <span className="text-emerald-400 font-black text-4xl tabular-nums">{selectedProduct.price}</span>
+                      <span className="block text-sm text-neutral-500 mb-2 font-medium">سعر المنتج</span>
+                      <div className="flex items-baseline gap-1">
+                          <span className="text-emerald-400 font-black text-5xl tabular-nums tracking-tighter">{selectedProduct.price}</span>
+                      </div>
                     </div>
                     
                     <a 
                       href={`https://wa.me/201019715490?text=أريد طلب: ${selectedProduct.name}`}
-                      className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-2xl transition-all font-bold shadow-lg shadow-emerald-900/30 text-lg w-full sm:w-auto"
+                      target="_blank" rel="noopener noreferrer"
+                      className="group relative flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-2xl transition-all font-bold text-lg w-full sm:w-auto overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]"
                     >
-                      <MessageCircle className="w-5 h-5" /> طلب الشراء الآن
+                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                      <MessageCircle className="w-6 h-6 relative z-10" /> 
+                      <span className="relative z-10">طلب عبر واتساب</span>
                     </a>
                   </div>
                 </div>
