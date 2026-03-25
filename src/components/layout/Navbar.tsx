@@ -22,15 +22,32 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, profile, signOut, isAdmin } = useAuth();
 
+  // 1. إدارة السكرول بشكل آمن جداً
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = ''; 
+    }
+    
+    // خطوة تنظيف (Cleanup) عشان لو المكون اتغير لأي سبب
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
+
+  // 2. إجبار الموبايل يفك السكرول ويقفل القائمة مع أي تنقل بين الصفحات
+  useEffect(() => {
+    setIsOpen(false);
+    setIsSearchOpen(false);
+    document.body.style.overflow = '';
+  }, [location.pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/courses?q=${encodeURIComponent(searchQuery)}`);
-      searchQuery("");
+      setSearchQuery("");
       setIsSearchOpen(false);
       setIsOpen(false);
     }
@@ -164,7 +181,6 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  onClick={() => setIsOpen(false)}
                   className={`p-5 rounded-2xl text-xl font-bold transition-all border ${
                     location.pathname === link.path 
                     ? "bg-emerald-600 text-white border-emerald-500 shadow-lg" 
@@ -176,7 +192,7 @@ const Navbar = () => {
               ))}
 
               {user && isAdmin && (
-                <Link to="/admin" onClick={() => setIsOpen(false)} className="p-5 rounded-2xl text-xl font-bold bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-3">
+                <Link to="/admin" className="p-5 rounded-2xl text-xl font-bold bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-3">
                   <LayoutDashboard className="w-6 h-6" />
                   لوحة التحكم
                 </Link>
@@ -187,7 +203,7 @@ const Navbar = () => {
               {user ? (
                 <div className="p-5 rounded-3xl bg-[#0a0f0c] border border-neutral-800 shadow-2xl flex flex-col">
                   
-                  <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-4 mb-6">
+                  <Link to="/profile" className="flex items-center gap-4 mb-6">
                     <div className="w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center overflow-hidden">
                       {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 text-xl font-bold">{getInitial()}</span>}
                     </div>
@@ -198,7 +214,7 @@ const Navbar = () => {
                   </Link>
 
                   {/* ❤️ زر المفضلة (الموبايل) ❤️ */}
-                  <Link to="/favorites" onClick={() => setIsOpen(false)} className="flex items-center justify-center w-full h-14 mb-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold gap-2 hover:bg-white/10 transition-all">
+                  <Link to="/favorites" className="flex items-center justify-center w-full h-14 mb-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold gap-2 hover:bg-white/10 transition-all">
                     <Heart className="w-5 h-5 text-red-500" /> الكورسات المفضلة
                   </Link>
 
@@ -209,8 +225,8 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-4">
-                  <Link to="/login" onClick={() => setIsOpen(false)}><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-700 hover:bg-neutral-800 text-white text-lg font-bold">دخول</Button></Link>
-                  <Link to="/register" onClick={() => setIsOpen(false)}><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-bold">حساب جديد</Button></Link>
+                  <Link to="/login"><Button variant="outline" className="w-full h-14 rounded-2xl border-neutral-700 hover:bg-neutral-800 text-white text-lg font-bold">دخول</Button></Link>
+                  <Link to="/register"><Button className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-lg font-bold">حساب جديد</Button></Link>
                 </div>
               )}
             </div>
