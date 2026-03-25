@@ -175,7 +175,7 @@ const CropOfTheMonth = () => {
                     variant="outline" 
                     className="w-full h-12 bg-transparent border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 rounded-xl gap-2 font-bold transition-all text-xs lg:text-sm px-0"
                   >
-                    <Bot className="w-4 h-4" /> اسأل نبتة
+                    <Bot className="w-4 h-4" /> اتعلم زراعته
                   </Button>
 
                   {/* 🌟 زر شراء التقاوي (يمرر اسم المحصول في الرابط) 🌟 */}
