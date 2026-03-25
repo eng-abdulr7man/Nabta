@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom"; // 🌟 استدعاء الـ Search Params
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Trash2, ShoppingBag, MessageCircle, 
@@ -7,7 +8,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import Navbar from "@/components/layout/Navbar"; // 🌟 استدعاء الناف بار
+import Navbar from "@/components/layout/Navbar";
 
 const categoryIcons: Record<string, any> = {
   "أسمدة": Leaf,
@@ -21,12 +22,18 @@ const categoryIcons: Record<string, any> = {
 const Marketplace = () => {
   const { user, isAdmin } = useAuth();
   
+  // 🌟 قراءة كلمة البحث الممررة في الرابط 🌟
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  
   const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   
   const [dbCategories, setDbCategories] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  
+  // 🌟 وضع الكلمة الابتدائية في شريط البحث 🌟
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   
   const [loading, setLoading] = useState(true);
   
@@ -34,7 +41,6 @@ const Marketplace = () => {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false);
 
-  // حالات إضافة أو تعديل منتج
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState("");
@@ -43,19 +49,16 @@ const Marketplace = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  // حالات إدارة الأقسام
   const [newCategoryName, setNewCategoryName] = useState("");
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [editCategoryName, setEditCategoryName] = useState("");
 
-  // 1. قفل السكرول بتاع الموقع لما أي مودال يفتح
   useEffect(() => {
     if (isModalOpen || selectedProduct || isManageCategoriesOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-    // تنظيف لما المكون يتمسح
     return () => { document.body.style.overflow = 'unset'; };
   }, [isModalOpen, selectedProduct, isManageCategoriesOpen]);
 
@@ -84,6 +87,7 @@ const Marketplace = () => {
     fetchProducts(); fetchCategories();
   }, []);
 
+  // 🌟 نظام الفلترة بيطبق تلقائي بناءً على الـ searchQuery والـ Category 🌟
   useEffect(() => {
     let result = products;
     if (activeCategory !== "all") result = result.filter(p => p.category === activeCategory);
@@ -110,7 +114,6 @@ const Marketplace = () => {
     setUploading(false);
   };
 
-  // فتح فورم الإضافة لمنتج جديد
   const openAddModal = () => {
     setEditingProductId(null);
     setNewName("");
@@ -121,7 +124,6 @@ const Marketplace = () => {
     setIsModalOpen(true);
   };
 
-  // فتح فورم التعديل لمنتج موجود
   const openEditModal = (product: any) => {
     setEditingProductId(product.id);
     setNewName(product.name);
@@ -132,12 +134,10 @@ const Marketplace = () => {
     setIsModalOpen(true);
   };
 
-  // دالة موحدة لحفظ المنتج (إضافة أو تعديل)
   const handleSaveProduct = async () => {
     if (!newName || !newPrice) return toast.error("يا هندسة كمل البيانات ناقصة!");
     
     if (editingProductId) {
-      // تعديل
       const { error } = await supabase.from("products").update({ 
         name: newName, price: newPrice, category: newCategory, description: newDescription, image_url: imageUrl 
       }).eq("id", editingProductId);
@@ -148,7 +148,6 @@ const Marketplace = () => {
         setIsModalOpen(false); fetchProducts();
       }
     } else {
-      // إضافة
       const { error } = await supabase.from("products").insert([
         { name: newName, price: newPrice, category: newCategory, description: newDescription, image_url: imageUrl }
       ]);
@@ -201,7 +200,6 @@ const Marketplace = () => {
 
   return (
     <>
-      {/* 🌟 ظهور الناف بار 🌟 */}
       <Navbar />
 
       <div className="min-h-screen bg-[#050806] text-white font-tajawal pt-24 md:pt-32 pb-16 md:pb-20 relative overflow-x-hidden" dir="rtl">
@@ -210,7 +208,6 @@ const Marketplace = () => {
 
         <div className="container mx-auto px-4 relative z-10 max-w-7xl">
           
-          {/* ---------------- HEADER ---------------- */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-10 gap-4 md:gap-6">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="w-full md:w-auto">
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 flex items-center gap-2 md:gap-3">
@@ -230,7 +227,6 @@ const Marketplace = () => {
             )}
           </div>
 
-          {/* ---------------- شريط البحث ---------------- */}
           <div className="mb-6 md:mb-8 max-w-xl relative">
             <div className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none">
               <Search className="w-4 h-4 md:w-5 md:h-5 text-neutral-500" />
@@ -244,7 +240,6 @@ const Marketplace = () => {
             />
           </div>
 
-          {/* ---------------- الفلاتر ---------------- */}
           <div className="flex flex-nowrap items-center gap-2 md:gap-3 mb-8 md:mb-12 pb-2 overflow-x-auto no-scrollbar scroll-smooth">
             <div className="flex-shrink-0 flex items-center gap-1.5 bg-[#0a0f0c] px-3 md:px-4 py-2 md:py-2.5 rounded-xl border border-white/5 shadow-inner">
               <Filter className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500" />
@@ -276,7 +271,6 @@ const Marketplace = () => {
             )}
           </div>
 
-          {/* ---------------- شبكة المنتجات ---------------- */}
           {loading ? (
             <div className="text-center py-20 md:py-40 text-neutral-600 flex flex-col items-center gap-4">
               <Loader2 className="animate-spin w-10 h-10 md:w-12 md:h-12 text-emerald-500" />
@@ -335,7 +329,6 @@ const Marketplace = () => {
                       </div>
                     </div>
                     
-                    {/* أزرار الحذف والتعديل للأدمن */}
                     {isAdmin && (
                       <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={(e)=>{ e.stopPropagation(); deleteProduct(p.id); }} className="p-2 bg-red-500/90 hover:bg-red-600 rounded-full text-white shadow-lg">
@@ -352,9 +345,7 @@ const Marketplace = () => {
             </div>
           )}
 
-          {/* ======================= MODALS ========================== */}
-
-          {/* ⚙️ Modal إدارة الأقسام */}
+          {/* Modals إدارة الأقسام والمنتجات */}
           <AnimatePresence>
             {isManageCategoriesOpen && isAdmin && (
               <motion.div 
@@ -411,7 +402,6 @@ const Marketplace = () => {
             )}
           </AnimatePresence>
 
-          {/* 🛠️ Modal إضافة / تعديل منتج */}
           <AnimatePresence>
             {isModalOpen && isAdmin && (
               <motion.div 
@@ -424,7 +414,6 @@ const Marketplace = () => {
                 >
                   <button onClick={() => setIsModalOpen(false)} className="absolute top-4 left-4 text-neutral-500 hover:text-white bg-white/5 p-1.5 rounded-full z-10"><X size={18}/></button>
                   
-                  {/* تغيير العنوان حسب الحالة (إضافة أو تعديل) */}
                   <h3 className="text-white font-bold mb-6 flex items-center gap-2 text-lg md:text-2xl"> 
                     {editingProductId ? <Edit2 className="text-blue-500 w-5 h-5 md:w-6 md:h-6" /> : <Plus className="text-emerald-500 w-5 h-5 md:w-6 md:h-6" />} 
                     {editingProductId ? "تعديل بيانات المنتج" : "إضافة صنف جديد"}
@@ -461,7 +450,6 @@ const Marketplace = () => {
             )}
           </AnimatePresence>
 
-          {/* 👁️ Modal تفاصيل المنتج */}
           <AnimatePresence>
             {selectedProduct && (
               <motion.div 
