@@ -76,6 +76,8 @@ const FavoritesPage = () => {
   }
 
   return (
+    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
+      <Navbar />
     <div className="min-h-screen bg-[#050806] text-white font-tajawal pt-24 md:pt-32 pb-20 relative overflow-x-hidden" dir="rtl">
       
       {/* إضاءات خلفية */}
