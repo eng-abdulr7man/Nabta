@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Trash2, BookOpen, PlayCircle, User, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import Navbar from "@/components/Navbar"; // تأكد إن ده مسار الناف بار بتاعك
+import Navbar from "@/components/layout/Navbar";//تأكد إن ده مسار الناف بار بتاعك
 import { toast } from "sonner";
 
 const FavoritesPage = () => {
