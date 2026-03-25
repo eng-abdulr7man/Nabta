@@ -40,35 +40,43 @@ const journeySteps = [
 
 const Roadmap = () => {
   return (
-    <section className="py-28 bg-[#090D0A] relative overflow-hidden font-tajawal">
+    <section className="py-24 md:py-32 bg-[#090D0A] relative overflow-hidden font-tajawal">
       
       {/* تأثيرات الإضاءة الخلفية للجو العام للمنصة */}
-      <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-emerald-900/10 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-[-10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-emerald-900/10 blur-[130px] rounded-full pointer-events-none" />
 
-      <div className="container mx-auto px-6 lg:px-12 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* رأس القسم */}
-        <div className="text-right mb-24 max-w-2xl md:mr-0 mr-auto text-center md:text-right space-y-3">
-          <motion.h2 
+        <div className="text-center md:text-right mb-16 md:mb-24 max-w-3xl mx-auto md:mx-0 space-y-4">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-[1.3] tracking-tight"
+            transition={{ duration: 0.6 }}
           >
-            رحلة نمو <span className="text-emerald-400">مسارك</span> المهني
-          </motion.h2>
-          <p className="text-xl text-neutral-400 mt-6 leading-relaxed max-w-xl md:mr-0 mr-auto font-medium">
-             ارسم خريطة مستقبلك في هندسة الزراعة المستدامة والحديثة معنا، خطوة بخطوة.
-          </p>
+            <div className="inline-flex items-center justify-center md:justify-start gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs md:text-sm font-bold mb-4 mx-auto md:mx-0">
+              <Trophy className="w-4 h-4" />
+              خريطة الطريق
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+              رحلة نمو <span className="text-emerald-400 relative">
+                مسارك
+                <svg className="absolute -bottom-2 left-0 w-full h-3 text-emerald-500/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                </svg>
+              </span> المهني
+            </h2>
+            <p className="text-base md:text-lg text-neutral-400 mt-6 leading-relaxed font-medium px-4 md:px-0">
+              ارسم خريطة مستقبلك في هندسة الزراعة المستدامة والحديثة معنا، خطوة بخطوة من البذور حتى الاحتراف.
+            </p>
+          </motion.div>
         </div>
 
-        {/* شبكة الكروت بتصميم انسيابي */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+        {/* شبكة الكروت بتصميم انسيابي ومتجاوب */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 relative">
           
-          {/* ✅ شيلنا خط الربط الأفقي اللي كان في الخلفية هنا */}
-
           {journeySteps.map((step, idx) => {
             const Icon = step.icon;
             return (
@@ -77,42 +85,44 @@ const Roadmap = () => {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.2, duration: 0.6 }}
-                className="group relative"
+                transition={{ delay: idx * 0.15, duration: 0.5 }}
+                className="group relative flex h-full"
               >
-                {/* كارت المرحلة */}
-                <div className={`relative p-8 rounded-[2.5rem] bg-[#121A15] border border-white/5 hover:border-emerald-500/30 transition-all duration-500 ${step.glow} hover:-translate-y-3 shadow-2xl overflow-hidden`}>
+                {/* كارت المرحلة - flex-1 و h-full لضمان تساوي الأطوال */}
+                <div className={`flex flex-col flex-1 w-full relative p-6 sm:p-8 rounded-[2rem] bg-gradient-to-b from-[#121A15] to-[#0a0f0c] border border-white/5 hover:border-emerald-500/30 transition-all duration-500 ${step.glow} hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(16,185,129,0.1)] overflow-hidden`}>
                   
                   {/* الرقم الخلفي العائم */}
-                  <span className={`absolute -top-3 -left-3 text-[120px] font-black text-white/[0.01] group-hover:text-emerald-500/[0.04] transition-colors pointer-events-none`}>
+                  <span className="absolute -top-4 -left-4 text-[100px] sm:text-[130px] font-black text-white/[0.015] group-hover:text-emerald-500/[0.05] transition-colors duration-500 pointer-events-none select-none">
                     0{idx + 1}
                   </span>
 
-                  <div className="relative z-10 space-y-8">
+                  <div className="relative z-10 flex flex-col h-full space-y-6 md:space-y-8">
                     {/* أيقونة المرحلة بتدرج لوني خاص */}
                     <div className="flex items-center justify-between">
-                       <div className={`w-16 h-16 rounded-[1.6rem] bg-gradient-to-br ${step.gradient} p-[1.5px] shadow-lg shadow-black/30 group-hover:scale-110 transition-transform duration-500`}>
-                          <div className="w-full h-full bg-[#121A15] rounded-[1.5rem] flex items-center justify-center border border-white/10">
-                             <Icon className={`w-7 h-7 text-white`} />
+                       <div className={`w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-[1.2rem] sm:rounded-[1.5rem] bg-gradient-to-br ${step.gradient} p-[1px] shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                          <div className="w-full h-full bg-[#121A15] rounded-[1.1rem] sm:rounded-[1.4rem] flex items-center justify-center border border-white/10">
+                             <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                           </div>
                        </div>
                     </div>
 
-                    <div className="space-y-3 text-right">
-                      <h3 className="text-2xl font-black text-white leading-snug group-hover:text-emerald-400 transition-colors">
+                    <div className="space-y-3 text-right flex-1 flex flex-col">
+                      <h3 className="text-xl sm:text-2xl font-black text-white leading-snug group-hover:text-emerald-400 transition-colors">
                         {step.title}
                       </h3>
-                      <p className="text-neutral-400 text-sm leading-loose font-medium font-sans group-hover:text-neutral-300 transition-colors">
+                      <p className="text-neutral-400 text-sm leading-relaxed font-medium">
                         {step.desc}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* سهم الربط بين الكروت (يتحرك مع الـ Hover) */}
+                {/* سهم الربط بين الكروت (يظهر فقط في الشاشات الكبيرة lg) */}
                 {idx < journeySteps.length - 1 && (
-                  <div className="hidden lg:flex absolute top-1/2 -left-6 z-20 items-center justify-center">
-                    <ChevronLeft className="w-6 h-6 text-white/10 group-hover:text-emerald-500 transition-all group-hover:translate-x-[-10px] group-hover:scale-110" />
+                  <div className="hidden lg:flex absolute top-1/2 -left-6 z-20 items-center justify-center -translate-y-1/2">
+                    <div className="w-8 h-8 rounded-full bg-[#090D0A] flex items-center justify-center border border-white/5">
+                      <ChevronLeft className="w-5 h-5 text-neutral-600 group-hover:text-emerald-500 transition-colors duration-300" />
+                    </div>
                   </div>
                 )}
               </motion.div>
@@ -121,14 +131,20 @@ const Roadmap = () => {
         </div>
 
         {/* زرار الـ CTA الأخير */}
-        <div className="mt-20 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.8 }}
+          className="mt-16 md:mt-24 text-center"
+        >
            <Link to="/courses">
-              <Button size="lg" variant="outline" className="bg-[#121A15] border-neutral-800 hover:border-emerald-500/30 text-white px-10 h-16 rounded-2xl text-lg font-black gap-3 shadow-xl backdrop-blur-md transition-all active:scale-95 group">
-                استعرض كورسات الأساسيات
-                <ArrowLeft className="w-5 h-5 transition-transform group-hover:translate-x-[-5px]" />
+              <Button size="lg" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-8 md:px-12 h-14 md:h-16 rounded-xl md:rounded-2xl text-base md:text-lg font-bold gap-3 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-all active:scale-95 group">
+                استكشف كورسات الأساسيات
+                <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
               </Button>
            </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
