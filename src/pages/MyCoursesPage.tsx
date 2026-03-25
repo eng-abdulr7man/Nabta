@@ -133,10 +133,10 @@ const MyCoursesPage = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-900/20 border border-emerald-500/20 text-emerald-400 text-sm font-bold shadow-[0_0_20px_rgba(16,185,129,0.1)] mb-6">
               <Award className="w-4 h-4" />
-              التعلم المستمر
+              تابع التعلم
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-4">
-              مساحة <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-emerald-600">كورساتي</span>
+               <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-emerald-600">كورساتي</span>
             </h1>
             <p className="text-lg md:text-xl text-neutral-400 leading-relaxed">
               تابع تقدمك، استكمل دروسك، واحصل على شهاداتك فور إتمامك للمسارات التدريبية.
