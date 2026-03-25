@@ -1,44 +1,12 @@
-// import Navbar from "@/components/layout/Navbar";
-// import Footer from "@/components/layout/Footer";
-// import BottomNav from "@/components/layout/BottomNav";
-// import HeroSection from "@/components/home/HeroSection";
-// import SpecializationsSection from "@/components/home/SpecializationsSection";
-// import FeaturedCourses from "@/components/home/FeaturedCourses";
-
-
-// const Index = () => {
-//   return (
-//     <div className="min-h-screen flex flex-col bg-background">
-//       <Navbar />
-//       <main className="flex-1 pt-16 pb-16 md:pb-0">
-//         <HeroSection />
-//         <motion.div
-//           initial={{ opacity: 0 }}
-//           whileInView={{ opacity: 1 }}
-//           transition={{ duration: 0.8 }}
-//           viewport={{ once: true }}
-//         >
-//           <Roadmap />
-//         </motion.div>
-//         <SpecializationsSection />
-//         <FeaturedCourses />
-//       </main>
-//       <Footer />
-//       <BottomNav />
-//     </div>
-//   );
-// };
-
-// export default Index;
-
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
-import HeroDarkSection from "@/components/home/HeroSection"; // 🌟 استخدمنا الهيرو الدارك اللي لسه عاملينه
+import HeroDarkSection from "@/components/home/HeroSection"; 
 import SpecializationsSection from "@/components/home/SpecializationsSection";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
-import Roadmap from "@/components/home/Roadmap"; // ✅ استدعاء الرودماب
-import { motion } from "framer-motion"; // ✅ استدعاء الفريمر موشن للأنيميشن
+import Roadmap from "@/components/home/Roadmap"; 
+import AiAnalyzerSection from "@/components/home/AiAnalyzerSection"; // 🌟 استدعاء قسم الذكاء الاصطناعي الجديد
+import { motion } from "framer-motion";
 
 const Index = () => {
   return (
@@ -61,11 +29,14 @@ const Index = () => {
         >
           <Roadmap />
         </motion.div>
+
+        {/* 🤖 3. قسم المستشار الذكي (AI Analyzer) - الجديد 🤖 */}
+        <AiAnalyzerSection />
         
-        {/* 3. قسم التخصصات */}
+        {/* 4. قسم التخصصات */}
         <SpecializationsSection />
         
-        {/* 4. قسم أحدث الكورسات */}
+        {/* 5. قسم أحدث الكورسات */}
         <FeaturedCourses />
         
       </main>
