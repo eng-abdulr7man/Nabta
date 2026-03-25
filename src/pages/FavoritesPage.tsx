@@ -1,268 +1,195 @@
-// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-// import { supabase } from "@/integrations/supabase/client";
-// import { useAuth } from "@/contexts/AuthContext";
-// import { Link } from "react-router-dom";
-// import { motion } from "framer-motion";
-// import { Heart, Trash2 } from "lucide-react";
-// import { Button } from "@/components/ui/button";
-// import { useToast } from "@/hooks/use-toast";
-// import CourseCard from "@/components/courses/CourseCard";
-// import Navbar from "@/components/layout/Navbar";
-// import Footer from "@/components/layout/Footer";
-// import BottomNav from "@/components/layout/BottomNav";
-
-// const FavoritesPage = () => {
-//   const { user } = useAuth();
-//   const { toast } = useToast();
-//   const queryClient = useQueryClient();
-
-//   const { data: favorites, isLoading } = useQuery({
-//     queryKey: ["my-favorites", user?.id],
-//     queryFn: async () => {
-//       const { data, error } = await supabase
-//         .from("favorites")
-//         .select("*, courses(*)")
-//         .eq("user_id", user!.id)
-//         .order("created_at", { ascending: false });
-//       if (error) throw error;
-//       return data;
-//     },
-//     enabled: !!user,
-//   });
-
-//   const removeFav = useMutation({
-//     mutationFn: async (favId: string) => {
-//       const { error } = await supabase.from("favorites").delete().eq("id", favId);
-//       if (error) throw error;
-//     },
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["my-favorites"] });
-//       toast({ title: "تمت إزالة الكورس من المفضلة" });
-//     },
-//   });
-
-//   return (
-//     <div className="min-h-screen flex flex-col bg-background">
-//       <Navbar />
-//       <main className="flex-1 pt-24 pb-20 md:pb-8">
-//         <div className="container mx-auto px-4">
-//           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-//             <h1 className="text-3xl font-black text-foreground mb-2">المفضلة</h1>
-//             <p className="text-muted-foreground">الكورسات التي أعجبتك وحفظتها</p>
-//           </motion.div>
-
-//           {isLoading ? (
-//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-//               {Array.from({ length: 3 }).map((_, i) => (
-//                 <div key={i} className="glass-card h-80 animate-pulse" />
-//               ))}
-//             </div>
-//           ) : !favorites || favorites.length === 0 ? (
-//             <div className="text-center py-16">
-//               <Heart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-//               <p className="text-lg text-muted-foreground mb-4">لا توجد كورسات في المفضلة</p>
-//               <Link to="/courses">
-//                 <Button className="bg-primary text-primary-foreground">تصفح الكورسات</Button>
-//               </Link>
-//             </div>
-//           ) : (
-//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-//               {favorites.map((fav: any, i: number) => {
-//                 const course = fav.courses;
-//                 if (!course) return null;
-//                 return (
-//                   <div key={fav.id} className="relative group">
-//                     <CourseCard {...course} index={i} />
-//                     <button
-//                       onClick={(e) => { e.preventDefault(); removeFav.mutate(fav.id); }}
-//                       className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-destructive/90 text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-//                     >
-//                       <Trash2 className="w-4 h-4" />
-//                     </button>
-//                   </div>
-//                 );
-//               })}
-//             </div>
-//           )}
-//         </div>
-//       </main>
-//       <Footer />
-//       <BottomNav />
-//     </div>
-//   );
-// };
-
-// export default FavoritesPage;
-
-//v2
-import { useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, Trash2, BookOpen, PlayCircle, User, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Heart, Trash2, HeartOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import CourseCard from "@/components/courses/CourseCard";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
+import { toast } from "sonner";
 
 const FavoritesPage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // تمرير لأعلى الصفحة عند الفتح
+  // 1. جلب المفضلة مع بيانات الكورس المربوط بيها
+  const fetchFavorites = async () => {
+    if (!user) return;
+    setLoading(true);
+    
+    // هنا بنعمل Join ذكي: بنجيب المفضلة، وبنجيب بيانات الكورس المرتبط بيها
+    const { data, error } = await supabase
+      .from("favorites")
+      .select(`
+        id,
+        created_at,
+        courses (
+          id,
+          title,
+          description,
+          instructor,
+          thumbnail_url
+        )
+      `)
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast.error("حدث خطأ أثناء تحميل المفضلة.");
+    } else {
+      setFavorites(data || []);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    fetchFavorites();
+  }, [user]);
 
-  const { data: favorites, isLoading } = useQuery({
-    queryKey: ["my-favorites", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("favorites")
-        .select("*, courses(*)")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
+  // 2. إزالة الكورس من المفضلة
+  const removeFavorite = async (favoriteId: string) => {
+    const { error } = await supabase
+      .from("favorites")
+      .delete()
+      .eq("id", favoriteId);
 
-  const removeFav = useMutation({
-    mutationFn: async (favId: string) => {
-      const { error } = await supabase.from("favorites").delete().eq("id", favId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-favorites"] });
-      toast({ title: "تمت إزالة الكورس من المفضلة", variant: "default" });
-    },
-  });
+    if (error) {
+      toast.error("لم نتمكن من إزالة الكورس، حاول مرة أخرى.");
+    } else {
+      toast.success("تم إزالة الكورس من المفضلة 💔");
+      // تحديث الواجهة فوراً بدون ريفريش
+      setFavorites(prev => prev.filter(fav => fav.id !== favoriteId));
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#050806] text-white">
+        <div className="text-center space-y-4">
+          <Heart className="w-16 h-16 text-neutral-600 mx-auto opacity-50" />
+          <h2 className="text-2xl font-bold">يجب تسجيل الدخول أولاً</h2>
+          <Link to="/login" className="inline-block bg-emerald-600 px-6 py-2.5 rounded-xl font-bold hover:bg-emerald-500 transition-colors">
+            تسجيل الدخول
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
-      <Navbar />
+    <div className="min-h-screen bg-[#050806] text-white font-tajawal pt-24 md:pt-32 pb-20 relative overflow-x-hidden" dir="rtl">
       
-      <main className="flex-1 pt-32 pb-24 md:pb-16 relative overflow-hidden">
+      {/* إضاءات خلفية */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
+      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-red-900/10 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
         
-        {/* إضاءات خلفية (Ambient Glows) */}
-        <div className="absolute top-0 left-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
-        <div className="absolute top-[40%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-emerald-900/5 blur-[120px] pointer-events-none" />
-
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          
-          {/* ======================================= */}
-          {/* الهيدر */}
-          {/* ======================================= */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.5 }}
-            className="mb-10 lg:mb-12"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-medium shadow-[0_0_20px_rgba(16,185,129,0.05)] mb-4">
-              <Heart className="w-4 h-4" />
-              قائمتي
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
-              الكورسات <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">المفضلة</span>
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-10 md:mb-16 border-b border-white/5 pb-8">
+          <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+            <Heart className="w-7 h-7 text-red-500 fill-red-500/20" />
+          </div>
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black mb-2 flex items-center gap-2">
+              كورساتي المفضلة
             </h1>
-            <p className="text-lg text-neutral-400 max-w-2xl leading-relaxed">
-              احتفظ ببرامجك التدريبية المفضلة هنا للعودة إليها والبدء في تعلمها في أي وقت.
+            <p className="text-neutral-500 text-sm md:text-base">
+              قائمة بالكورسات التي أضفتها لتشاهدها لاحقاً.
             </p>
-          </motion.div>
+          </div>
+        </div>
 
-          {/* ======================================= */}
-          {/* المحتوى (Loading, Empty State, Grid) */}
-          {/* ======================================= */}
-          {isLoading ? (
-            
-            // --- حالة التحميل (Premium Skeletons) ---
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-[#0a0f0c] border border-neutral-800/50 rounded-3xl p-4 h-[400px] flex flex-col animate-pulse shadow-lg">
-                  <div className="w-full h-48 bg-[#121A15] rounded-2xl mb-4 border border-neutral-800/50" />
-                  <div className="space-y-3 flex-1">
-                    <div className="h-4 w-1/3 bg-emerald-900/20 rounded-md mb-3" />
-                    <div className="h-6 w-full bg-[#121A15] rounded-md" />
-                    <div className="h-6 w-3/4 bg-[#121A15] rounded-md" />
-                  </div>
-                  <div className="h-10 w-full bg-[#121A15] rounded-xl mt-4" />
-                </div>
-              ))}
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+            <p className="text-neutral-400">جاري تحميل كورساتك المفضلة...</p>
+          </div>
+        ) : favorites.length === 0 ? (
+          /* Empty State */
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-32 bg-[#0a0f0c] rounded-[2rem] border border-white/5 shadow-2xl text-center px-4"
+          >
+            <div className="w-24 h-24 rounded-full bg-neutral-900 border border-white/5 flex items-center justify-center mb-6">
+              <Heart className="w-10 h-10 text-neutral-600" />
             </div>
+            <h3 className="text-2xl font-bold text-white mb-3">القائمة فارغة حالياً</h3>
+            <p className="text-neutral-400 max-w-md mb-8 leading-relaxed">
+              لم تقم بإضافة أي كورسات للمفضلة بعد. تصفح مكتبة الكورسات وابدأ في إضافة ما يهمك لتعود إليه بسهولة.
+            </p>
+            <Link to="/courses" className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20">
+              <BookOpen className="w-5 h-5" /> استكشف الكورسات
+            </Link>
+          </motion.div>
+        ) : (
+          /* شبكة الكورسات المفضلة */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <AnimatePresence>
+              {favorites.map((fav, idx) => {
+                const course = fav.courses; // بيانات الكورس المرتبطة
+                if (!course) return null; // لو الكورس اتمسح من الداتابيس
 
-          ) : !favorites || favorites.length === 0 ? (
-            
-            // --- حالة القائمة الفارغة (Empty State) ---
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-24 px-4 text-center bg-[#0a0f0c] border border-dashed border-neutral-800 rounded-[2rem] shadow-lg max-w-2xl mx-auto mt-8"
-            >
-              <div className="w-20 h-20 bg-[#121A15] rounded-2xl flex items-center justify-center mb-6 border border-neutral-800 shadow-inner relative">
-                <div className="absolute inset-0 bg-red-500/5 rounded-2xl blur-md" />
-                <HeartOff className="w-10 h-10 text-neutral-500 relative z-10" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">قائمتك فارغة</h3>
-              <p className="text-neutral-400 max-w-sm mb-8 leading-relaxed">
-                لم تقم بإضافة أي كورسات إلى المفضلة بعد. تصفح مكتبتنا واحتفظ بالكورسات التي تهمك هنا.
-              </p>
-              <Link to="/courses">
-                <Button className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 h-12 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]">
-                  تصفح الكورسات
-                </Button>
-              </Link>
-            </motion.div>
-
-          ) : (
-            
-            // --- عرض الكورسات المفضلة ---
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {favorites.map((fav: any, i: number) => {
-                const course = fav.courses;
-                if (!course) return null;
                 return (
                   <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    key={fav.id} 
-                    className="relative group h-full"
+                    key={fav.id}
+                    layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    className="group flex flex-col bg-[#0a0f0c] rounded-[1.5rem] md:rounded-[2rem] border border-white/5 overflow-hidden hover:border-emerald-500/30 transition-all shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10"
                   >
-                    <CourseCard {...course} index={i} />
-                    
-                    {/* زرار الحذف (محسّن للموبايل والكمبيوتر) */}
-                    <button
-                      onClick={(e) => { 
-                        e.preventDefault(); 
-                        removeFav.mutate(fav.id); 
-                      }}
-                      className="absolute top-4 left-4 z-20 w-10 h-10 rounded-xl bg-[#0a0f0c]/80 backdrop-blur-md border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-red-500 hover:border-red-500 transition-all duration-300 shadow-lg"
-                      title="إزالة من المفضلة"
-                    >
-                      {removeFav.isPending ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {/* صورة الكورس */}
+                    <Link to={`/courses/${course.id}`} className="block relative h-48 sm:h-56 bg-neutral-900 overflow-hidden">
+                      {course.thumbnail_url ? (
+                        <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                       ) : (
-                        <Trash2 className="w-4 h-4" />
+                        <div className="w-full h-full flex items-center justify-center text-neutral-700">
+                          <BookOpen className="w-12 h-12 opacity-50" />
+                        </div>
                       )}
-                    </button>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0c] via-transparent to-transparent opacity-90" />
+                      
+                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-2 rounded-full border border-white/10 group-hover:bg-emerald-500/20 transition-colors">
+                        <PlayCircle className="w-5 h-5 text-emerald-400" />
+                      </div>
+                    </Link>
+
+                    {/* تفاصيل الكورس */}
+                    <div className="p-5 flex flex-col flex-1 relative z-10 -mt-6 bg-[#0a0f0c] rounded-t-2xl">
+                      <Link to={`/courses/${course.id}`}>
+                        <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-emerald-400 transition-colors leading-snug">
+                          {course.title}
+                        </h3>
+                      </Link>
+                      <div className="flex items-center gap-2 text-neutral-400 text-sm mb-4 mt-auto">
+                        <User className="w-4 h-4 text-emerald-500/70" />
+                        <span className="truncate">{course.instructor || "نبتة أكاديمي"}</span>
+                      </div>
+
+                      {/* أزرار التحكم */}
+                      <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                        <Link 
+                          to={`/courses/${course.id}`}
+                          className="flex-1 text-center bg-white/5 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors ml-3 border border-white/5"
+                        >
+                          بدء التعلم
+                        </Link>
+                        <button 
+                          onClick={() => removeFavorite(fav.id)}
+                          title="إزالة من المفضلة"
+                          className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all border border-red-500/20"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>
                 );
               })}
-            </div>
+            </AnimatePresence>
+          </div>
+        )}
 
-          )}
-        </div>
-      </main>
-      
-      <Footer />
-      <BottomNav />
+      </div>
     </div>
   );
 };
