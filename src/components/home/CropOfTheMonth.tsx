@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CalendarDays, ArrowLeft, ThermometerSun, Droplets, ShoppingBag, BookOpen, Loader2 } from "lucide-react";
+import { CalendarDays, ThermometerSun, Droplets, ShoppingBag, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const GROQ_API_KEY = "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";
 
-// واجهة البيانات اللي هنستقبلها من الذكاء الاصطناعي
 interface AiCropData {
   monthName: string;
   season: string;
@@ -29,10 +28,8 @@ const CropOfTheMonth = () => {
       setIsLoading(true);
       setError(null);
 
-      // جلب اسم الشهر الحالي برمجياً باللغة العربية
       const currentMonth = new Intl.DateTimeFormat('ar-EG', { month: 'long' }).format(new Date());
 
-      // هندسة الأوامر (Prompt Engineering) لإجبار الـ AI على إرجاع JSON متوافق مع تصميمنا
       const systemPrompt = `أنت خبير زراعي مصري محترف. الوقت الحالي هو شهر "${currentMonth}".
       بناءً على هذا الشهر والمناخ العام في مصر والشرق الأوسط، اقترح أفضل 3 محاصيل للزراعة الآن.
       يجب أن يكون ردك عبارة عن كائن JSON فقط (بدون أي نصوص إضافية أو علامات Markdown) بهذه الصيغة الدقيقة:
@@ -58,14 +55,13 @@ const CropOfTheMonth = () => {
           body: JSON.stringify({
             model: "llama-3.3-70b-versatile",
             messages: [{ role: "user", content: systemPrompt }],
-            temperature: 0.3, // تقليل العشوائية لضمان دقة الـ JSON
+            temperature: 0.3,
           }),
         });
 
         const data = await response.json();
         
         if (data.choices?.[0]?.message?.content) {
-          // تنظيف الرد تحسباً لو الـ AI أضاف علامات ```json
           let jsonString = data.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
           const parsedData = JSON.parse(jsonString) as AiCropData;
           setAiData(parsedData);
@@ -83,37 +79,36 @@ const CropOfTheMonth = () => {
     fetchAiRecommendations();
   }, []);
 
+  // 🌟 الدالة اللي بتفتح الشات وتبعث السؤال 🌟
+  const handleLearnWithAi = (cropName: string) => {
+    const event = new CustomEvent('openAiChat', {
+      detail: { query: `كيف أزرع ${cropName} ومتى أفضل وقت لزراعته؟` }
+    });
+    window.dispatchEvent(event);
+  };
+
   return (
     <section className="py-24 relative overflow-hidden bg-[#050806] font-tajawal">
-      {/* إضاءات وجماليات الخلفية */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-yellow-900/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10 max-w-6xl">
-        
-        {/* Header القسم */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold mb-4">
               <CalendarDays className="w-4 h-4" />
               التقويم الزراعي الذكي
             </div>
-            
             <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
               ماذا نزرع في شهر <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-yellow-500">{aiData?.monthName || "..."}</span>؟
             </h2>
-            
             <p className="text-neutral-400 mt-4 max-w-xl text-lg">
               توصيات حية من مستشار نبتة الذكي مدعومة بالذكاء الاصطناعي بناءً على حالة الطقس والموسم الزراعي الحالي.
             </p>
           </motion.div>
 
-          {/* ظروف الشهر الجوية (تظهر فقط إذا تم التحميل) */}
           {aiData && !isLoading && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-              className="flex gap-4 bg-[#0a0f0c] p-4 rounded-2xl border border-white/5 shadow-xl shrink-0"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex gap-4 bg-[#0a0f0c] p-4 rounded-2xl border border-white/5 shadow-xl shrink-0">
               <div className="flex items-center gap-3 pr-4 border-l border-white/10">
                 <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
                   <ThermometerSun className="w-5 h-5 text-yellow-500" />
@@ -136,9 +131,7 @@ const CropOfTheMonth = () => {
           )}
         </div>
 
-        {/* حالة التحميل أو الخطأ أو عرض الكروت */}
         {isLoading ? (
-          // Skeleton Loader فخم أثناء التفكير
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-6 h-[350px] animate-pulse flex flex-col">
@@ -158,7 +151,6 @@ const CropOfTheMonth = () => {
             <p>{error}</p>
           </div>
         ) : aiData ? (
-          // الكروت التفاعلية للمحاصيل (من الـ AI)
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {aiData.crops.map((crop, idx) => (
               <motion.div
@@ -177,11 +169,16 @@ const CropOfTheMonth = () => {
                 </p>
                 
                 <div className="mt-auto grid grid-cols-2 gap-3 border-t border-white/5 pt-5">
-                  <Link to={`/courses?q=${crop.name}`} className="w-full">
-                    <Button variant="outline" className="w-full h-12 bg-transparent border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 rounded-xl gap-2 font-bold transition-all text-xs lg:text-sm px-0">
-                      <BookOpen className="w-4 h-4" /> تعلم زراعته
-                    </Button>
-                  </Link>
+                  {/* 🌟 زر اسأل نبتة 🌟 */}
+                  <Button 
+                    onClick={() => handleLearnWithAi(crop.name)}
+                    variant="outline" 
+                    className="w-full h-12 bg-transparent border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 rounded-xl gap-2 font-bold transition-all text-xs lg:text-sm px-0"
+                  >
+                    <Bot className="w-4 h-4" /> اسأل نبتة
+                  </Button>
+
+                  {/* 🌟 زر شراء التقاوي (يمرر اسم المحصول في الرابط) 🌟 */}
                   <Link to={`/marketplace?q=${crop.name}`} className="w-full">
                     <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl gap-2 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all text-xs lg:text-sm px-0">
                       <ShoppingBag className="w-4 h-4" /> شراء التقاوي
@@ -192,7 +189,6 @@ const CropOfTheMonth = () => {
             ))}
           </div>
         ) : null}
-
       </div>
     </section>
   );
