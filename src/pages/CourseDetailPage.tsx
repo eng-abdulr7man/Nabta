@@ -1,6 +1,4 @@
-
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
@@ -38,6 +36,34 @@ const CourseDetailPage = () => {
 
   const spec = specs?.find((s) => s.id === course?.specialization_id);
 
+  // ==========================================
+  // حالات المفضلة الجديدة (استعلام ديناميكي)
+  // ==========================================
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
+
+  // التأكد هل الكورس في المفضلة عند تحميل الصفحة
+  useEffect(() => {
+    if (!user || !id) return;
+    const checkFavoriteStatus = async () => {
+      const { data } = await supabase
+        .from("favorites")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("course_id", id)
+        .maybeSingle();
+
+      if (data) {
+        setIsFavorite(true);
+        setFavoriteId(data.id);
+      } else {
+        setIsFavorite(false);
+        setFavoriteId(null);
+      }
+    };
+    checkFavoriteStatus();
+  }, [user, id]);
+
   const enrollMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("يجب تسجيل الدخول أولاً");
@@ -57,24 +83,42 @@ const CourseDetailPage = () => {
     },
   });
 
-  const favMutation = useMutation({
+  // ==========================================
+  // دالة Toggle للإضافة أو الإزالة من المفضلة
+  // ==========================================
+  const toggleFavMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("يجب تسجيل الدخول أولاً");
-      const { error } = await supabase.from("favorites").insert({
-        user_id: user.id,
-        course_id: id!,
-      });
-      if (error) throw error;
+      
+      if (isFavorite && favoriteId) {
+        // إزالة من المفضلة
+        const { error } = await supabase.from("favorites").delete().eq("id", favoriteId);
+        if (error) throw error;
+        return { action: "removed" };
+      } else {
+        // إضافة للمفضلة
+        const { data, error } = await supabase
+          .from("favorites")
+          .insert({ user_id: user.id, course_id: id! })
+          .select("id")
+          .single();
+        if (error) throw error;
+        return { action: "added", id: data.id };
+      }
     },
-    onSuccess: () => {
-      toast({ title: "تمت الإضافة للمفضلة" });
+    onSuccess: (data) => {
+      if (data.action === "added") {
+        setIsFavorite(true);
+        setFavoriteId(data.id);
+        toast({ title: "تمت الإضافة للمفضلة ❤️" });
+      } else {
+        setIsFavorite(false);
+        setFavoriteId(null);
+        toast({ title: "تمت الإزالة من المفضلة 💔" });
+      }
     },
     onError: (err: any) => {
-      if (err.message?.includes("duplicate")) {
-        toast({ title: "الكورس موجود بالفعل في المفضلة" });
-      } else {
-        toast({ title: "خطأ", description: err.message, variant: "destructive" });
-      }
+      toast({ title: "خطأ", description: err.message, variant: "destructive" });
     },
   });
 
@@ -86,12 +130,12 @@ const CourseDetailPage = () => {
     enrollMutation.mutate();
   };
 
-  const handleFavorite = () => {
+  const handleToggleFavorite = () => {
     if (!user) {
       navigate("/login");
       return;
     }
-    favMutation.mutate();
+    toggleFavMutation.mutate();
   };
 
   const totalLessons = lessons?.length || 0;
@@ -271,13 +315,27 @@ const CourseDetailPage = () => {
                     </Button>
                   )}
                   
+                  {/* زر المفضلة الديناميكي الذكي */}
                   <Button 
                     variant="outline" 
-                    onClick={handleFavorite}
-                    className="w-full bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white hover:border-emerald-500/50 h-12 font-bold rounded-xl transition-all group"
+                    onClick={handleToggleFavorite}
+                    disabled={toggleFavMutation.isPending}
+                    className={`w-full h-12 font-bold rounded-xl transition-all group ${
+                      isFavorite
+                        ? "bg-red-500/10 border-red-500/30 text-red-500 hover:bg-red-500/20"
+                        : "bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white hover:border-emerald-500/50"
+                    }`}
                   >
-                    <Heart className="w-4 h-4 ml-2 group-hover:text-red-500 transition-colors" />
-                    إضافة إلى المفضلة
+                    <Heart 
+                      className={`w-4 h-4 ml-2 transition-colors ${
+                        isFavorite ? "fill-current" : "group-hover:text-red-500"
+                      }`} 
+                    />
+                    {toggleFavMutation.isPending 
+                      ? "جاري التحديث..." 
+                      : isFavorite 
+                      ? "إزالة من المفضلة" 
+                      : "إضافة إلى المفضلة"}
                   </Button>
                 </div>
 
