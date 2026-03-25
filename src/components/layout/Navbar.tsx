@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sprout, LogIn, Search, LogOut, LayoutDashboard, BookOpen, Heart, User } from "lucide-react";
+import { Menu, X, Sprout, Search, LogOut, LayoutDashboard, BookOpen, Heart, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -126,18 +126,23 @@ const Navbar = () => {
                   </Link>
                 )}
 
+                {/* 📚 أيقونة كورساتي (الكمبيوتر) 📚 */}
+                <Link to="/my-courses" title="كورساتي" className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 group hover:border-emerald-500/50 hover:bg-emerald-500/10 transition-all shadow-lg">
+                  <PlayCircle className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
+                </Link>
+
                 {/* ❤️ أيقونة المفضلة (الكمبيوتر) ❤️ */}
-                <Link to="/favorites" className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 group hover:border-red-500/50 hover:bg-red-500/10 transition-all shadow-lg">
+                <Link to="/favorites" title="المفضلة" className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 group hover:border-red-500/50 hover:bg-red-500/10 transition-all shadow-lg">
                   <Heart className="w-4 h-4 text-neutral-400 group-hover:text-red-500 transition-colors" />
                 </Link>
 
-                <Link to="/profile">
+                <Link to="/profile" title="حسابي">
                   <div className="w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 flex items-center justify-center overflow-hidden hover:border-emerald-500 transition-all shadow-lg">
                     {profile?.avatar_url ? <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-emerald-500 font-bold">{getInitial()}</span>}
                   </div>
                 </Link>
 
-                <Button variant="ghost" size="icon" onClick={() => signOut()} className="hidden sm:flex text-neutral-400 hover:text-red-500 hover:bg-red-500/10">
+                <Button variant="ghost" size="icon" onClick={() => signOut()} className="hidden sm:flex text-neutral-400 hover:text-red-500 hover:bg-red-500/10" title="تسجيل الخروج">
                   <LogOut className="w-4 h-4" />
                 </Button>
               </div>
@@ -147,7 +152,7 @@ const Navbar = () => {
               </Link>
             )}
 
-            {/* زرار المنيو */}
+            {/* زرار المنيو للموبايل */}
             <button className="lg:hidden p-2 text-white z-[110]" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
             </button>
@@ -211,6 +216,11 @@ const Navbar = () => {
                       <p className="font-bold text-white text-lg truncate">{profile?.full_name || "مستخدم نبتة"}</p>
                       <p className="text-sm text-neutral-500 truncate max-w-[180px]">{user.email}</p>
                     </div>
+                  </Link>
+
+                  {/* 📚 زر كورساتي (الموبايل) 📚 */}
+                  <Link to="/my-courses" className="flex items-center justify-center w-full h-14 mb-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold gap-2 hover:bg-emerald-500/20 transition-all">
+                    <PlayCircle className="w-5 h-5" /> كورساتي الحالية
                   </Link>
 
                   {/* ❤️ زر المفضلة (الموبايل) ❤️ */}
