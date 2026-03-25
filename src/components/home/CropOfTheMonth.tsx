@@ -167,23 +167,23 @@ const CropOfTheMonth = () => {
                   {crop.desc}
                 </p>
                 
-                {/* 🌟 تعديل الأزرار لتكون متجاوبة (Responsive) تماماً 🌟 */}
-                <div className="mt-auto flex flex-col xl:flex-row gap-3 border-t border-white/5 pt-5">
+                {/* 🌟 تعديل الأزرار لتكون مثالية على الموبايل 🌟 */}
+                <div className="mt-auto grid grid-cols-2 gap-2 sm:gap-3 border-t border-white/5 pt-5">
                   
                   {/* زر اسأل نبتة */}
                   <Button 
                     onClick={() => handleLearnWithAi(crop.name)}
                     variant="outline" 
-                    className="flex-1 h-12 bg-transparent border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400 hover:text-emerald-300 rounded-xl gap-2 font-bold transition-all text-xs sm:text-sm whitespace-nowrap overflow-hidden"
+                    className="w-full h-10 sm:h-12 bg-transparent border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400 hover:text-emerald-300 rounded-lg sm:rounded-xl gap-1.5 sm:gap-2 font-bold transition-all text-[12px] sm:text-sm px-0"
                   >
-                    <Bot className="w-4 h-4 shrink-0" /> 
+                    <Bot className="w-4 h-4 shrink-0 hidden sm:block" /> 
                     <span className="truncate">اتعلم زراعته</span>
                   </Button>
 
                   {/* زر شراء التقاوي */}
-                  <Link to={`/marketplace?q=${crop.name}`} className="flex-1 w-full">
-                    <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl gap-2 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all text-xs sm:text-sm whitespace-nowrap overflow-hidden">
-                      <ShoppingBag className="w-4 h-4 shrink-0" /> 
+                  <Link to={`/marketplace?q=${crop.name}`} className="w-full">
+                    <Button className="w-full h-10 sm:h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg sm:rounded-xl gap-1.5 sm:gap-2 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all text-[12px] sm:text-sm px-0">
+                      <ShoppingBag className="w-4 h-4 shrink-0 hidden sm:block" /> 
                       <span className="truncate">شراء تقاوي</span>
                     </Button>
                   </Link>
