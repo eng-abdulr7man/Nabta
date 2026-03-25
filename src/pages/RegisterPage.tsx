@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 const RegisterPage = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState(""); // 1. إضافة حالة الهاتف
+  const [phone, setPhone] = useState(""); // حالة رقم الهاتف
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,14 +17,15 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleRegister = async (e) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!acceptTerms) {
       toast({ title: "تنبيه", description: "يجب الموافقة على شروط الاستخدام أولاً", variant: "destructive" });
       return;
     }
-    
-    // التحقق المبدئي من رقم الهاتف (اختياري: للتأكد إنه مش أقل من 11 رقم في مصر مثلاً)
+
+    // تحقق بسيط من طول رقم الهاتف
     if (phone.length < 10) {
       toast({ title: "تنبيه", description: "يُرجى إدخال رقم هاتف صحيح", variant: "destructive" });
       return;
@@ -32,7 +33,7 @@ const RegisterPage = () => {
     
     setLoading(true);
     
-    // 2. إرسال البيانات للـ Supabase بما فيها رقم الهاتف
+    // إنشاء الحساب وتسجيل البيانات الإضافية في الـ Metadata
     const { data: authData, error } = await supabase.auth.signUp({
       email,
       password,
@@ -40,14 +41,12 @@ const RegisterPage = () => {
         emailRedirectTo: window.location.origin,
         data: { 
           full_name: fullName,
-          phone: phone // تسجيل الهاتف في الـ Metadata
+          phone: phone 
         },
       },
     });
 
-    // 3. (خطوة تأكيدية) تحديث جدول profiles مباشرة لو الايميل مش بيحتاج تفعيل
-    // لو الايميل بيحتاج تفعيل (Email Confirmation)، الخطوة دي ممكن تفشل لأن المستخدم لسه مش مسجل دخول
-    // الأفضل دايماً يكون فيه Database Trigger بينقل الـ phone من الـ metadata لجدول profiles
+    // تحديث جدول profiles بالهاتف كخطوة تأكيدية إضافية 
     if (authData?.user && !error) {
        await supabase.from('profiles').update({ phone: phone }).eq('user_id', authData.user.id);
     }
@@ -61,14 +60,15 @@ const RegisterPage = () => {
         title: "تم إنشاء الحساب بنجاح",
         description: "تم انشاء الحساب بنجاح قم بتسجيل الدخول الان !",
       });
-      navigate("/login");
+      // توجيه المستخدم لصفحة الدخول مع تمرير الإيميل عشان يظهر هناك تلقائي
+      navigate("/login", { state: { registeredEmail: email } });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#050806] px-4 py-20 relative overflow-hidden font-tajawal">
       
-      {/* إضاءات خلفية (Ambient Glow) */}
+      {/* إضاءات خلفية */}
       <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-emerald-900/10 blur-[100px] pointer-events-none" />
 
@@ -128,7 +128,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* 📱 حقل رقم الهاتف (الجديد) */}
+            {/* حقل رقم الهاتف */}
             <div>
               <label className="text-sm font-bold text-neutral-300 mb-2 block">رقم الهاتف</label>
               <div className="relative group">
@@ -143,7 +143,6 @@ const RegisterPage = () => {
                   required
                 />
               </div>
-              {/* هينت (Hint) احترافي يوضح سبب طلب الرقم */}
               <div className="flex items-start gap-1.5 mt-2 text-emerald-500/80 bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />
                 <p className="text-xs leading-relaxed">
