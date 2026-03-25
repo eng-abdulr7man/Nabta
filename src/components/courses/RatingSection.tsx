@@ -176,31 +176,48 @@
 // };
 
 // export default RatingSection;
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 const RatingSection = ({ courseId }: { courseId: string }) => {
-  // جلب التقييمات مع بيانات اليوزر (الاسم والصورة) من جدول profiles
   const { data: reviews, isLoading } = useQuery({
     queryKey: ["course-reviews", courseId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // 1. جلب التقييمات الأساسية أولاً
+      const { data: ratingsData, error: ratingsError } = await supabase
         .from("ratings")
-        .select(`
-          *,
-          profiles (
-            full_name,
-            avatar_url
-          )
-        `)
+        .select("*")
         .eq("course_id", courseId)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (ratingsError) throw ratingsError;
+      if (!ratingsData || ratingsData.length === 0) return [];
+
+      // 2. استخراج أرقام المستخدمين (user_ids) اللي عملوا التقييمات بدون تكرار
+      const userIds = [...new Set(ratingsData.map((r) => r.user_id))];
+
+      // 3. جلب بيانات البروفايلات الخاصة بيهم
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, avatar_url")
+        .in("user_id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // 4. دمج (Merge) الداتا مع بعض عشان نعرضها في الـ UI بسلاسة
+      const profilesMap: Record<string, any> = {};
+      profilesData.forEach((profile) => {
+        profilesMap[profile.user_id] = profile;
+      });
+
+      const combinedData = ratingsData.map((rating) => ({
+        ...rating,
+        profiles: profilesMap[rating.user_id] || null, // إضافة بيانات البروفايل للتقييم
+      }));
+
+      return combinedData;
     },
   });
 
@@ -227,7 +244,7 @@ const RatingSection = ({ courseId }: { courseId: string }) => {
 
       <div className="space-y-4">
         {reviews.map((review, index) => {
-          // استخراج بيانات اليوزر بأمان
+          // استخراج بيانات اليوزر بأمان بعد الدمج اللي عملناه فوق
           const userProfile = review.profiles;
           const fullName = userProfile?.full_name || "طالب في نبتة";
           const avatarUrl = userProfile?.avatar_url;
@@ -288,7 +305,7 @@ const RatingSection = ({ courseId }: { courseId: string }) => {
                     </p>
                   )}
                   
-                  {/* تاريخ التقييم (اختياري بس بيدي شكل حلو) */}
+                  {/* تاريخ التقييم */}
                   <span className="text-[10px] text-neutral-600 block mt-3">
                     {new Date(review.created_at).toLocaleDateString("ar-EG", {
                       year: "numeric",
