@@ -79,7 +79,6 @@ const CropOfTheMonth = () => {
     fetchAiRecommendations();
   }, []);
 
-  // 🌟 الدالة اللي بتفتح الشات وتبعث السؤال 🌟
   const handleLearnWithAi = (cropName: string) => {
     const event = new CustomEvent('openAiChat', {
       detail: { query: `كيف أزرع ${cropName} ومتى أفضل وقت لزراعته؟` }
@@ -158,32 +157,37 @@ const CropOfTheMonth = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="group bg-gradient-to-br from-[#0a0f0c] to-[#121A15] border border-neutral-800/60 rounded-[2rem] p-6 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10 flex flex-col h-full"
+                className="group bg-gradient-to-br from-[#0a0f0c] to-[#121A15] border border-neutral-800/60 rounded-[2rem] p-5 sm:p-6 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10 flex flex-col h-full"
               >
-                <div className="w-16 h-16 bg-[#1a241d] rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 bg-[#1a241d] rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-300 shrink-0">
                   {crop.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{crop.name}</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{crop.name}</h3>
                 <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
                   {crop.desc}
                 </p>
                 
-                <div className="mt-auto grid grid-cols-2 gap-3 border-t border-white/5 pt-5">
-                  {/* 🌟 زر اسأل نبتة 🌟 */}
+                {/* 🌟 تعديل الأزرار لتكون متجاوبة (Responsive) تماماً 🌟 */}
+                <div className="mt-auto flex flex-col xl:flex-row gap-3 border-t border-white/5 pt-5">
+                  
+                  {/* زر اسأل نبتة */}
                   <Button 
                     onClick={() => handleLearnWithAi(crop.name)}
                     variant="outline" 
-                    className="w-full h-12 bg-transparent border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 rounded-xl gap-2 font-bold transition-all text-xs lg:text-sm px-0"
+                    className="flex-1 h-12 bg-transparent border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400 hover:text-emerald-300 rounded-xl gap-2 font-bold transition-all text-xs sm:text-sm whitespace-nowrap overflow-hidden"
                   >
-                    <Bot className="w-4 h-4" /> اتعلم زراعته
+                    <Bot className="w-4 h-4 shrink-0" /> 
+                    <span className="truncate">اتعلم زراعته</span>
                   </Button>
 
-                  {/* 🌟 زر شراء التقاوي (يمرر اسم المحصول في الرابط) 🌟 */}
-                  <Link to={`/marketplace?q=${crop.name}`} className="w-full">
-                    <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl gap-2 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all text-xs lg:text-sm px-0">
-                      <ShoppingBag className="w-4 h-4" /> شراء التقاوي
+                  {/* زر شراء التقاوي */}
+                  <Link to={`/marketplace?q=${crop.name}`} className="flex-1 w-full">
+                    <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl gap-2 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all text-xs sm:text-sm whitespace-nowrap overflow-hidden">
+                      <ShoppingBag className="w-4 h-4 shrink-0" /> 
+                      <span className="truncate">شراء تقاوي</span>
                     </Button>
                   </Link>
+
                 </div>
               </motion.div>
             ))}
