@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, Trash2, Lock } from "lucide-react";
-import { Link } from "react-router-dom"; // لإضافة الروابط
-import { useAuth } from "@/contexts/AuthContext"; // استدعاء حالة المستخدم
+import { Link } from "react-router-dom"; 
+import { useAuth } from "@/contexts/AuthContext"; 
 
 const GROQ_API_KEY = "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";
 
@@ -21,7 +21,7 @@ const SYSTEM_PROMPT: Message = {
 };
 
 const AiChatWidget = () => {
-  const { user } = useAuth(); // جلب حالة تسجيل الدخول
+  const { user } = useAuth(); 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: WELCOME_MESSAGE }]);
   const [input, setInput] = useState("");
@@ -40,18 +40,17 @@ const AiChatWidget = () => {
     setMessages([{ role: "assistant", content: WELCOME_MESSAGE }]);
   };
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || !user) return; // حماية إضافية لمنع الإرسال لو مش مسجل
+  // 🌟 الدالة المسؤولة عن الإرسال (تم فصلها عشان نقدر ننادي عليها من جوه ومن بره) 🌟
+  const sendMessageToAi = async (messageText: string) => {
+    if (!messageText.trim() || !user) return;
 
-    const userMsg = input.trim();
-    const userMessage: Message = { role: "user", content: userMsg };
+    const userMessage: Message = { role: "user", content: messageText };
     
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
     setIsLoading(true);
 
     const exitWords = ["شكرا", "مع السلامة", "سلام", "قفلنا", "شكراً", "تم"];
-    const isExit = exitWords.some(word => userMsg.toLowerCase().includes(word));
+    const isExit = exitWords.some(word => messageText.toLowerCase().includes(word));
 
     try {
       const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
@@ -90,6 +89,32 @@ const AiChatWidget = () => {
     }
   };
 
+  const handleSendMessage = () => {
+    if (!input.trim()) return;
+    sendMessageToAi(input.trim());
+    setInput("");
+  };
+
+  // 🌟 الاستماع للأحداث الخارجية (Custom Events) 🌟
+  useEffect(() => {
+    const handleOpenChatWithQuery = (event: CustomEvent) => {
+      const query = event.detail?.query;
+      if (query && user) {
+        setIsOpen(true);
+        // تأخير بسيط عشان الشات يفتح الأول وبعدين يبعت الرسالة
+        setTimeout(() => {
+          sendMessageToAi(query);
+        }, 300);
+      } else if (query && !user) {
+         setIsOpen(true); // لو مش مسجل، افتح الشات عشان يشوف رسالة "يجب تسجيل الدخول"
+      }
+    };
+
+    window.addEventListener('openAiChat', handleOpenChatWithQuery as EventListener);
+    return () => window.removeEventListener('openAiChat', handleOpenChatWithQuery as EventListener);
+  }, [user, messages]); // ضفنا messages هنا عشان لما يجي يبعت رسالة تانية ياخد الـ History معاه
+
+
   return (
     <div className="fixed bottom-24 md:bottom-6 left-4 md:left-6 z-[200] font-tajawal">
       <AnimatePresence>
@@ -100,7 +125,7 @@ const AiChatWidget = () => {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="absolute bottom-16 md:bottom-20 left-0 w-[350px] md:w-[400px] h-[75vh] max-h-[550px] bg-[#0a0f0c] border border-emerald-500/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header (ثابت في كل الحالات) */}
+            {/* Header */}
             <div className="bg-[#121A15] border-b border-white/5 p-4 flex items-center justify-between z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
@@ -111,7 +136,7 @@ const AiChatWidget = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {user && ( // إخفاء زرار المسح لو هو مش مسجل أصلاً
+                {user && ( 
                   <button onClick={clearChat} title="مسح المحادثة" className="text-neutral-500 hover:text-emerald-500 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -124,14 +149,13 @@ const AiChatWidget = () => {
 
             {/* التحقق من تسجيل الدخول */}
             {!user ? (
-              // 🔴 واجهة غير المسجلين (طلب تسجيل الدخول)
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
                 <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
                   <Lock className="w-10 h-10 text-emerald-400" />
                 </div>
                 <h4 className="text-xl text-white font-black mb-3">عذراً، يجب تسجيل الدخول!</h4>
                 <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
-                  هذه الميزة متاحة فقط لأعضاء أكاديمية نبتة. سجل دخولك الآن أو أنشئ حساباً جديداً مجاناً لتتمكن من التحدث مع مستشارك الزراعي الذكي.
+                  هذه الميزة متاحة فقط لأعضاء أكاديمية نبتة. سجل دخولك الآن لتتمكن من التحدث مع مستشارك الزراعي الذكي.
                 </p>
                 <div className="flex flex-col w-full gap-3">
                   <Link 
@@ -151,7 +175,6 @@ const AiChatWidget = () => {
                 </div>
               </div>
             ) : (
-              // 🟢 واجهة المحادثة (للمسجلين فقط)
               <>
                 {/* Chat Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
