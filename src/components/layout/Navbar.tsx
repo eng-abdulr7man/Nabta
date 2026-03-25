@@ -1,4 +1,3 @@
-//v7
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,14 +5,12 @@ import { Menu, X, Sprout, LogIn, Search, LogOut, LayoutDashboard, BookOpen, Hear
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
-// ✅ ضفنا "أدوات زراعية" هنا عشان تظهر في كل مكان (ديسك توب وموبايل)
-// ✅ ضفنا "المتجر الزراعي" و "أدوات نبتة" في القائمة
 const navLinks = [
   { label: "الرئيسية", path: "/" },
-  { label: "المتجر الزراعي", path: "/marketplace" }, // <-- ضفنا المتجر هنا
+  { label: "المتجر الزراعي", path: "/marketplace" },
   { label: "الكورسات", path: "/courses" },
   { label: "التخصصات", path: "/specializations" },
-  { label: "أدوات نبتة", path: "/tools" }, // <-- دي الحاسبات والذكاء الاصطناعي
+  { label: "أدوات نبتة", path: "/tools" },
   { label: "تواصل معنا", path: "/contact" },
 ];
 
@@ -33,7 +30,7 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/courses?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery("");
+      searchQuery("");
       setIsSearchOpen(false);
       setIsOpen(false);
     }
@@ -50,7 +47,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-full">
           
-          {/* الـ Logo ثابت */}
+          {/* الـ Logo */}
           <Link to="/" className="flex items-center gap-3 shrink-0 z-[110]">
             <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shadow-emerald-500/10 shadow-lg group hover:border-emerald-500/50 transition-colors">
               <Sprout className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
@@ -102,7 +99,7 @@ const Navbar = () => {
             {user ? (
               <div className="flex items-center gap-2 lg:gap-3">
                 
-                {/* لوحة التحكم (بتظهر للأدمن بس) */}
+                {/* لوحة التحكم (للأدمن) */}
                 {isAdmin && (
                   <Link to="/admin" className="hidden md:block">
                     <Button variant="ghost" size="sm" className="text-emerald-400 hover:bg-emerald-500/10 gap-1.5 rounded-xl h-10 font-bold border border-emerald-500/20">
@@ -111,6 +108,11 @@ const Navbar = () => {
                     </Button>
                   </Link>
                 )}
+
+                {/* ❤️ أيقونة المفضلة (الكمبيوتر) ❤️ */}
+                <Link to="/favorites" className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 group hover:border-red-500/50 hover:bg-red-500/10 transition-all shadow-lg">
+                  <Heart className="w-4 h-4 text-neutral-400 group-hover:text-red-500 transition-colors" />
+                </Link>
 
                 <Link to="/profile">
                   <div className="w-10 h-10 rounded-full bg-[#121A15] border-2 border-neutral-700 flex items-center justify-center overflow-hidden hover:border-emerald-500 transition-all shadow-lg">
@@ -136,7 +138,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* سلايدر الموبايل (أسود صريح ومعتم) */}
+      {/* سلايدر الموبايل */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -173,7 +175,6 @@ const Navbar = () => {
                 </Link>
               ))}
 
-              {/* لوحة التحكم في الموبايل */}
               {user && isAdmin && (
                 <Link to="/admin" onClick={() => setIsOpen(false)} className="p-5 rounded-2xl text-xl font-bold bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-3">
                   <LayoutDashboard className="w-6 h-6" />
@@ -184,7 +185,8 @@ const Navbar = () => {
 
             <div className="mt-auto pt-10 pb-6 space-y-4">
               {user ? (
-                <div className="p-5 rounded-3xl bg-[#0a0f0c] border border-neutral-800 shadow-2xl">
+                <div className="p-5 rounded-3xl bg-[#0a0f0c] border border-neutral-800 shadow-2xl flex flex-col">
+                  
                   <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-4 mb-6">
                     <div className="w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center overflow-hidden">
                       {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-emerald-500 text-xl font-bold">{getInitial()}</span>}
@@ -194,9 +196,16 @@ const Navbar = () => {
                       <p className="text-sm text-neutral-500 truncate max-w-[180px]">{user.email}</p>
                     </div>
                   </Link>
+
+                  {/* ❤️ زر المفضلة (الموبايل) ❤️ */}
+                  <Link to="/favorites" onClick={() => setIsOpen(false)} className="flex items-center justify-center w-full h-14 mb-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold gap-2 hover:bg-white/10 transition-all">
+                    <Heart className="w-5 h-5 text-red-500" /> الكورسات المفضلة
+                  </Link>
+
                   <Button onClick={() => { signOut(); setIsOpen(false); }} variant="outline" className="w-full h-14 rounded-2xl border-red-500/30 text-red-500 font-bold gap-2 hover:bg-red-500/10">
                     <LogOut className="w-5 h-5" /> تسجيل الخروج
                   </Button>
+                  
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-4">
