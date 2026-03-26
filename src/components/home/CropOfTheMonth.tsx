@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { CalendarDays, ThermometerSun, Droplets, ShoppingBag, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";
 
 interface AiCropData {
   monthName: string;
