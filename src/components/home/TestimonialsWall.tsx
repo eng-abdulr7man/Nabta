@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, Quote, MessageSquareHeart, BookOpen } from "lucide-react";
+import { Star, Quote, MessageSquareHeart, BookOpen, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-// تقييمات احتياطية في حالة إن الداتابيس لسه مفهاش تقييمات كفاية
 const FALLBACK_REVIEWS = [
   { id: "f1", name: "م. أحمد محمود", initial: "أ", rating: 5, comment: "الكورسات هنا غيرت نظرتي للزراعة الحديثة، محتوى دسم وعملي جداً وربط العلم بالسوق.", courseTitle: "أساسيات الزراعة المائية" },
-  { id: "f2", name: "محمود سعد", initial: "م", rating: 5, comment: "اشتريت تقاوي الطماطم من المتجر والإنتاجية كانت ممتازة. شكراً نبتة على المصداقية!", courseTitle: "مكافحة الآفات الزراعية" },
+  { id: "f2", name: "محمود سعد", initial: "م", rating: 5, comment: "اشتريت تقاوي الطماطم من المتجر والإنتاجية كانت ممتازة. شكراً نبتة على المصداقية!", courseTitle: "" },
   { id: "f3", name: "د. فاطمة علي", initial: "ف", rating: 4, comment: "المستشار الذكي ساعدني كتير في تشخيص نقص العناصر في محصولي ووفر عليا وقت طويل.", courseTitle: "تسميد المحاصيل الحقلية" },
   { id: "f4", name: "يوسف إبراهيم", initial: "ي", rating: 5, comment: "منصة متكاملة فعلاً، من التعليم لتوفير المستلزمات. أنصح بها بشدة لكل مهندس ومزارع.", courseTitle: "إدارة المزارع الذكية" },
   { id: "f5", name: "كريم حسن", initial: "ك", rating: 5, comment: "شرح المهندسين في الكورسات مبسط جداً، والشهادة فرقت معايا في شغلي.", courseTitle: "لاندسكيب وتنسيق حدائق" }
@@ -19,7 +18,6 @@ const TestimonialsWall = () => {
   useEffect(() => {
     const fetchTopReviews = async () => {
       try {
-        // 1. هنسحب التقييمات العالية (4 أو 5 نجوم)
         const { data: ratingsData, error: ratingsError } = await supabase
           .from("ratings")
           .select("*")
@@ -35,7 +33,6 @@ const TestimonialsWall = () => {
           return;
         }
 
-        // 2. سحب بيانات البروفايل لأصحاب التقييمات
         const userIds = [...new Set(ratingsData.map((r) => r.user_id))];
         const { data: profilesData } = await supabase
           .from("profiles")
@@ -47,7 +44,6 @@ const TestimonialsWall = () => {
           profilesData.forEach((p) => { profilesMap[p.user_id] = p; });
         }
 
-        // 3. 🌟 سحب أسماء الكورسات المرتبطة بالتقييمات 🌟
         const courseIds = [...new Set(ratingsData.map((r) => r.course_id).filter(Boolean))];
         const { data: coursesData } = await supabase
           .from("courses")
@@ -59,11 +55,10 @@ const TestimonialsWall = () => {
           coursesData.forEach((c) => { coursesMap[c.id] = c.title; });
         }
 
-        // 4. دمج البيانات كلها مع بعض
         const formattedReviews = ratingsData.map((r) => {
           const profile = profilesMap[r.user_id];
           const name = profile?.full_name || "مستخدم نبتة";
-          const courseTitle = coursesMap[r.course_id] || ""; // اسم الكورس
+          const courseTitle = coursesMap[r.course_id] || ""; 
 
           return {
             id: r.id,
@@ -76,9 +71,7 @@ const TestimonialsWall = () => {
           };
         });
 
-        // التأكد من وجود تعليقات نصية
         const reviewsWithComments = formattedReviews.filter(r => r.comment && r.comment.length > 10);
-        
         setReviews(reviewsWithComments.length >= 3 ? reviewsWithComments : FALLBACK_REVIEWS);
       } catch (err) {
         console.error("Error fetching reviews:", err);
@@ -134,47 +127,51 @@ const TestimonialsWall = () => {
             <div 
               key={`${review.id}-${idx}`} 
               dir="rtl"
-              className="w-[320px] md:w-[400px] shrink-0 bg-[#0a0f0c] border border-white/5 rounded-3xl p-6 md:p-8 hover:border-emerald-500/30 hover:bg-[#121A15] transition-colors relative group flex flex-col"
+              className="w-[320px] md:w-[400px] shrink-0 bg-[#0a0f0c] border border-white/5 rounded-3xl p-6 md:p-8 hover:border-emerald-500/30 hover:bg-[#121A15] transition-colors relative group flex flex-col h-full"
             >
               <Quote className="absolute top-6 left-6 w-10 h-10 text-emerald-500/10 group-hover:text-emerald-500/20 transition-colors rotate-180" />
               
-              <div className="flex items-center justify-between mb-5">
-                {/* النجوم */}
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-neutral-700"}`} 
-                    />
-                  ))}
-                </div>
-                
-                {/* 🌟 اسم الكورس (Badge) 🌟 */}
-                {review.courseTitle && (
-                  <div className="flex items-center gap-1.5 bg-emerald-950/30 border border-emerald-500/20 px-2.5 py-1 rounded-lg max-w-[150px] md:max-w-[180px]">
-                    <BookOpen className="w-3 h-3 text-emerald-500 shrink-0" />
-                    <span className="text-[10px] md:text-xs text-emerald-400 font-bold truncate">
-                      {review.courseTitle}
-                    </span>
-                  </div>
-                )}
+              {/* 🌟 النجوم في الهيدر لوحدها 🌟 */}
+              <div className="flex gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-neutral-700"}`} 
+                  />
+                ))}
               </div>
 
-              <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-6 line-clamp-4 min-h-[5rem] flex-1">
+              {/* 🌟 النص أخد مساحته بحرية 🌟 */}
+              <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-6 line-clamp-4 flex-1 min-h-[5rem]">
                 "{review.comment}"
               </p>
 
-              <div className="flex items-center gap-3 border-t border-white/5 pt-4 shrink-0">
-                <div className="w-10 h-10 rounded-full bg-emerald-900/30 border border-emerald-500/20 flex items-center justify-center overflow-hidden shrink-0">
+              {/* 🌟 منطقة اليوزر مدمجة مع اسم الكورس 🌟 */}
+              <div className="flex items-center gap-3.5 border-t border-white/5 pt-5 shrink-0">
+                <div className="w-12 h-12 rounded-full bg-emerald-900/30 border border-emerald-500/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                   {review.avatar ? (
                     <img src={review.avatar} alt={review.name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-emerald-500 font-bold text-sm">{review.initial}</span>
+                    <span className="text-emerald-500 font-bold text-lg">{review.initial}</span>
                   )}
                 </div>
-                <div>
-                  <h4 className="text-white font-bold text-sm">{review.name}</h4>
-                  <p className="text-emerald-400 text-[10px] font-bold">طالب وعميل موثق</p>
+                <div className="flex flex-col justify-center overflow-hidden">
+                  <h4 className="text-white font-bold text-sm mb-1.5 truncate">{review.name}</h4>
+                  
+                  {review.courseTitle ? (
+                    // لو فيه كورس، هيظهر كمرجع تحته
+                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-neutral-400">
+                      <BookOpen className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="shrink-0">درس:</span>
+                      <span className="text-emerald-400 font-bold truncate">{review.courseTitle}</span>
+                    </div>
+                  ) : (
+                    // لو مفيش كورس هيظهر إنه عميل موثق
+                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-emerald-400 font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>طالب وعميل موثق</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
