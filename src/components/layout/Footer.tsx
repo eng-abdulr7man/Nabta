@@ -14,7 +14,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
           
           {/* ======================================= */}
-          {/* العمود الأول: براند المنصة والنشرة البريدية */}
+          {/* العمود الأول: براند المنصة */}
           {/* ======================================= */}
           <div className="lg:col-span-4 space-y-6">
             <Link to="/" className="flex items-center gap-3 w-fit group">
@@ -105,20 +105,26 @@ const Footer = () => {
         </div>
 
         {/* ======================================= */}
-        {/* الشريط السفلي (حقوق النشر والسوشيال ميديا) */}
+        {/* الشريط السفلي (حقوق النشر وتطوير المطور) */}
+        {/* pb-40 للموبايل لمنع التداخل تماماً مع زر المساعد الذكي */}
         {/* ======================================= */}
-        <div className="pt-8 border-t border-neutral-800/40 flex flex-col md:flex-row items-center justify-between gap-6 pb-28 md:pb-8">
+        <div className="pt-8 border-t border-neutral-800/40 flex flex-col md:flex-row items-center justify-between gap-6 pb-40 md:pb-8">
           
-          <div className="flex items-center gap-2 text-sm text-neutral-500 font-medium">
-            <span>© {new Date().getFullYear()} <span className="text-emerald-500 font-bold">نـَـبْـتـَـة</span>.</span>
-            <span className="hidden sm:inline">جميع الحقوق محفوظة.</span>
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-neutral-500 font-medium text-center">
+            <span>© {new Date().getFullYear()} <span className="text-emerald-500 font-bold">نـَـبْـتـَـة</span>. جميع الحقوق محفوظة.</span>
+            <span className="hidden sm:block w-1 h-1 rounded-full bg-neutral-700"></span>
+            
+            {/* 🌟 كريديت المطور (تواصل المطور) 🌟 */}
+            <span className="mt-1 sm:mt-0">
+              تطوير بـ 💚 بواسطة <a href="https://www.instagram.com/eng_abdulr7man/" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-emerald-400 transition-colors font-bold border-b border-emerald-500/0 hover:border-emerald-400 pb-0.5">م. عبدالرحمن</a>
+            </span>
           </div>
           
-          {/* أيقونات السوشيال ميديا */}
+          {/* أيقونات السوشيال ميديا للمنصة */}
           <div className="flex items-center gap-3">
             {[
               { icon: Facebook, href: "https://www.facebook.com/share/18Dbz2ppwn/" },
-              { icon: Send, href: "https://t.me/eng_abdulr7man" }, // استخدمنا Send لتعبر عن تليجرام
+              { icon: Send, href: "https://t.me/eng_abdulr7man" },
               { icon: Instagram, href: "https://www.instagram.com/eng_abdulr7man/" },
               { icon: Linkedin, href: "https://www.linkedin.com/in/eng_abdulr7man" },
             ].map((social, i) => {
