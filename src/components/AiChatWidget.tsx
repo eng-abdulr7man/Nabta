@@ -4,7 +4,7 @@ import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, Trash2, Lock } fr
 import { Link } from "react-router-dom"; 
 import { useAuth } from "@/contexts/AuthContext"; 
 
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";
 
 interface Message {
   role: "system" | "user" | "assistant";
