@@ -2,11 +2,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import HeroDarkSection from "@/components/home/HeroSection"; 
-import SmartWeatherAlert from "@/components/home/SmartWeatherAlert"; // 🌟 النشرة الذكية
+import SmartWeatherAlert from "@/components/home/SmartWeatherAlert"; 
 import SpecializationsSection from "@/components/home/SpecializationsSection";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
 import Roadmap from "@/components/home/Roadmap"; 
 import CropOfTheMonth from "@/components/home/CropOfTheMonth"; 
+import FeaturedMarketplace from "@/components/home/FeaturedMarketplace"; // 🌟 استدعاء المتجر المصغر 
 import { motion } from "framer-motion";
 
 const Index = () => {
@@ -16,8 +17,6 @@ const Index = () => {
       <main className="flex-1 pb-16 md:pb-0">
         
         <HeroDarkSection />
-        
-        {/* 🌟 شريط طقس المزرعة الذكي هنا 🌟 */}
         <SmartWeatherAlert />
         
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true, margin: "-100px" }}>
@@ -27,6 +26,9 @@ const Index = () => {
         <CropOfTheMonth />
         <SpecializationsSection />
         <FeaturedCourses />
+
+        {/* 🛒 قسم عرض أحدث المنتجات من المتجر 🛒 */}
+        <FeaturedMarketplace />
         
       </main>
       <Footer />
