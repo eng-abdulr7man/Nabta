@@ -105,7 +105,7 @@ const TestimonialsWall = () => {
             جدار الثقة
           </div>
           <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
-            ماذا يقولون عن <span className="text-emerald-500">نبتة</span>؟
+            آراء طلابنا عن <span className="text-emerald-500">نبتة</span>؟
           </h2>
           <p className="text-neutral-400 mt-4 text-lg">
             نفخر بآراء المهندسين والمزارعين في كورساتنا ومنتجاتنا، نجاحك هو هدفنا الأول.
