@@ -107,7 +107,7 @@ const Footer = () => {
                 <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shrink-0 group-hover:border-emerald-500/50 transition-all duration-300">
                   <Phone className="w-4 h-4 text-emerald-500" />
                 </div>
-                <span dir="ltr" className="group-hover:text-white font-medium transition-colors text-right">010 1971 5490</span>
+                <span dir="ltr" className="group-hover:text-white font-medium transition-colors text-right">0101 971 5490</span>
               </li>
               <li className="flex items-center gap-4 text-sm text-neutral-400 group cursor-default">
                 <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shrink-0 group-hover:border-emerald-500/50 transition-all duration-300">
@@ -128,7 +128,7 @@ const Footer = () => {
             © {new Date().getFullYear()} <span className="text-emerald-500 font-bold">نـَـبْـتـَـة</span>. جميع الحقوق محفوظة.
           </p>
           <p className="text-sm text-neutral-500 font-medium">
-            تطوير بـ 💚 بواسطة <a href="https://www.instagram.com/eng_abdulr7man/" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-emerald-400 transition-colors font-bold border-b border-emerald-500/0 hover:border-emerald-400 pb-0.5">م. عبدالرحمن</a>
+            تطوير بـ بواسطة <a href="https://www.instagram.com/eng_abdulr7man/" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-emerald-400 transition-colors font-bold border-b border-emerald-500/0 hover:border-emerald-400 pb-0.5">3bdulr7man</a>
           </p>
         </div>
 
