@@ -99,7 +99,7 @@ const CropOfTheMonth = () => {
               التقويم الزراعي الذكي
             </div>
             <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
-              ماذا نزرع في شهر <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-yellow-500">{aiData?.monthName || "..."}</span>؟
+              نزرع ايه في شهر <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-yellow-500">{aiData?.monthName || "..."}</span>؟
             </h2>
             <p className="text-neutral-400 mt-4 max-w-xl text-lg">
               توصيات حية من مستشار نبتة الذكي مدعومة بالذكاء الاصطناعي بناءً على حالة الطقس والموسم الزراعي الحالي.
