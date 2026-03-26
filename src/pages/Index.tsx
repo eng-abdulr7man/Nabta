@@ -7,7 +7,8 @@ import SpecializationsSection from "@/components/home/SpecializationsSection";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
 import Roadmap from "@/components/home/Roadmap"; 
 import CropOfTheMonth from "@/components/home/CropOfTheMonth"; 
-import FeaturedMarketplace from "@/components/home/FeaturedMarketplace"; // 🌟 استدعاء المتجر المصغر 
+import FeaturedMarketplace from "@/components/home/FeaturedMarketplace"; 
+import TestimonialsWall from "@/components/home/TestimonialsWall"; // 🌟 استدعاء جدار الثقة
 import { motion } from "framer-motion";
 
 const Index = () => {
@@ -16,19 +17,27 @@ const Index = () => {
       <Navbar />
       <main className="flex-1 pb-16 md:pb-0">
         
+        {/* 1. ההيرو والطقس الذكي */}
         <HeroDarkSection />
         <SmartWeatherAlert />
         
+        {/* 2. خريطة الطريق */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true, margin: "-100px" }}>
           <Roadmap />
         </motion.div>
 
+        {/* 3. التقويم الذكي بالـ AI */}
         <CropOfTheMonth />
+        
+        {/* 4. التعليم (التخصصات والكورسات) */}
         <SpecializationsSection />
         <FeaturedCourses />
 
-        {/* 🛒 قسم عرض أحدث المنتجات من المتجر 🛒 */}
+        {/* 5. المتجر والمبيعات */}
         <FeaturedMarketplace />
+
+        {/* 6. جدار الثقة والمراجعات (الختام القوي) 🌟 */}
+        <TestimonialsWall />
         
       </main>
       <Footer />
