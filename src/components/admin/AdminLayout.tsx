@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, BookOpen, Users, MessageSquare, Settings, LogOut, Sprout, 
   ChevronRight, GraduationCap, Menu, X, Activity, FileText, Youtube, 
-  ChevronLeft, Sparkles, ShieldCheck
+  ChevronLeft, Sparkles, ShieldCheck, Library // 🌟 استدعاء أيقونة المكتبة
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ const sidebarLinks = [
     { label: "الكورسات", path: "/admin/courses", icon: BookOpen },
     { label: "استيراد يوتيوب", path: "/admin/youtube-import", icon: Youtube },
     { label: "التخصصات", path: "/admin/specializations", icon: GraduationCap },
+    // 🌟 إضافة رابط المكتبة هنا 🌟
+    { label: "المكتبة الأكاديمية", path: "/admin/library", icon: Library },
   ]},
   { group: "الإدارة والتواصل", items: [
     { label: "المستخدمين", path: "/admin/users", icon: Users },
