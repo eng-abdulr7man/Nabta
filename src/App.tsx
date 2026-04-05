@@ -42,6 +42,8 @@ const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
 const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
 const AdminArticles = lazy(() => import("./pages/admin/AdminArticles"));
 const AdminYoutubeImport = lazy(() => import("./pages/admin/AdminYoutubeImport")); 
+// 🌟 استدعاء صفحة إدارة المكتبة (تأكد إن مسار الملف صح عندك) 🌟
+const AdminLibraryManager = lazy(() => import("./components/admin/AdminLibraryManager"));
 
 // Support/Legal Pages
 const FAQPage = lazy(() => import("./pages/FAQPage"));
@@ -69,14 +71,13 @@ const Loading = () => (
   </div>
 );
 
-// 🌟 مكون جديد وظيفته التقاط حدث "استعادة كلمة المرور" من الـ URL 🌟
+// مكون جديد وظيفته التقاط حدث "استعادة كلمة المرور" من الـ URL
 const AuthListener = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
-        // إذا كان الحدث هو استعادة باسوورد، وجهه مباشرة للصفحة المخصصة
         navigate("/reset-password", { replace: true });
       }
     });
@@ -86,7 +87,7 @@ const AuthListener = () => {
     };
   }, [navigate]);
 
-  return null; // لا يعرض أي شيء في الواجهة
+  return null; 
 };
 
 const App = () => (
@@ -97,7 +98,6 @@ const App = () => (
       
       <BrowserRouter>
         <AuthProvider>
-          {/* 🌟 التعديل هنا: نقلنا المساعد الذكي و الـ Listener جوه الـ AuthProvider والراوتر 🌟 */}
           <AuthListener />
           <AiChatWidget />
           <ScrollToTop />
@@ -142,6 +142,9 @@ const App = () => (
               <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
               <Route path="/admin/articles" element={<ProtectedRoute adminOnly><AdminArticles /></ProtectedRoute>} />
               <Route path="/admin/youtube-import" element={<ProtectedRoute adminOnly><AdminYoutubeImport /></ProtectedRoute>} />
+              
+              {/* 🌟 المسار الجديد الخاص بإدارة المكتبة 🌟 */}
+              <Route path="/admin/library" element={<ProtectedRoute adminOnly><AdminLibraryManager /></ProtectedRoute>} />
               
               {/* --- 404 --- */}
               <Route path="*" element={<NotFound />} />
