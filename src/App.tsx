@@ -32,6 +32,9 @@ const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
 
+// 🌟 استدعاء صفحة المكتبة للطلبة 🌟
+const LibraryPage = lazy(() => import("./pages/LibraryPage"));
+
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminCourses = lazy(() => import("./pages/admin/AdminCourses"));
@@ -42,7 +45,6 @@ const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
 const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
 const AdminArticles = lazy(() => import("./pages/admin/AdminArticles"));
 const AdminYoutubeImport = lazy(() => import("./pages/admin/AdminYoutubeImport")); 
-// 🌟 استدعاء صفحة إدارة المكتبة (تأكد إن مسار الملف صح عندك) 🌟
 const AdminLibraryManager = lazy(() => import("./components/admin/AdminLibraryManager"));
 
 // Support/Legal Pages
@@ -61,7 +63,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// لودر شيك يتماشى مع هوية نبتة
 const Loading = () => (
   <div className="min-h-screen flex items-center justify-center bg-[#050806]">
     <div className="relative">
@@ -71,7 +72,6 @@ const Loading = () => (
   </div>
 );
 
-// مكون جديد وظيفته التقاط حدث "استعادة كلمة المرور" من الـ URL
 const AuthListener = () => {
   const navigate = useNavigate();
 
@@ -125,6 +125,9 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="/tools" element={<ToolsPage />} />
               <Route path="/marketplace" element={<Marketplace />} />
+              
+              {/* 🌟 المسار الجديد الخاص بصفحة المكتبة للطلبة 🌟 */}
+              <Route path="/library" element={<LibraryPage />} />
 
               {/* --- Student Protected Routes --- */}
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
@@ -142,8 +145,6 @@ const App = () => (
               <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
               <Route path="/admin/articles" element={<ProtectedRoute adminOnly><AdminArticles /></ProtectedRoute>} />
               <Route path="/admin/youtube-import" element={<ProtectedRoute adminOnly><AdminYoutubeImport /></ProtectedRoute>} />
-              
-              {/* 🌟 المسار الجديد الخاص بإدارة المكتبة 🌟 */}
               <Route path="/admin/library" element={<ProtectedRoute adminOnly><AdminLibraryManager /></ProtectedRoute>} />
               
               {/* --- 404 --- */}
