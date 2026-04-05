@@ -10,6 +10,8 @@ const navLinks = [
   { label: "المتجر الزراعي", path: "/marketplace" },
   { label: "الكورسات", path: "/courses" },
   { label: "التخصصات", path: "/specializations" },
+  // 🌟 رابط المكتبة الأكاديمية اتضاف هنا 🌟
+  { label: "المكتبة الأكاديمية", path: "/library" },
   { label: "أدوات نبتة", path: "/tools" },
   { label: "تواصل معنا", path: "/contact" },
 ];
