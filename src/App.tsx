@@ -1,162 +1,145 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
-import { AuthProvider } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import ScrollToTop from "./components/ScrollToTop";
-import SupportPage from "./pages/Support";
-import AiChatWidget from "@/components/AiChatWidget";
-import Marketplace from "./components/shop/Marketplace";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, PlaySquare, Presentation, Mic, ArrowRight, Loader2, Download, ExternalLink } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
+import { Button } from "@/components/ui/button";
 
-// --- Lazy Load Pages ---
-const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
-const CoursesPage = lazy(() => import("./pages/CoursesPage"));
-const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
-const SpecializationsPage = lazy(() => import("./pages/SpecializationsPage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const RegisterPage = lazy(() => import("./pages/RegisterPage"));
-const ContactPage = lazy(() => import("./pages/ContactPage"));
-const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
-const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-const LearnPage = lazy(() => import("./pages/LearnPage"));
-const VerifyCertificate = lazy(() => import("./pages/VerifyCertificate"));
-const MyCoursesPage = lazy(() => import("./pages/MyCoursesPage"));
-const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
-const ToolsPage = lazy(() => import("./pages/ToolsPage"));
-const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
-
-// 🌟 استدعاء صفحات المكتبة 🌟
-const LibraryPage = lazy(() => import("./pages/LibraryPage"));
-const SubjectMaterialsPage = lazy(() => import("./pages/SubjectMaterialsPage"));
-
-// Admin Pages
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
-const AdminCourses = lazy(() => import("./pages/admin/AdminCourses"));
-const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
-const AdminSpecializations = lazy(() => import("./pages/admin/AdminSpecializations"));
-const AdminCourseDetail = lazy(() => import("./pages/admin/AdminCourseDetail"));
-const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
-const AdminArticles = lazy(() => import("./pages/admin/AdminArticles"));
-const AdminYoutubeImport = lazy(() => import("./pages/admin/AdminYoutubeImport")); 
-const AdminLibraryManager = lazy(() => import("./components/admin/AdminLibraryManager"));
-
-// Support/Legal Pages
-const FAQPage = lazy(() => import("./pages/FAQPage"));
-const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
-const TermsPage = lazy(() => import("./pages/TermsPage"));
-const HelpPage = lazy(() => import("./pages/HelpPage"));
-const AboutPage = lazy(() => import("./pages/AboutPage"));
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-const Loading = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[#050806]">
-    <div className="relative">
-      <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-      <div className="absolute inset-0 bg-emerald-500/10 blur-xl rounded-full animate-pulse" />
-    </div>
-  </div>
-);
-
-const AuthListener = () => {
+const SubjectMaterialsPage = () => {
+  const { id } = useParams(); // ID المادة
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type") || "lecture"; // نوع الملف
   const navigate = useNavigate();
 
+  const [subject, setSubject] = useState<any>(null);
+  const [materials, setMaterials] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        navigate("/reset-password", { replace: true });
-      }
-    });
+    fetchData();
+  }, [id, type]);
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
+  const fetchData = async () => {
+    setIsLoading(true);
+    
+    // جلب اسم المادة
+    const { data: subjData } = await supabase.from("subjects").select("*").eq("id", id).single();
+    if (subjData) setSubject(subjData);
 
-  return null; 
+    // جلب الملفات
+    const { data: matData } = await supabase.from("materials").select("*").eq("subject_id", id).eq("type", type).order("created_at", { ascending: true });
+    if (matData) setMaterials(matData);
+    
+    setIsLoading(false);
+  };
+
+  const getTypeName = () => {
+    switch (type) {
+      case "lecture": return "المحاضرات";
+      case "section": return "السكاشن العملي";
+      case "ppt": return "العروض التقديمية";
+      case "record": return "التسجيلات الصوتية";
+      default: return "الملفات";
+    }
+  };
+
+  const getTypeIcon = () => {
+    switch (type) {
+      case "lecture": return <FileText className="w-6 h-6" />;
+      case "section": return <PlaySquare className="w-6 h-6" />;
+      case "ppt": return <Presentation className="w-6 h-6" />;
+      case "record": return <Mic className="w-6 h-6" />;
+      default: return <FileText className="w-6 h-6" />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30" dir="rtl">
+      <Navbar />
+
+      <main className="flex-1 pt-28 pb-20 relative z-10">
+        {/* إضاءات الخلفية */}
+        <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none -z-10" />
+
+        <div className="container mx-auto px-4 max-w-4xl">
+          
+          {/* الهيدر وزرار الرجوع */}
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-10 bg-gradient-to-l from-[#121A15] to-[#0a0f0c] p-6 rounded-[2rem] border border-white/5 shadow-xl">
+            <div className="flex items-center gap-5">
+              <button onClick={() => navigate("/library")} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-400 transition-all">
+                <ArrowRight className="w-6 h-6" />
+              </button>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black text-white">{subject?.name || "جاري التحميل..."}</h1>
+                <div className="flex items-center gap-2 text-emerald-500 font-bold mt-2">
+                  {getTypeIcon()} <span className="text-lg">{getTypeName()}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* قائمة الملفات */}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <AnimatePresence>
+                {materials.length > 0 ? (
+                  materials.map((mat, idx) => (
+                    <motion.div
+                      key={mat.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-[#0a0f0c] border border-white/5 hover:border-emerald-500/40 hover:bg-[#121A15] transition-all duration-300 shadow-lg hover:shadow-emerald-500/5"
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                          <span className="text-emerald-500">{getTypeIcon()}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
+                            {mat.title}
+                          </h3>
+                          <p className="text-neutral-500 text-sm mt-1">
+                            ملف جاهز للتحميل والمشاهدة
+                          </p>
+                        </div>
+                      </div>
+
+                      <a 
+                        href={mat.drive_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="shrink-0"
+                      >
+                        <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-12 px-6 gap-2 font-bold shadow-lg shadow-emerald-900/20 transition-all group-hover:-translate-y-1">
+                          <Download className="w-5 h-5" /> تحميل / عرض
+                        </Button>
+                      </a>
+                    </motion.div>
+                  ))
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center justify-center py-24 text-neutral-500 bg-[#0a0f0c] border border-dashed border-white/10 rounded-3xl"
+                  >
+                    <FileText className="w-20 h-20 mb-6 opacity-20" />
+                    <p className="text-xl font-bold text-neutral-400 mb-2">لا توجد ملفات هنا بعد</p>
+                    <p className="text-sm text-neutral-600">سيتم إضافة المحتوى قريباً من قبل الإدارة.</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-center" /> 
-      
-      <BrowserRouter>
-        <AuthProvider>
-          <AuthListener />
-          <AiChatWidget />
-          <ScrollToTop />
-          
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              {/* --- Public Routes --- */}
-              <Route path="/" element={<Index />} />
-              <Route path="/articles" element={<ArticlesPage />} />
-              <Route path="/courses" element={<CoursesPage />} />
-              <Route path="/courses/:id" element={<CourseDetailPage />} />
-              <Route path="/specializations" element={<SpecializationsPage />} />
-              <Route path="/roadmap" element={<RoadmapPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
-              <Route path="/support" element={<SupportPage />} />
-              <Route path="/faq" element={<FAQPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/help" element={<HelpPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/tools" element={<ToolsPage />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              
-              {/* 🌟 مسارات المكتبة للطلبة 🌟 */}
-              <Route path="/library" element={<LibraryPage />} />
-              <Route path="/library/:id" element={<SubjectMaterialsPage />} />
-
-              {/* --- Student Protected Routes --- */}
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="/my-courses" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
-              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
-              <Route path="/courses/:id/learn" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
-              
-              {/* --- Admin Protected Routes --- */}
-              <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />
-              <Route path="/admin/courses/:id" element={<ProtectedRoute adminOnly><AdminCourseDetail /></ProtectedRoute>} />
-              <Route path="/admin/specializations" element={<ProtectedRoute adminOnly><AdminSpecializations /></ProtectedRoute>} />
-              <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
-              <Route path="/admin/messages" element={<ProtectedRoute adminOnly><AdminMessages /></ProtectedRoute>} />
-              <Route path="/admin/activity" element={<ProtectedRoute adminOnly><AdminActivityLog /></ProtectedRoute>} />
-              <Route path="/admin/articles" element={<ProtectedRoute adminOnly><AdminArticles /></ProtectedRoute>} />
-              <Route path="/admin/youtube-import" element={<ProtectedRoute adminOnly><AdminYoutubeImport /></ProtectedRoute>} />
-              <Route path="/admin/library" element={<ProtectedRoute adminOnly><AdminLibraryManager /></ProtectedRoute>} />
-              
-              {/* --- 404 --- */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+export default SubjectMaterialsPage;
