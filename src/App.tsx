@@ -32,8 +32,9 @@ const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
 
-// 🌟 استدعاء صفحة المكتبة للطلبة 🌟
+// 🌟 استدعاء صفحات المكتبة 🌟
 const LibraryPage = lazy(() => import("./pages/LibraryPage"));
+const SubjectMaterialsPage = lazy(() => import("./pages/SubjectMaterialsPage"));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -126,8 +127,9 @@ const App = () => (
               <Route path="/tools" element={<ToolsPage />} />
               <Route path="/marketplace" element={<Marketplace />} />
               
-              {/* 🌟 المسار الجديد الخاص بصفحة المكتبة للطلبة 🌟 */}
+              {/* 🌟 مسارات المكتبة للطلبة 🌟 */}
               <Route path="/library" element={<LibraryPage />} />
+              <Route path="/library/:id" element={<SubjectMaterialsPage />} />
 
               {/* --- Student Protected Routes --- */}
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
