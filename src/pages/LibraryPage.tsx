@@ -18,6 +18,9 @@ const LibraryPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<any | null>(null);
 
+  // حالة فتح القائمة المنسدلة المخصصة
+  const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
+
   useEffect(() => {
     fetchUniversitiesAndSubjects();
   }, []);
@@ -54,28 +57,28 @@ const LibraryPage = () => {
       <Navbar />
 
       <main className="flex-1 pt-32 pb-20 relative z-10 overflow-x-hidden">
-        {/* إضاءات خلفية ديكورية خافتة */}
+        {/* إضاءات خلفية */}
         <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           
-          {/* العنوان الرئيسي */}
+          {/* العناوين */}
           <div className="text-center max-w-3xl mx-auto mb-12">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-sm font-bold mb-6">
-              <Library className="w-4 h-4" /> المكتبة الأكاديمية المجانية
+              <Library className="w-4 h-4" /> المكتبة الأكاديمية
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-              كل مراجعك الدراسية <span className="text-emerald-500">في مكان واحد</span>
+              كل مراجعك <span className="text-emerald-500">في مكان واحد</span>
             </motion.h1>
           </div>
 
-          {/* بار البحث والفلترة الاحترافي المعدل */}
-          <div className="max-w-4xl mx-auto mb-16 px-2">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 bg-[#0a0f0c] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden backdrop-blur-xl">
+          {/* بار البحث والفلترة الاحترافي (Custom Dropdown) */}
+          <div className="max-w-4xl mx-auto mb-16 px-2 relative z-[100]">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 bg-[#0a0f0c] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-visible backdrop-blur-xl">
               
               {/* حقل البحث */}
-              <div className="flex-[2] flex items-center gap-4 px-8 py-5 border-b md:border-b-0 md:border-l border-white/5 group transition-colors hover:bg-white/[0.01]">
-                <Search className="w-5 h-5 text-emerald-500 group-focus-within:scale-110 transition-transform" />
+              <div className="flex-[2] flex items-center gap-4 px-8 py-5 border-b md:border-b-0 md:border-l border-white/5 group">
+                <Search className="w-5 h-5 text-emerald-500 transition-transform group-focus-within:scale-110" />
                 <input 
                   type="text" 
                   placeholder="ابحث عن مادة..." 
@@ -85,56 +88,75 @@ const LibraryPage = () => {
                 />
               </div>
               
-              {/* القائمة المنسدلة المحسنة */}
-              <div className="flex-1 relative group transition-colors hover:bg-white/[0.02]">
-                <div className="flex items-center gap-3 px-8 py-5 cursor-pointer">
+              {/* القائمة المنسدلة المحسنة (اليدوية) */}
+              <div className="flex-1 relative">
+                <div 
+                  onClick={() => setIsUniMenuOpen(!isUniMenuOpen)}
+                  className="flex items-center gap-3 px-8 py-5 cursor-pointer hover:bg-white/[0.02] transition-colors h-full"
+                >
                   <Building2 className="w-5 h-5 text-emerald-500" />
-                  <div className="flex-1">
+                  <div className="flex-1 text-right">
                     <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider mb-0.5">الجامعة</p>
-                    <select 
-                      value={selectedUni}
-                      onChange={(e) => setSelectedUni(e.target.value)}
-                      className="w-full bg-transparent border-none outline-none text-white font-black cursor-pointer appearance-none pr-0 leading-tight focus:ring-0"
-                    >
-                      <option value="all" className="bg-[#0a0f0c] text-white">كل الجامعات</option>
-                      {universities.map(uni => (
-                        <option key={uni.id} value={uni.id} className="bg-[#0a0f0c] text-white">
-                          {uni.name}
-                        </option>
-                      ))}
-                    </select>
+                    <p className="text-white font-black text-lg leading-tight truncate max-w-[150px]">
+                      {selectedUni === "all" ? "كل الجامعات" : universities.find(u => u.id === selectedUni)?.name}
+                    </p>
                   </div>
-                  <ChevronDown className="w-5 h-5 text-emerald-500 group-hover:translate-y-0.5 transition-transform shrink-0" />
+                  <ChevronDown className={`w-5 h-5 text-emerald-500 transition-transform duration-300 ${isUniMenuOpen ? 'rotate-180' : ''}`} />
                 </div>
+
+                <AnimatePresence>
+                  {isUniMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setIsUniMenuOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute top-full right-0 left-0 mt-3 bg-[#0a0f0c] border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden z-[100] backdrop-blur-2xl p-2"
+                      >
+                        <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                          <button
+                            onClick={() => { setSelectedUni("all"); setIsUniMenuOpen(false); }}
+                            className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === "all" ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
+                          >
+                            <span className="font-bold">كل الجامعات</span>
+                            {selectedUni === "all" && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                          </button>
+                          
+                          {universities.map((uni) => (
+                            <button
+                              key={uni.id}
+                              onClick={() => { setSelectedUni(uni.id); setIsUniMenuOpen(false); }}
+                              className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === uni.id ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
+                            >
+                              <span className="font-bold">{uni.name}</span>
+                              {selectedUni === uni.id && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
 
-          {/* شبكة المواد */}
+          {/* المواد */}
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
-              <p className="text-neutral-500 font-bold">بنجيبلك المواد...</p>
-            </div>
+            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-emerald-500" /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredSubjects.map((subj, idx) => (
+              {filteredSubjects.map((subj) => (
                 <motion.div
                   key={subj.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.05 }}
+                  whileHover={{ y: -8 }}
                   onClick={() => setSelectedSubject(subj)}
-                  className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 hover:bg-[#0d130f] transition-all duration-500 hover:-translate-y-2 text-center shadow-lg"
+                  className="bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6 mx-auto group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6 mx-auto">
                     <BookOpen className="w-8 h-8 text-emerald-500" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-emerald-400 transition-colors line-clamp-1">{subj.name}</h3>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-neutral-500 text-xs font-bold uppercase">{subj.universities?.name || "عام"}</p>
-                    <p className="text-emerald-500/60 text-[10px] font-black">{subj.academic_year}</p>
-                  </div>
+                  <h3 className="text-xl font-bold mb-2">{subj.name}</h3>
+                  <p className="text-neutral-500 text-xs font-bold uppercase">{subj.universities?.name || "عام"}</p>
                 </motion.div>
               ))}
             </div>
@@ -142,71 +164,38 @@ const LibraryPage = () => {
         </div>
       </main>
 
-      <Footer />
-
-      {/* الـ Popup المحسن المتمركز 100% */}
+      {/* Popup Modal */}
       <AnimatePresence>
         {selectedSubject && (
           <div className="fixed inset-0 flex items-center justify-center z-[150] px-4">
-            {/* الخلفية المعتمة */}
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setSelectedSubject(null)}
-              className="absolute inset-0 bg-black/95 backdrop-blur-md"
-            />
-            
-            {/* جسم النافذة */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 30 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="relative w-full max-w-2xl bg-[#0a0f0c] border border-white/10 rounded-[3.5rem] p-8 md:p-14 shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden"
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedSubject(null)} className="absolute inset-0 bg-black/95 backdrop-blur-md" />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="relative w-full max-w-2xl bg-[#0a0f0c] border border-white/10 rounded-[3.5rem] p-8 md:p-14 shadow-2xl"
             >
-              {/* زر الإغلاق المحسن */}
-              <button 
-                onClick={() => setSelectedSubject(null)} 
-                className="absolute top-8 left-8 p-4 rounded-2xl bg-white/5 hover:bg-rose-500/10 hover:text-rose-400 text-neutral-400 transition-all active:scale-90"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
+              <button onClick={() => setSelectedSubject(null)} className="absolute top-8 left-8 p-3 rounded-2xl bg-white/5 hover:text-rose-400 transition-all"><X className="w-5 h-5" /></button>
               <div className="text-center mb-12">
-                <div className="w-20 h-20 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-8 mx-auto shadow-2xl">
-                  <Sparkles className="w-10 h-10 text-emerald-500 animate-pulse" />
-                </div>
-                <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">مادة {selectedSubject.name}</h2>
-                <p className="text-neutral-500 font-bold uppercase tracking-widest text-xs md:text-sm">اختر القسم الذي تود مراجعته الآن</p>
+                <div className="w-20 h-20 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-8 mx-auto"><Sparkles className="w-10 h-10 text-emerald-500" /></div>
+                <h2 className="text-3xl md:text-5xl font-black mb-4">مادة {selectedSubject.name}</h2>
+                <p className="text-neutral-500 font-bold uppercase text-xs">اختر القسم المطلوب</p>
               </div>
-
-              {/* شبكة الأقسام المتجاوبة */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { id: "lecture", label: "المحاضرات", icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10" },
                   { id: "section", label: "السكاشن", icon: PlaySquare, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-                  { id: "ppt", label: "العروض", icon: Presentation, color: "text-purple-400", bg: "bg-purple-500/10" },
+                  { id: "ppt", label: "البوربوينت", icon: Presentation, color: "text-purple-400", bg: "bg-purple-500/10" },
                   { id: "record", label: "التسجيلات", icon: Mic, color: "text-yellow-400", bg: "bg-yellow-500/10" },
                 ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleOpenMaterialType(item.id)}
-                    className="flex flex-col items-center justify-center gap-5 p-6 md:p-10 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:border-emerald-500/30 transition-all duration-500 group active:scale-95"
-                  >
-                    <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl ${item.bg} flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                      <item.icon className={`w-7 h-7 md:w-8 md:h-8 ${item.color}`} />
-                    </div>
+                  <button key={item.id} onClick={() => handleOpenMaterialType(item.id)} className="flex flex-col items-center gap-4 p-6 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:border-emerald-500/30 transition-all group active:scale-95">
+                    <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center group-hover:scale-110 transition-all`}><item.icon className={`w-7 h-7 ${item.color}`} /></div>
                     <span className="text-white font-black text-xs md:text-sm">{item.label}</span>
                   </button>
                 ))}
-              </div>
-
-              {/* شعار نبتة الصغير أسفل الـ Popup */}
-              <div className="mt-14 text-center">
-                <span className="text-[10px] text-neutral-800 font-black uppercase tracking-[0.3em]">Nabta Academy</span>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+      <Footer />
     </div>
   );
 };
