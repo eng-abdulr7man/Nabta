@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   Library, Search, Building2, BookOpen, 
-  Presentation, Mic, PlaySquare, FileText, X, Sparkles, GraduationCap 
+  Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown 
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
@@ -48,93 +48,74 @@ const LibraryPage = () => {
     <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30 text-white" dir="rtl">
       <Navbar />
 
-      <main className="flex-1 pt-24 pb-20 relative z-10 overflow-x-hidden">
-        {/* إضاءات الخلفية الديكورية */}
-        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-blue-900/10 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <main className="flex-1 pt-32 pb-20 relative z-10 overflow-x-hidden">
+        {/* الخلفية المضيئة */}
+        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           
-          {/* Header & Search Section */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold mb-6">
-              <Library className="w-4 h-4" /> المكتبة الأكاديمية الرقمية
+          {/* العنوان الرئيسي */}
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-sm font-bold mb-6">
+              <Library className="w-4 h-4" /> المكتبة الأكاديمية
             </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-              ابحث عن <span className="text-emerald-500 underline decoration-emerald-500/30 underline-offset-8">مادتك</span> الدراسية
+            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+              كل مراجعك الدراسية <span className="text-emerald-500">في مكان واحد</span>
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-neutral-400 text-lg mb-10 px-4">
-              كل ما تحتاجه من محاضرات وسكاشن في مكان واحد منظم وسريع.
-            </motion.p>
+          </div>
 
-            {/* Filters Bar */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-[#0a0f0c]/80 backdrop-blur-xl p-3 rounded-[2rem] border border-white/5 shadow-2xl mx-4">
-              <div className="flex-1 flex items-center gap-3 px-4 py-2">
-                <Search className="w-5 h-5 text-emerald-500 shrink-0" />
+          {/* بار البحث والفلترة الاحترافي */}
+          <div className="max-w-4xl mx-auto mb-16 px-2">
+            <div className="flex flex-col md:flex-row items-center gap-4 bg-[#0a0f0c] p-2 rounded-[2rem] border border-white/5 shadow-2xl">
+              <div className="flex-[2] flex items-center gap-3 px-6 py-3 w-full border-b md:border-b-0 md:border-l border-white/5">
+                <Search className="w-5 h-5 text-neutral-500" />
                 <input 
                   type="text" 
-                  placeholder="ابحث بالاسم (وراثة، كيمياء...)" 
+                  placeholder="ابحث عن مادة..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none outline-none text-white placeholder:text-neutral-600 font-bold"
+                  className="w-full bg-transparent border-none outline-none text-white font-bold placeholder:text-neutral-600"
                 />
               </div>
-              <div className="hidden md:block w-px h-8 bg-white/10" />
-              <div className="flex-1 flex items-center gap-3 px-4 py-2">
-                <Building2 className="w-5 h-5 text-emerald-500 shrink-0" />
+              
+              <div className="flex-1 flex items-center gap-3 px-6 py-3 w-full relative">
+                <Building2 className="w-5 h-5 text-neutral-500" />
                 <select 
                   value={selectedUni}
                   onChange={(e) => setSelectedUni(e.target.value)}
-                  className="w-full bg-transparent border-none outline-none text-neutral-300 cursor-pointer appearance-none font-bold"
+                  className="w-full bg-transparent border-none outline-none text-neutral-300 font-bold cursor-pointer appearance-none"
                 >
-                  <option value="all" className="bg-[#121A15]">جميع الجامعات</option>
+                  <option value="all" className="bg-[#0a0f0c]">جميع الجامعات</option>
                   {universities.map(uni => (
-                    <option key={uni.id} value={uni.id} className="bg-[#121A15]">{uni.name}</option>
+                    <option key={uni.id} value={uni.id} className="bg-[#0a0f0c]">{uni.name}</option>
                   ))}
                 </select>
+                <ChevronDown className="w-4 h-4 text-neutral-500 pointer-events-none absolute left-6" />
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Subjects Grid */}
+          {/* شبكة المواد */}
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-              <p className="text-neutral-500 animate-pulse font-bold">بنحضرلك المكتبة...</p>
-            </div>
+            <div className="flex justify-center py-20"><Loader2 /></div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              <AnimatePresence>
-                {filteredSubjects.map((subj, idx) => (
-                  <motion.div
-                    key={subj.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.05 }}
-                    onClick={() => setSelectedSubject(subj)}
-                    className="group relative bg-[#0a0f0c] border border-white/5 hover:border-emerald-500/40 rounded-[2.5rem] p-8 cursor-pointer transition-all duration-500 hover:-translate-y-3 shadow-xl flex flex-col items-center text-center overflow-hidden"
-                  >
-                    {/* Hover Glow */}
-                    <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    <div className="w-20 h-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6 group-hover:rotate-6 transition-transform duration-500">
-                      <BookOpen className="w-10 h-10 text-emerald-400" />
-                    </div>
-                    
-                    <h3 className="text-2xl font-black mb-3 group-hover:text-emerald-400 transition-colors line-clamp-1">{subj.name}</h3>
-                    
-                    <div className="flex flex-col gap-2">
-                      <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-neutral-400 text-xs font-bold">
-                        {subj.universities?.name || "جامعة عامة"}
-                      </span>
-                      <span className="text-emerald-500/80 text-xs font-black uppercase tracking-widest italic">
-                        {subj.academic_year}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredSubjects.map((subj, idx) => (
+                <motion.div
+                  key={subj.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => setSelectedSubject(subj)}
+                  className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 hover:-translate-y-2 text-center"
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6 mx-auto group-hover:bg-emerald-500/20 transition-colors">
+                    <BookOpen className="w-8 h-8 text-emerald-500" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-emerald-400 transition-colors">{subj.name}</h3>
+                  <p className="text-neutral-500 text-sm font-bold">{subj.universities?.name || "عام"}</p>
+                </motion.div>
+              ))}
             </div>
           )}
         </div>
@@ -142,70 +123,66 @@ const LibraryPage = () => {
 
       <Footer />
 
-      {/* ========================================= */}
-      {/* PopUp Modal - النسخة المحسنة Responsev 100% */}
-      {/* ========================================= */}
+      {/* الـ Popup المحسن والمنظم */}
       <AnimatePresence>
         {selectedSubject && (
-          <>
+          <div className="fixed inset-0 flex items-center justify-center z-[150] px-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setSelectedSubject(null)}
-              className="fixed inset-0 bg-black/95 backdrop-blur-md z-[110]"
+              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
             />
             
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 50 }} 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 50 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-4xl bg-[#0a0f0c] border border-white/10 rounded-[3rem] p-8 md:p-12 z-[120] shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto max-h-[95vh] custom-scrollbar"
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl bg-[#0a0f0c] border border-white/10 rounded-[3rem] p-8 md:p-12 shadow-[0_0_50px_rgba(0,0,0,0.5)]"
             >
               <button 
                 onClick={() => setSelectedSubject(null)} 
-                className="absolute top-6 left-6 p-3 rounded-2xl bg-white/5 hover:bg-rose-500/20 hover:text-rose-400 text-neutral-400 transition-all active:scale-90"
+                className="absolute top-8 left-8 p-3 rounded-2xl bg-white/5 hover:bg-rose-500/10 hover:text-rose-400 text-neutral-400 transition-all"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
 
-              <div className="text-center mb-12 mt-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-emerald-500/10 border border-emerald-500/20 mb-6">
+              <div className="text-center mb-12">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6 mx-auto">
                   <Sparkles className="w-8 h-8 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl md:text-5xl font-black mb-4">مادة {selectedSubject.name}</h2>
-                <p className="text-neutral-500 text-lg font-medium">اختر القسم الذي تريد الوصول إليه</p>
+                <h2 className="text-3xl md:text-4xl font-black mb-3">مادة {selectedSubject.name}</h2>
+                <p className="text-neutral-500 font-bold uppercase tracking-widest text-sm">اختر القسم المطلوب</p>
               </div>
 
-              {/* Grid الأقسام - متجاوب 100% */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {[
-                  { id: "lecture", label: "المحاضرات", icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-                  { id: "section", label: "السكاشن", icon: PlaySquare, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-                  { id: "ppt", label: "البوربوينت", icon: Presentation, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-                  { id: "record", label: "التسجيلات", icon: Mic, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
+                  { id: "lecture", label: "المحاضرات", icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10" },
+                  { id: "section", label: "السكاشن", icon: PlaySquare, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                  { id: "ppt", label: "العروض", icon: Presentation, color: "text-purple-400", bg: "bg-purple-500/10" },
+                  { id: "record", label: "التسجيلات", icon: Mic, color: "text-yellow-400", bg: "bg-yellow-500/10" },
                 ].map((item) => (
                   <button
                     key={item.id}
                     onClick={() => handleOpenMaterialType(item.id)}
-                    className="group relative flex flex-col items-center justify-center gap-5 p-6 md:p-10 rounded-[2.5rem] bg-white/[0.02] border border-white/5 transition-all duration-500 hover:border-white/20 hover:-translate-y-2 active:scale-95 min-h-[160px] md:min-h-[220px] overflow-hidden"
+                    className="flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 group active:scale-95"
                   >
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b from-transparent via-white/[0.02] to-white/[0.05]`} />
-                    
-                    <div className={`w-14 h-14 md:w-20 md:h-20 rounded-[1.5rem] ${item.bg} border ${item.border} flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-500 z-10`}>
-                      <item.icon className={`w-7 h-7 md:w-10 md:h-10 ${item.color}`} />
+                    <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <item.icon className={`w-6 h-6 ${item.color}`} />
                     </div>
-                    
-                    <span className="text-white font-black text-sm md:text-lg z-10">
-                      {item.label}
-                    </span>
+                    <span className="text-white font-bold text-sm md:text-base">{item.label}</span>
                   </button>
                 ))}
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </div>
   );
 };
+
+const Loader2 = () => (
+  <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+);
 
 export default LibraryPage;
