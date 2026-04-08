@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { 
   Library, Search, Building2, BookOpen, 
   Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2,
-  Trash2, Pencil // 🌟 أيقونات التعديل والحذف الجديدة
+  Trash2, Pencil 
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { toast } from "sonner"; // 🌟 لإظهار رسائل نجاح/فشل أنيقة
+import { toast } from "sonner";
 
 const LibraryPage = () => {
   const navigate = useNavigate();
@@ -20,52 +20,46 @@ const LibraryPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<any | null>(null);
 
-  // حالة فتح القائمة المنسدلة المخصصة
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🌟 حالة لمعرفة هل المستخدم الحالي أدمن أم لا
+  // حالة للتحقق من أن المستخدم الحالي هو "أدمن"
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    checkAdminStatus();
     fetchUniversitiesAndSubjects();
-    checkIfAdmin(); // 🌟 فحص صلاحيات المستخدم عند تحميل الصفحة
   }, []);
 
-  // إضافة مراقب للضغط خارج القائمة المنسدلة
+  // مراقبة الضغط خارج القائمة المنسدلة
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsUniMenuOpen(false);
       }
     };
-
     if (isUniMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isUniMenuOpen]);
 
-  // 🌟 دالة التحقق من صلاحيات الأدمن
-  const checkIfAdmin = async () => {
+  // دالة التحقق الحقيقي من الداتابيس لمعرفة إذا كان اليوزر أدمن
+  const checkAdminStatus = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // افترضنا هنا أن لديك جدول profiles يحتوي على عمود role
-        // يمكنك تعديل هذا الاستعلام بناءً على هيكل قاعدة البيانات الخاصة بك
-        const { data } = await supabase
+      if (session?.user) {
+        // بنفترض إنك بتخزن بيانات المستخدمين في جدول profiles وفيه عمود role
+        const { data, error } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", session.user.id)
           .single();
           
-        if (data?.role === "admin") {
-          setIsAdmin(true);
+        if (!error && data?.role === "admin") {
+          setIsAdmin(true); // تفعيل وضع الأدمن
         }
       }
     } catch (error) {
@@ -88,18 +82,14 @@ const LibraryPage = () => {
     }
   };
 
-  // 🌟 دالة حذف المادة
   const handleDeleteSubject = async (e: React.MouseEvent, id: string, name: string) => {
-    e.stopPropagation(); // منع فتح الـ Popup الخاص بالكارت
-    
+    e.stopPropagation(); 
     if (!window.confirm(`هل أنت متأكد من حذف مادة "${name}" بجميع ملفاتها؟`)) return;
 
     try {
       const { error } = await supabase.from("subjects").delete().eq("id", id);
-      
       if (error) throw error;
-
-      // تحديث الواجهة فوراً بعد الحذف (بدون عمل ريفرش)
+      
       setSubjects((prev) => prev.filter((subj) => subj.id !== id));
       toast.success("تم حذف المادة بنجاح");
     } catch (error) {
@@ -108,10 +98,9 @@ const LibraryPage = () => {
     }
   };
 
-  // 🌟 دالة تعديل المادة (توجيه الأدمن لصفحة الإدارة)
   const handleEditSubject = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // منع فتح الـ Popup الخاص بالكارت
-    navigate(`/admin/library?edit=${id}`); // توجيه لصفحة الكنترول مع إرسال الـ ID
+    e.stopPropagation(); 
+    navigate(`/admin/library?edit=${id}`);
   };
 
   const filteredSubjects = subjects.filter(subj => {
@@ -131,12 +120,10 @@ const LibraryPage = () => {
       <Navbar />
 
       <main className="flex-1 pt-32 pb-20 relative z-10 overflow-x-hidden">
-        {/* إضاءات خلفية ديكورية */}
         <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           
-          {/* العناوين */}
           <div className="text-center max-w-3xl mx-auto mb-12">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-sm font-bold mb-6">
               <Library className="w-4 h-4" /> المكتبة الأكاديمية
@@ -146,11 +133,9 @@ const LibraryPage = () => {
             </motion.h1>
           </div>
 
-          {/* بار البحث والفلترة الاحترافي (Custom Dropdown) */}
           <div className="max-w-4xl mx-auto mb-16 px-2 relative z-[100]">
             <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 bg-[#0a0f0c] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-visible backdrop-blur-xl">
               
-              {/* حقل البحث */}
               <div className="flex-[2] flex items-center gap-4 px-8 py-5 border-b md:border-b-0 md:border-l border-white/5 group">
                 <Search className="w-5 h-5 text-emerald-500 transition-transform group-focus-within:scale-110" />
                 <input 
@@ -162,7 +147,6 @@ const LibraryPage = () => {
                 />
               </div>
               
-              {/* القائمة المنسدلة المحسنة (اليدوية) */}
               <div className="flex-1 relative" ref={dropdownRef}>
                 <div 
                   onClick={() => setIsUniMenuOpen(!isUniMenuOpen)}
@@ -211,7 +195,6 @@ const LibraryPage = () => {
             </div>
           </div>
 
-          {/* المواد */}
           {isLoading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-emerald-500" /></div>
           ) : (
@@ -223,19 +206,19 @@ const LibraryPage = () => {
                   onClick={() => setSelectedSubject(subj)}
                   className="relative group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center overflow-hidden"
                 >
-                  {/* 🌟 زراير التحكم للأدمن فقط 🌟 */}
+                  {/* زراير التحكم الثابتة والظاهرة دائماً للأدمن */}
                   {isAdmin && (
-                    <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-100 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
                       <button 
                         onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
-                        className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all"
+                        className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all cursor-pointer"
                         title="حذف المادة"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={(e) => handleEditSubject(e, subj.id)}
-                        className="p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 transition-all"
+                        className="p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 transition-all cursor-pointer"
                         title="تعديل المادة"
                       >
                         <Pencil className="w-4 h-4" />
@@ -243,13 +226,12 @@ const LibraryPage = () => {
                     </div>
                   )}
 
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6 mt-4">
                     <BookOpen className="w-8 h-8 text-emerald-500" />
                   </div>
                   
                   <h3 className="text-xl font-bold mb-4 px-4">{subj.name}</h3>
                   
-                  {/* الفرقة والجامعة */}
                   <div className="mt-auto flex flex-col gap-2 items-center w-full">
                     <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
                       {subj.academic_year || "الفرقة غير محددة"}
@@ -265,7 +247,6 @@ const LibraryPage = () => {
         </div>
       </main>
 
-      {/* Popup Modal */}
       <AnimatePresence>
         {selectedSubject && (
           <div className="fixed inset-0 flex items-center justify-center z-[150] px-4">
