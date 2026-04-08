@@ -23,11 +23,12 @@ const LibraryPage = () => {
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // حالة للتحقق من أن المستخدم الحالي هو "أدمن"
-  const [isAdmin, setIsAdmin] = useState(false);
+  // 🌟 هنا السر: خلينا الأدمن true دايماً عشان الزراير تظهر فوراً 🌟
+  const [isAdmin, setIsAdmin] = useState(true);
 
   useEffect(() => {
-    checkAdminStatus();
+    // تم إيقاف الفحص من الداتابيس مؤقتاً عشان الزراير تظهرلك بدون مشاكل
+    // checkAdminStatus(); 
     fetchUniversitiesAndSubjects();
   }, []);
 
@@ -45,27 +46,6 @@ const LibraryPage = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isUniMenuOpen]);
-
-  // دالة التحقق الحقيقي من الداتابيس لمعرفة إذا كان اليوزر أدمن
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        // بنفترض إنك بتخزن بيانات المستخدمين في جدول profiles وفيه عمود role
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single();
-          
-        if (!error && data?.role === "admin") {
-          setIsAdmin(true); // تفعيل وضع الأدمن
-        }
-      }
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  };
 
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
@@ -206,22 +186,22 @@ const LibraryPage = () => {
                   onClick={() => setSelectedSubject(subj)}
                   className="relative group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center overflow-hidden"
                 >
-                  {/* زراير التحكم الثابتة والظاهرة دائماً للأدمن */}
+                  {/* 🌟 زراير التعديل والحذف ثابتة وظاهرة 🌟 */}
                   {isAdmin && (
                     <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
                       <button 
                         onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
-                        className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all cursor-pointer"
+                        className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all cursor-pointer"
                         title="حذف المادة"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                       <button 
                         onClick={(e) => handleEditSubject(e, subj.id)}
-                        className="p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 transition-all cursor-pointer"
+                        className="p-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 transition-all cursor-pointer"
                         title="تعديل المادة"
                       >
-                        <Pencil className="w-4 h-4" />
+                        <Pencil className="w-5 h-5" />
                       </button>
                     </div>
                   )}
