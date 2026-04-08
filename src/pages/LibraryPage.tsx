@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -20,10 +20,32 @@ const LibraryPage = () => {
 
   // حالة فتح القائمة المنسدلة المخصصة
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
+  
+  // Ref عشان نراقب الضغط بره القائمة
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchUniversitiesAndSubjects();
   }, []);
+
+  // إضافة مراقب للضغط خارج القائمة المنسدلة
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsUniMenuOpen(false);
+      }
+    };
+
+    if (isUniMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isUniMenuOpen]);
 
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
@@ -89,7 +111,7 @@ const LibraryPage = () => {
               </div>
               
               {/* القائمة المنسدلة المحسنة (اليدوية) */}
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" ref={dropdownRef}>
                 <div 
                   onClick={() => setIsUniMenuOpen(!isUniMenuOpen)}
                   className="flex items-center gap-3 px-8 py-5 cursor-pointer hover:bg-white/[0.02] transition-colors h-full"
@@ -106,34 +128,31 @@ const LibraryPage = () => {
 
                 <AnimatePresence>
                   {isUniMenuOpen && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setIsUniMenuOpen(false)} />
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute top-full right-0 left-0 mt-3 bg-[#0a0f0c] border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden z-[100] backdrop-blur-2xl p-2"
-                      >
-                        <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute top-full right-0 left-0 mt-3 bg-[#0a0f0c] border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden z-[100] backdrop-blur-2xl p-2"
+                    >
+                      <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                        <button
+                          onClick={() => { setSelectedUni("all"); setIsUniMenuOpen(false); }}
+                          className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === "all" ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
+                        >
+                          <span className="font-bold">كل الجامعات</span>
+                          {selectedUni === "all" && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                        </button>
+                        
+                        {universities.map((uni) => (
                           <button
-                            onClick={() => { setSelectedUni("all"); setIsUniMenuOpen(false); }}
-                            className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === "all" ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
+                            key={uni.id}
+                            onClick={() => { setSelectedUni(uni.id); setIsUniMenuOpen(false); }}
+                            className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === uni.id ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
                           >
-                            <span className="font-bold">كل الجامعات</span>
-                            {selectedUni === "all" && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                            <span className="font-bold">{uni.name}</span>
+                            {selectedUni === uni.id && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
                           </button>
-                          
-                          {universities.map((uni) => (
-                            <button
-                              key={uni.id}
-                              onClick={() => { setSelectedUni(uni.id); setIsUniMenuOpen(false); }}
-                              className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === uni.id ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
-                            >
-                              <span className="font-bold">{uni.name}</span>
-                              {selectedUni === uni.id && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    </>
+                        ))}
+                      </div>
+                    </motion.div>
                   )}
                 </AnimatePresence>
               </div>
