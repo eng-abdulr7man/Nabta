@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Library, Search, Building2, BookOpen, 
   Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2,
-  Trash2, Pencil, ShieldAlert // 🌟 أيقونة جديدة للأدمن
+  Trash2, Pencil, ShieldAlert 
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
@@ -23,11 +23,11 @@ const LibraryPage = () => {
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🌟 خلينا الأدمن true إجباري عشان نجرب، وهتلاقي شريط الإدارة ظهر جوه الكارت 🌟
-  const [isAdmin, setIsAdmin] = useState(true);
+  // 🌟 هنا التعديل: رجعناها false كوضع افتراضي عشان متظهرش للناس العادية 🌟
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // checkAdminStatus(); // معطلين دي مؤقتاً للتأكد من الشكل
+    checkAdminStatus(); // 🌟 شغلنا الدالة اللي بتشيك من الداتابيس تاني 🌟
     fetchUniversitiesAndSubjects();
   }, []);
 
@@ -44,6 +44,26 @@ const LibraryPage = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isUniMenuOpen]);
+
+  // 🌟 الدالة الحقيقية اللي بتجيب الصلاحية من جدول user_roles 🌟
+  const checkAdminStatus = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data, error } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .single();
+          
+        if (!error && data?.role === "admin") {
+          setIsAdmin(true); // لو أدمن فعلاً، خليها true
+        }
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+    }
+  };
 
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
@@ -181,7 +201,7 @@ const LibraryPage = () => {
                   onClick={() => setSelectedSubject(subj)}
                   className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-6 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 shadow-xl flex flex-col"
                 >
-                  {/* 🌟 شريط التحكم الخاص بالأدمن (جزء من محتوى الكارت عشان ميختفيش) 🌟 */}
+                  {/* شريط التحكم يظهر فقط إذا كان isAdmin = true (يعني لو اليوزر ده أدمن فعلاً في الداتابيس) */}
                   {isAdmin && (
                     <div className="flex items-center justify-between w-full mb-6 pb-4 border-b border-white/5">
                       <div className="flex items-center gap-1.5 text-rose-500 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
