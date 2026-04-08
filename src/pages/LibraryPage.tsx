@@ -225,7 +225,7 @@ const LibraryPage = () => {
                 >
                   {/* 🌟 زراير التحكم للأدمن فقط 🌟 */}
                   {isAdmin && (
-                    <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-100 group-hover:opacity-100 transition-opacity duration-300 z-20">
                       <button 
                         onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
                         className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all"
