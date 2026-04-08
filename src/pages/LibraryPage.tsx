@@ -23,12 +23,11 @@ const LibraryPage = () => {
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🌟 هنا السر: خلينا الأدمن true دايماً عشان الزراير تظهر فوراً 🌟
-  const [isAdmin, setIsAdmin] = useState(true);
+  // حالة للتحقق من أن المستخدم الحالي هو "أدمن"
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // تم إيقاف الفحص من الداتابيس مؤقتاً عشان الزراير تظهرلك بدون مشاكل
-    // checkAdminStatus(); 
+    checkAdminStatus();
     fetchUniversitiesAndSubjects();
   }, []);
 
@@ -46,6 +45,26 @@ const LibraryPage = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isUniMenuOpen]);
+
+  // 🌟 الدالة تم تعديلها لتقرأ من جدول user_roles بناءً على الـ Schema بتاعك 🌟
+  const checkAdminStatus = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data, error } = await supabase
+          .from("user_roles") // هنا التعديل: قراءة من جدول user_roles
+          .select("role")
+          .eq("user_id", session.user.id) // هنا التعديل: البحث بـ user_id
+          .single();
+          
+        if (!error && data?.role === "admin") {
+          setIsAdmin(true); // تفعيل وضع الأدمن
+        }
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+    }
+  };
 
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
@@ -186,7 +205,7 @@ const LibraryPage = () => {
                   onClick={() => setSelectedSubject(subj)}
                   className="relative group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center overflow-hidden"
                 >
-                  {/* 🌟 زراير التعديل والحذف ثابتة وظاهرة 🌟 */}
+                  {/* زراير التحكم الثابتة للـ Admin فقط */}
                   {isAdmin && (
                     <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
                       <button 
