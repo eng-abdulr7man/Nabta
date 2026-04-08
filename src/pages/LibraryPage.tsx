@@ -57,7 +57,7 @@ const LibraryPage = () => {
       <Navbar />
 
       <main className="flex-1 pt-32 pb-20 relative z-10 overflow-x-hidden">
-        {/* إضاءات خلفية */}
+        {/* إضاءات خلفية ديكورية */}
         <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
@@ -150,13 +150,23 @@ const LibraryPage = () => {
                   key={subj.id}
                   whileHover={{ y: -8 }}
                   onClick={() => setSelectedSubject(subj)}
-                  className="bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl"
+                  className="bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6 mx-auto">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6">
                     <BookOpen className="w-8 h-8 text-emerald-500" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{subj.name}</h3>
-                  <p className="text-neutral-500 text-xs font-bold uppercase">{subj.universities?.name || "عام"}</p>
+                  
+                  <h3 className="text-xl font-bold mb-4">{subj.name}</h3>
+                  
+                  {/* الفرقة والجامعة */}
+                  <div className="mt-auto flex flex-col gap-2 items-center w-full">
+                    <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
+                      {subj.academic_year || "الفرقة غير محددة"}
+                    </span>
+                    <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider mt-1">
+                      {subj.universities?.name || "جامعة عامة"}
+                    </p>
+                  </div>
                 </motion.div>
               ))}
             </div>
