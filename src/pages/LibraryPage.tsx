@@ -3,13 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   Library, Search, Building2, BookOpen, 
-  Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2,
-  Trash2, Pencil, ShieldAlert 
+  Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2 
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { toast } from "sonner";
 
 const LibraryPage = () => {
   const navigate = useNavigate();
@@ -23,11 +21,7 @@ const LibraryPage = () => {
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🌟 هنا التعديل: رجعناها false كوضع افتراضي عشان متظهرش للناس العادية 🌟
-  const [isAdmin, setIsAdmin] = useState(false);
-
   useEffect(() => {
-    checkAdminStatus(); // 🌟 شغلنا الدالة اللي بتشيك من الداتابيس تاني 🌟
     fetchUniversitiesAndSubjects();
   }, []);
 
@@ -45,26 +39,6 @@ const LibraryPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isUniMenuOpen]);
 
-  // 🌟 الدالة الحقيقية اللي بتجيب الصلاحية من جدول user_roles 🌟
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .single();
-          
-        if (!error && data?.role === "admin") {
-          setIsAdmin(true); // لو أدمن فعلاً، خليها true
-        }
-      }
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  };
-
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
     try {
@@ -78,27 +52,6 @@ const LibraryPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleDeleteSubject = async (e: React.MouseEvent, id: string, name: string) => {
-    e.stopPropagation(); 
-    if (!window.confirm(`هل أنت متأكد من حذف مادة "${name}" بجميع ملفاتها؟`)) return;
-
-    try {
-      const { error } = await supabase.from("subjects").delete().eq("id", id);
-      if (error) throw error;
-      
-      setSubjects((prev) => prev.filter((subj) => subj.id !== id));
-      toast.success("تم حذف المادة بنجاح");
-    } catch (error) {
-      console.error("Error deleting subject:", error);
-      toast.error("حدث خطأ أثناء الحذف");
-    }
-  };
-
-  const handleEditSubject = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); 
-    navigate(`/admin/library?edit=${id}`);
   };
 
   const filteredSubjects = subjects.filter(subj => {
@@ -199,49 +152,21 @@ const LibraryPage = () => {
                   key={subj.id}
                   whileHover={{ y: -5 }}
                   onClick={() => setSelectedSubject(subj)}
-                  className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-6 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 shadow-xl flex flex-col"
+                  className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-6 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 shadow-xl flex flex-col items-center text-center"
                 >
-                  {/* شريط التحكم يظهر فقط إذا كان isAdmin = true (يعني لو اليوزر ده أدمن فعلاً في الداتابيس) */}
-                  {isAdmin && (
-                    <div className="flex items-center justify-between w-full mb-6 pb-4 border-b border-white/5">
-                      <div className="flex items-center gap-1.5 text-rose-500 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
-                        <ShieldAlert className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-black uppercase tracking-wider">أدمن</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={(e) => handleEditSubject(e, subj.id)}
-                          className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 transition-all"
-                          title="تعديل المادة"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
-                          className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-all"
-                          title="حذف المادة"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col items-center text-center mt-2">
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-5 group-hover:scale-110 transition-transform">
-                      <BookOpen className="w-8 h-8 text-emerald-500" />
-                    </div>
-                    
-                    <h3 className="text-xl font-bold mb-4">{subj.name}</h3>
-                    
-                    <div className="mt-auto flex flex-col gap-2 items-center w-full">
-                      <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
-                        {subj.academic_year || "الفرقة غير محددة"}
-                      </span>
-                      <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider mt-1">
-                        {subj.universities?.name || "جامعة عامة"}
-                      </p>
-                    </div>
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-5 group-hover:scale-110 transition-transform mt-2">
+                    <BookOpen className="w-8 h-8 text-emerald-500" />
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-4">{subj.name}</h3>
+                  
+                  <div className="mt-auto flex flex-col gap-2 items-center w-full">
+                    <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
+                      {subj.academic_year || "الفرقة غير محددة"}
+                    </span>
+                    <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider mt-1">
+                      {subj.universities?.name || "جامعة عامة"}
+                    </p>
                   </div>
                 </motion.div>
               ))}
