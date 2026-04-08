@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   Library, Search, Building2, BookOpen, 
-  Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2 
+  Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2,
+  Trash2, Pencil // 🌟 أيقونات التعديل والحذف الجديدة
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { toast } from "sonner"; // 🌟 لإظهار رسائل نجاح/فشل أنيقة
 
 const LibraryPage = () => {
   const navigate = useNavigate();
@@ -20,12 +22,14 @@ const LibraryPage = () => {
 
   // حالة فتح القائمة المنسدلة المخصصة
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
-  
-  // Ref عشان نراقب الضغط بره القائمة
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 🌟 حالة لمعرفة هل المستخدم الحالي أدمن أم لا
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetchUniversitiesAndSubjects();
+    checkIfAdmin(); // 🌟 فحص صلاحيات المستخدم عند تحميل الصفحة
   }, []);
 
   // إضافة مراقب للضغط خارج القائمة المنسدلة
@@ -47,6 +51,28 @@ const LibraryPage = () => {
     };
   }, [isUniMenuOpen]);
 
+  // 🌟 دالة التحقق من صلاحيات الأدمن
+  const checkIfAdmin = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // افترضنا هنا أن لديك جدول profiles يحتوي على عمود role
+        // يمكنك تعديل هذا الاستعلام بناءً على هيكل قاعدة البيانات الخاصة بك
+        const { data } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+          
+        if (data?.role === "admin") {
+          setIsAdmin(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+    }
+  };
+
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
     try {
@@ -60,6 +86,32 @@ const LibraryPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 🌟 دالة حذف المادة
+  const handleDeleteSubject = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation(); // منع فتح الـ Popup الخاص بالكارت
+    
+    if (!window.confirm(`هل أنت متأكد من حذف مادة "${name}" بجميع ملفاتها؟`)) return;
+
+    try {
+      const { error } = await supabase.from("subjects").delete().eq("id", id);
+      
+      if (error) throw error;
+
+      // تحديث الواجهة فوراً بعد الحذف (بدون عمل ريفرش)
+      setSubjects((prev) => prev.filter((subj) => subj.id !== id));
+      toast.success("تم حذف المادة بنجاح");
+    } catch (error) {
+      console.error("Error deleting subject:", error);
+      toast.error("حدث خطأ أثناء الحذف");
+    }
+  };
+
+  // 🌟 دالة تعديل المادة (توجيه الأدمن لصفحة الإدارة)
+  const handleEditSubject = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // منع فتح الـ Popup الخاص بالكارت
+    navigate(`/admin/library?edit=${id}`); // توجيه لصفحة الكنترول مع إرسال الـ ID
   };
 
   const filteredSubjects = subjects.filter(subj => {
@@ -169,13 +221,33 @@ const LibraryPage = () => {
                   key={subj.id}
                   whileHover={{ y: -8 }}
                   onClick={() => setSelectedSubject(subj)}
-                  className="bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center"
+                  className="relative group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center overflow-hidden"
                 >
+                  {/* 🌟 زراير التحكم للأدمن فقط 🌟 */}
+                  {isAdmin && (
+                    <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                      <button 
+                        onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
+                        className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all"
+                        title="حذف المادة"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={(e) => handleEditSubject(e, subj.id)}
+                        className="p-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 transition-all"
+                        title="تعديل المادة"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
                   <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6">
                     <BookOpen className="w-8 h-8 text-emerald-500" />
                   </div>
                   
-                  <h3 className="text-xl font-bold mb-4">{subj.name}</h3>
+                  <h3 className="text-xl font-bold mb-4 px-4">{subj.name}</h3>
                   
                   {/* الفرقة والجامعة */}
                   <div className="mt-auto flex flex-col gap-2 items-center w-full">
