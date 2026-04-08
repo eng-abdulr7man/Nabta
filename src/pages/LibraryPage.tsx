@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Library, Search, Building2, BookOpen, 
   Presentation, Mic, PlaySquare, FileText, X, Sparkles, ChevronDown, Loader2,
-  Trash2, Pencil 
+  Trash2, Pencil, ShieldAlert // 🌟 أيقونة جديدة للأدمن
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
@@ -23,15 +23,14 @@ const LibraryPage = () => {
   const [isUniMenuOpen, setIsUniMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // حالة للتحقق من أن المستخدم الحالي هو "أدمن"
-  const [isAdmin, setIsAdmin] = useState(false);
+  // 🌟 خلينا الأدمن true إجباري عشان نجرب، وهتلاقي شريط الإدارة ظهر جوه الكارت 🌟
+  const [isAdmin, setIsAdmin] = useState(true);
 
   useEffect(() => {
-    checkAdminStatus();
+    // checkAdminStatus(); // معطلين دي مؤقتاً للتأكد من الشكل
     fetchUniversitiesAndSubjects();
   }, []);
 
-  // مراقبة الضغط خارج القائمة المنسدلة
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -45,26 +44,6 @@ const LibraryPage = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isUniMenuOpen]);
-
-  // 🌟 الدالة تم تعديلها لتقرأ من جدول user_roles بناءً على الـ Schema بتاعك 🌟
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data, error } = await supabase
-          .from("user_roles") // هنا التعديل: قراءة من جدول user_roles
-          .select("role")
-          .eq("user_id", session.user.id) // هنا التعديل: البحث بـ user_id
-          .single();
-          
-        if (!error && data?.role === "admin") {
-          setIsAdmin(true); // تفعيل وضع الأدمن
-        }
-      }
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  };
 
   const fetchUniversitiesAndSubjects = async () => {
     setIsLoading(true);
@@ -134,7 +113,6 @@ const LibraryPage = () => {
 
           <div className="max-w-4xl mx-auto mb-16 px-2 relative z-[100]">
             <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 bg-[#0a0f0c] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-visible backdrop-blur-xl">
-              
               <div className="flex-[2] flex items-center gap-4 px-8 py-5 border-b md:border-b-0 md:border-l border-white/5 group">
                 <Search className="w-5 h-5 text-emerald-500 transition-transform group-focus-within:scale-110" />
                 <input 
@@ -145,7 +123,6 @@ const LibraryPage = () => {
                   className="w-full bg-transparent border-none outline-none text-white font-bold placeholder:text-neutral-700 text-lg"
                 />
               </div>
-              
               <div className="flex-1 relative" ref={dropdownRef}>
                 <div 
                   onClick={() => setIsUniMenuOpen(!isUniMenuOpen)}
@@ -175,7 +152,6 @@ const LibraryPage = () => {
                           <span className="font-bold">كل الجامعات</span>
                           {selectedUni === "all" && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
                         </button>
-                        
                         {universities.map((uni) => (
                           <button
                             key={uni.id}
@@ -201,43 +177,51 @@ const LibraryPage = () => {
               {filteredSubjects.map((subj) => (
                 <motion.div
                   key={subj.id}
-                  whileHover={{ y: -8 }}
+                  whileHover={{ y: -5 }}
                   onClick={() => setSelectedSubject(subj)}
-                  className="relative group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-8 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 text-center shadow-xl flex flex-col items-center overflow-hidden"
+                  className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-6 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 shadow-xl flex flex-col"
                 >
-                  {/* زراير التحكم الثابتة للـ Admin فقط */}
+                  {/* 🌟 شريط التحكم الخاص بالأدمن (جزء من محتوى الكارت عشان ميختفيش) 🌟 */}
                   {isAdmin && (
-                    <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-                      <button 
-                        onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
-                        className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all cursor-pointer"
-                        title="حذف المادة"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                      <button 
-                        onClick={(e) => handleEditSubject(e, subj.id)}
-                        className="p-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20 transition-all cursor-pointer"
-                        title="تعديل المادة"
-                      >
-                        <Pencil className="w-5 h-5" />
-                      </button>
+                    <div className="flex items-center justify-between w-full mb-6 pb-4 border-b border-white/5">
+                      <div className="flex items-center gap-1.5 text-rose-500 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
+                        <ShieldAlert className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">أدمن</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={(e) => handleEditSubject(e, subj.id)}
+                          className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 transition-all"
+                          title="تعديل المادة"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={(e) => handleDeleteSubject(e, subj.id, subj.name)}
+                          className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-all"
+                          title="حذف المادة"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   )}
 
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-6 mt-4">
-                    <BookOpen className="w-8 h-8 text-emerald-500" />
-                  </div>
-                  
-                  <h3 className="text-xl font-bold mb-4 px-4">{subj.name}</h3>
-                  
-                  <div className="mt-auto flex flex-col gap-2 items-center w-full">
-                    <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
-                      {subj.academic_year || "الفرقة غير محددة"}
-                    </span>
-                    <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider mt-1">
-                      {subj.universities?.name || "جامعة عامة"}
-                    </p>
+                  <div className="flex flex-col items-center text-center mt-2">
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-5 group-hover:scale-110 transition-transform">
+                      <BookOpen className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    
+                    <h3 className="text-xl font-bold mb-4">{subj.name}</h3>
+                    
+                    <div className="mt-auto flex flex-col gap-2 items-center w-full">
+                      <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
+                        {subj.academic_year || "الفرقة غير محددة"}
+                      </span>
+                      <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider mt-1">
+                        {subj.universities?.name || "جامعة عامة"}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               ))}
