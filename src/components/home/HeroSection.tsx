@@ -1,28 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowLeft,
-  Play,
-  Star,
-  Users,
-  X,
-  Send,
-  MessageCircle,
-  Search,
-  Award,
-  BadgeCheck,
-  TrendingUp,
-  BookOpen,
-  CheckCircle2,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, Play, Star, ShieldCheck, Users, X, Send, MessageCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import heroBg from "@/assets/animal-production.jpg"; // صورة الإنتاج الحيواني
 
 // قائمة التخصصات التي ستتبدل في العنوان
-// أقسام كليات الزراعة المعتمدة
 const specialties = [
   "الإنتاج الحيواني",
   "الإنتاج الداجني",
@@ -38,26 +21,11 @@ const specialties = [
   "تكنولوجيا الأعلاف",
 ];
 
-// مميزات الثقة أسفل الهيرو
-const trustBadges = [
-  { icon: BadgeCheck, label: "شهادات معتمدة" },
-  { icon: Award, label: "خبراء معتمدون" },
-  { icon: TrendingUp, label: "محتوى عملي 100%" },
-  { icon: BookOpen, label: "تعلم ذاتي مرن" },
-];
-
-// نقاط التقييم
-const ratingPoints = [
-  "محتوى عملي وحديث",
-  "مدربون متخصصون",
-  "متابعة ودعم مستمر",
-];
-
 const HeroDarkSection = () => {
+  // 1. استدعاء profile عشان نقدر نجيب منه اسم المستخدم
   const { user, profile } = useAuth();
   const [showPopup, setShowPopup] = useState(false);
   const [currentSpecialty, setCurrentSpecialty] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
 
   // التحكم في تبديل النصوص كل 3 ثوانٍ
   useEffect(() => {
@@ -67,33 +35,36 @@ const HeroDarkSection = () => {
     return () => clearInterval(textInterval);
   }, []);
 
-  // ظهور النافذة المنبثقة (مرة كل 24 ساعة)
+  // التحكم في ظهور النافذة المنبثقة بناءً على الـ Local Storage
   useEffect(() => {
     const popupClosedTime = localStorage.getItem("agriPopupClosed");
-    const waitTime = 24 * 60 * 60 * 1000;
+    const waitTime = 1 * 24 * 60 * 60 * 1000; // يوم واحد 
+    
     let shouldShow = true;
 
     if (popupClosedTime) {
-      const timePassed = Date.now() - parseInt(popupClosedTime, 10);
-      if (timePassed < waitTime) shouldShow = false;
+      const timePassed = new Date().getTime() - parseInt(popupClosedTime, 10);
+      if (timePassed < waitTime) {
+        shouldShow = false; 
+      }
     }
 
     if (shouldShow) {
-      const timer = setTimeout(() => setShowPopup(true), 1500);
+      const timer = setTimeout(() => {
+        setShowPopup(true);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, []);
 
   const handleClosePopup = () => {
     setShowPopup(false);
-    localStorage.setItem("agriPopupClosed", Date.now().toString());
+    localStorage.setItem("agriPopupClosed", new Date().getTime().toString());
   };
-
-  const firstName = user && profile?.full_name ? profile.full_name.split(" ")[0] : null;
 
   return (
     <>
-      {/* ================= النافذة المنبثقة (Popup) ================= */}
+      {/* --- النافذة المنبثقة (Popup Modal) --- */}
       <AnimatePresence>
         {showPopup && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -116,7 +87,6 @@ const HeroDarkSection = () => {
               <button
                 onClick={handleClosePopup}
                 className="absolute top-4 left-4 p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-full transition-colors"
-                aria-label="إغلاق"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -125,31 +95,28 @@ const HeroDarkSection = () => {
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-inner">
                   <Users className="w-8 h-8 text-emerald-400" />
                 </div>
-
-                <h3 className="text-2xl font-bold text-white tracking-tight">
-                  انضم لمجتمعنا الزراعي!
-                </h3>
-                <p className="text-neutral-400 text-sm leading-relaxed">
-                  لا تفوّت أحدث الكورسات، النصائح الزراعية، والنقاشات المفيدة.
-                  انضم لآلاف المهندسين والمهتمين بالمجال مجاناً.
+                
+                <h3 className="text-2xl font-bold text-white tracking-tight">انضم لمجتمعنا الزراعي!</h3>
+                <p className="text-neutral-400 text-sm leading-relaxed mb-6">
+                  لا تفوت أحدث الكورسات، النصائح الزراعية، والنقاشات المفيدة. انضم لآلاف المهندسين والمهتمين بالمجال الآن مجاناً لمعرفة جميع تحديثات المنصة.
                 </p>
 
                 <div className="space-y-3 pt-4">
-                  <a
-                    href="https://chat.whatsapp.com/Ifb8sOwZiGr4cYcDfvqEIx?mode=hq2tcla"
+                  <a 
+                    href="https://chat.whatsapp.com/Ifb8sOwZiGr4cYcDfvqEIx?mode=hq2tcla" 
                     onClick={handleClosePopup}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" 
+                    rel="noopener noreferrer" 
                     className="flex items-center justify-center w-full gap-3 py-3.5 px-4 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/30 rounded-xl transition-all font-semibold"
                   >
                     <MessageCircle className="w-5 h-5" />
                     جروب الواتساب
                   </a>
-                  <a
-                    href="https://t.me/NabtaUpdates"
+                  <a 
+                    href="https://t.me/NabtaUpdates" 
                     onClick={handleClosePopup}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" 
+                    rel="noopener noreferrer" 
                     className="flex items-center justify-center w-full gap-3 py-3.5 px-4 bg-[#0088cc]/10 hover:bg-[#0088cc]/20 text-[#0088cc] border border-[#0088cc]/30 rounded-xl transition-all font-semibold"
                   >
                     <Send className="w-5 h-5" />
@@ -162,258 +129,137 @@ const HeroDarkSection = () => {
         )}
       </AnimatePresence>
 
-      {/* ================= شريط إعلانات علوي (Announcement Bar) ================= */}
-      <div className="bg-gradient-to-l from-emerald-600 to-emerald-700 text-white text-center py-2.5 px-4 text-sm font-medium relative z-10">
-        <span className="inline-flex items-center gap-2">
-          <Sparkles className="w-4 h-4" />
-          خصم يصل إلى 40% على جميع الكورسات لفترة محدودة
-          <Link
-            to="/courses"
-            className="underline underline-offset-4 font-bold hover:text-emerald-100 transition-colors"
-          >
-            اكتشف العروض
-          </Link>
-        </span>
-      </div>
+      {/* --- قسم الهيرو الرئيسي (Hero Section) --- */}
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-[#090D0A] text-white pt-32 pb-20">
 
-      {/* ================= قسم الهيرو الرئيسي ================= */}
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-[#090D0A] text-white pt-16 pb-20 lg:pt-20">
-        {/* خلفيات متدرجة */}
-        <div className="absolute top-[-10%] right-[-5%] w-[45vw] h-[45vw] rounded-full bg-emerald-900/25 blur-[130px] pointer-events-none" />
-        <div className="absolute bottom-[-15%] left-[-10%] w-[35vw] h-[35vw] rounded-full bg-green-900/15 blur-[110px] pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+        {/* خلفية شبكية خافتة + إضاءات — بديل احترافي عن الصورة */}
+        <div
+          className="absolute inset-0 opacity-[0.07] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(140 20% 90%) 1px, transparent 1px), linear-gradient(90deg, hsl(140 20% 90%) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%)",
+            WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%)",
+          }}
+        />
+        <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[60vw] h-[45vw] rounded-full bg-emerald-900/25 blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-green-900/10 blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-10 items-center">
+          <div className="max-w-3xl mx-auto text-center space-y-8">
 
-            {/* ===== النص والمحتوى (يمين) ===== */}
-            <div className="space-y-7 text-center lg:text-right order-2 lg:order-1">
+            {/* شارة علوية */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+              className="flex justify-center"
+            >
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs sm:text-sm font-medium ios-press">
+                <ShieldCheck className="w-4 h-4" />
+                المنصة الأولى للتعليم الزراعي المتقدم
+              </span>
+            </motion.div>
 
-              {/* شارة الثقة */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm font-medium">
-                  <BadgeCheck className="w-4 h-4" />
-                  المنصة العربية الأولى للتعليم الزراعي المتقدم
-                </span>
-              </motion.div>
+            {/* الترحيب المخصص (Personalized Greeting) */}
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.05, ease: [0.4, 0, 0.2, 1] }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.35] tracking-tight text-neutral-50"
+            >
+              أهلاً {user && profile?.full_name ? (
+                <span className="text-emerald-400">{profile.full_name.split(' ')[0]}</span>
+              ) : (
+                "بك"
+              )}<br /> جاهز تتعلم<br />
 
-              {/* العنوان */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-4xl lg:text-5xl xl:text-[3.6rem] font-extrabold leading-[1.35] tracking-tight text-neutral-50"
-              >
-                أهلاً {firstName ? (
-                  <span className="text-emerald-400">{firstName}</span>
-                ) : (
-                  "بك"
-                )}
-                <br />
-                احترف تخصص
-                <span className="inline-grid [grid-template-areas:'text'] mt-2 min-h-[1.4em]">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={currentSpecialty}
-                      initial={{ y: 24, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -24, opacity: 0 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                      className="[grid-area:text] text-transparent bg-clip-text bg-gradient-to-l from-emerald-300 via-emerald-400 to-green-500 pb-2"
-                    >
-                      {specialties[currentSpecialty]}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
-              </motion.h1>
+              <span className="inline-grid [grid-template-areas:'text'] mt-2">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={currentSpecialty}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                    className="[grid-area:text] text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600 pb-2"
+                  >
+                    {specialties[currentSpecialty]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </motion.h1>
 
-              {/* الوصف */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-lg text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed"
-              >
-                كورسات عملية بشهادات معتمدة، يقدمها أعضاء هيئة تدريس وخبراء من كليات الزراعة.
-                تعلم في وقتك وبسرعتك الخاصة، واحترف تخصصك من الإنتاج الحيواني إلى تصنيع الأغذية.
-              </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.12, ease: [0.4, 0, 0.2, 1] }}
+              className="text-lg text-neutral-400 max-w-xl mx-auto leading-relaxed"
+            >
+              اكتسب المعرفة العملية والشهادات المعتمدة من خبراء متخصصين. ابدأ الآن وانضم لآلاف المتدربين في مجالات الزراعة الذكية والمستدامة.
+            </motion.p>
 
-              {/* شريط البحث */}
-              <motion.form
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.25 }}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (searchQuery.trim()) {
-                    window.location.href = `/courses?search=${encodeURIComponent(searchQuery.trim())}`;
-                  } else {
-                    window.location.href = "/courses";
-                  }
-                }}
-                className="flex items-center gap-2 bg-[#101711] border border-neutral-800 focus-within:border-emerald-500/50 rounded-2xl p-2 max-w-xl mx-auto lg:mx-0 transition-colors shadow-lg"
-              >
-                <Search className="w-5 h-5 text-neutral-500 mr-2 shrink-0" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ابحث عن كورس أو تخصص... مثال: الزراعة المائية"
-                  className="flex-1 bg-transparent text-white placeholder:text-neutral-500 outline-none text-sm sm:text-base min-w-0"
-                />
-                <Button
-                  type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 sm:px-6 h-11 rounded-xl font-semibold shrink-0"
-                >
-                  بحث
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.18, ease: [0.4, 0, 0.2, 1] }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
+            >
+              <Link to="/courses" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-8 h-14 text-base font-semibold gap-2 shadow-[0_0_20px_rgba(5,150,105,0.3)] hover:shadow-[0_0_30px_rgba(5,150,105,0.5)]">
+                  ابدأ التعلم الآن
+                  <ArrowLeft className="w-4 h-4 mr-1" />
                 </Button>
-              </motion.form>
+              </Link>
 
-              {/* الأزرار */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
-              >
-                <Link to="/courses" className="w-full sm:w-auto">
+              {!user && (
+                <Link to="/register" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-8 h-14 text-base font-semibold gap-2 transition-all shadow-[0_0_25px_rgba(5,150,105,0.35)] hover:shadow-[0_0_40px_rgba(5,150,105,0.55)]"
+                    variant="outline"
+                    className="group w-full sm:w-auto bg-white/5 hover:bg-white text-white hover:text-black border-white/15 hover:border-white px-8 h-14 text-base font-bold"
                   >
-                    ابدأ التعلم الآن
-                    <ArrowLeft className="w-4 h-4" />
+                    <Play className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:scale-110" />
+                    انشئ حسابك مجانا
                   </Button>
                 </Link>
-
-                {!user && (
-                  <Link to="/register" className="w-full sm:w-auto">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="group w-full sm:w-auto bg-white/5 hover:bg-emerald-600 text-white hover:text-white border-neutral-700 hover:border-emerald-500 px-8 h-14 text-base font-bold transition-all duration-300 backdrop-blur-sm"
-                    >
-                      <Play className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:scale-110" />
-                      أنشئ حسابك مجاناً
-                    </Button>
-                  </Link>
-                )}
-              </motion.div>
-
-              {/* الإحصائيات */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="flex items-center justify-center lg:justify-start gap-6 sm:gap-10 pt-6 border-t border-neutral-800/60"
-              >
-                <div className="text-center lg:text-right">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-white">+100</p>
-                  <p className="text-xs sm:text-sm text-neutral-500">كورس متخصص</p>
-                </div>
-                <div className="w-px h-10 bg-neutral-800" />
-                <div className="text-center lg:text-right">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-white">+5K</p>
-                  <p className="text-xs sm:text-sm text-neutral-500">متدرب نشط</p>
-                </div>
-                <div className="w-px h-10 bg-neutral-800" />
-                <div className="text-center lg:text-right">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-emerald-400">4.9</p>
-                  <p className="text-xs sm:text-sm text-neutral-500">متوسط التقييم</p>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* ===== الصورة والبطاقات العائمة (يسار) ===== */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative order-1 lg:order-2"
-            >
-              <div className="relative rounded-3xl overflow-hidden border border-neutral-800 shadow-[0_20px_60px_rgba(0,0,0,0.5)] aspect-[4/3] lg:aspect-square max-w-md mx-auto z-10">
-                <div className="absolute inset-0 bg-gradient-to-t from-[#090D0A]/80 via-transparent to-transparent z-10" />
-                <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay z-10" />
-                <img
-                  src={heroBg}
-                  alt="كورسات الإنتاج الحيواني والألبان"
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-
-              {/* بطاقة التقييم */}
-              <motion.div
-                animate={{ y: [-10, 10, -10] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-8 -right-4 sm:-right-6 lg:-right-10 bg-[#121A15]/90 border border-neutral-800/80 p-4 rounded-2xl shadow-xl backdrop-blur-md z-20 w-44"
-              >
-                <div className="flex items-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-xl font-extrabold text-white">4.9/5</p>
-                <p className="text-xs text-neutral-400">تقييم المتدربين</p>
-                <ul className="mt-3 space-y-1.5">
-                  {ratingPoints.map((point) => (
-                    <li key={point} className="flex items-center gap-1.5 text-[11px] text-neutral-300">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-
-              {/* بطاقة المجتمع */}
-              <motion.div
-                animate={{ y: [10, -10, 10] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute bottom-8 -left-4 sm:-left-6 lg:-left-10 bg-[#121A15]/90 border border-neutral-800/80 p-4 rounded-2xl shadow-xl backdrop-blur-md flex items-center gap-3 z-20"
-              >
-                <div className="w-11 h-11 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">+5,000 مهندس</p>
-                  <p className="text-xs text-neutral-400">في مجتمعنا الزراعي</p>
-                </div>
-              </motion.div>
-
-              {/* شارة الشهادات */}
-              <motion.div
-                animate={{ y: [-6, 6, -6] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-4 right-8 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-900/40 flex items-center gap-2 z-20"
-              >
-                <Award className="w-4 h-4" />
-                <span className="text-xs font-bold">شهادات إتمام معتمدة</span>
-              </motion.div>
+              )}
             </motion.div>
-          </div>
 
-          {/* ===== شريط الثقة (Trust Bar) ===== */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-16 lg:mt-20 grid grid-cols-2 md:grid-cols-4 gap-4"
-          >
-            {trustBadges.map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center justify-center gap-3 bg-[#101711]/80 border border-neutral-800/70 hover:border-emerald-500/30 rounded-2xl py-4 px-4 transition-colors group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                  <Icon className="w-5 h-5" />
+            {/* شريط ثقة/إحصائيات */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.32 }}
+              className="flex items-center justify-center flex-wrap gap-x-10 gap-y-6 pt-10 mt-4 border-t border-neutral-800/60"
+            >
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-4 h-4 text-emerald-500" />
+                <div className="flex flex-col text-right">
+                  <span className="text-xl font-bold text-white leading-none">100+</span>
+                  <span className="text-xs text-neutral-500 mt-1">كورس متخصص</span>
                 </div>
-                <span className="text-sm font-semibold text-neutral-200">{label}</span>
               </div>
-            ))}
-          </motion.div>
+              <div className="w-px h-8 bg-neutral-800 hidden sm:block" />
+              <div className="flex items-center gap-2.5">
+                <Users className="w-4 h-4 text-emerald-500" />
+                <div className="flex flex-col text-right">
+                  <span className="text-xl font-bold text-white leading-none">5K+</span>
+                  <span className="text-xs text-neutral-500 mt-1">متدرب نشط</span>
+                </div>
+              </div>
+              <div className="w-px h-8 bg-neutral-800 hidden sm:block" />
+              <div className="flex items-center gap-2.5">
+                <Star className="w-4 h-4 text-emerald-500 fill-current" />
+                <div className="flex flex-col text-right">
+                  <span className="text-xl font-bold text-white leading-none">4.9/5</span>
+                  <span className="text-xs text-neutral-500 mt-1">تقييم المتدربين</span>
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
         </div>
       </section>
     </>
