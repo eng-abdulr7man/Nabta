@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -18,21 +18,24 @@ import {
   FlaskConical,
   Tractor,
   Milk,
+  BookOpen,
+  Clock,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
-// ===== الأقسام مع أيقونة لكل قسم =====
+// ===== الأقسام مع أيقونة وصورة مصغرة لكل قسم =====
 const departments = [
-  { name: "الإنتاج الحيواني", icon: Beef },
-  { name: "الإنتاج الداجني", icon: Wheat },
-  { name: "الثروة السمكية", icon: Fish },
-  { name: "الإنتاج النباتي والمحاصيل", icon: Sprout },
-  { name: "علوم البساتين", icon: Apple },
-  { name: "وقاية النبات", icon: Leaf },
-  { name: "علوم التربة", icon: FlaskConical },
-  { name: "الهندسة الزراعية", icon: Tractor },
-  { name: "تصنيع الأغذية", icon: Milk },
+  { name: "الإنتاج الحيواني", icon: Beef, coursesCount: "12 كورس", desc: "أساسيات تربية وتغذية الحيوانات وادارة المزارع الحديثة" },
+  { name: "الإنتاج الداجني", icon: Wheat, coursesCount: "9 كورسات", desc: "إدارة مزارع الدواجن وبرامج التحصين والتغذية المتقدمة" },
+  { name: "الثروة السمكية", icon: Fish, coursesCount: "7 كورسات", desc: "إنشاء وإدارة المزارع السمكية وأنظمة الاستزراع المكثف" },
+  { name: "الإنتاج النباتي والمحاصيل", icon: Sprout, coursesCount: "15 كورس", desc: "استراتيجيات زراعة وإنتاج المحاصيل الحقلية الاستراتيجية" },
+  { name: "علوم البساتين", icon: Apple, coursesCount: "11 كورس", desc: "تكنولوجيا إنتاج الفاكهة الخضر وزراعة الأسطح والبساتين" },
+  { name: "وقاية النبات", icon: Leaf, coursesCount: "10 كورسات", desc: "مكافحة الآفات الزراعية والأمراض النباتية بالطرق الحديثة" },
+  { name: "علوم التربة", icon: FlaskConical, coursesCount: "8 كورسات", desc: "تحليل خواص التربة، التسميد الحيوي، وإصلاح الأراضي" },
+  { name: "الهندسة الزراعية", icon: Tractor, coursesCount: "6 كورسات", desc: "صيانة الماكنات الزراعية وتصميم شبكات الري الحديثة" },
+  { name: "تصنيع الأغذية", icon: Milk, coursesCount: "10 كورسات", desc: "حفظ وتصنيع منتجات الألبان والصناعات الغذائية الزراعية" },
 ];
 
 // أسماء الأقسام للآلة الكاتبة
@@ -77,7 +80,8 @@ const HeroSection = () => {
   }, [typedText, isDeleting, deptIndex]);
 
   const firstName = user && profile?.full_name ? profile.full_name.split(" ")[0] : null;
-  const ActiveIcon = departments[deptIndex].icon;
+  const ActiveDept = departments[deptIndex];
+  const ActiveIcon = ActiveDept.icon;
 
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden bg-[#090D0A] text-white">
@@ -122,7 +126,7 @@ const HeroSection = () => {
 
       {/* ===== المحتوى الرئيسي ===== */}
       <div className="container mx-auto px-4 lg:px-8 relative z-10 flex-1 flex items-center">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-10 items-center w-full pt-32 pb-14">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-12 items-center w-full pt-32 pb-14">
 
           {/* ===== النصوص (يمين) ===== */}
           <div className="space-y-7 text-center lg:text-right order-2 lg:order-1">
@@ -170,7 +174,7 @@ const HeroSection = () => {
                 const q = searchQuery.trim();
                 window.location.href = q ? `/courses?search=${encodeURIComponent(q)}` : "/courses";
               }}
-              className="flex items-center gap-2 bg-white/[0.04] border border-neutral-800 focus-within:border-emerald-500/50 rounded-2xl p-1.5 max-w-lg mx-auto lg:mx-0 transition-colors"
+              className="flex items-center gap-2 bg-white/[0.04] border border-neutral-800 focus-within:border-emerald-500/50 rounded-2xl p-1.5 max-w-lg mx-auto lg:mx-0 transition-colors shadow-lg"
             >
               <Search className="w-5 h-5 text-neutral-500 mr-2.5 shrink-0" />
               <input
@@ -249,86 +253,119 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* ===== التكوين البصري (يسار) ===== */}
+          {/* ===== التصميم البديل الأنيق للجانب الأيسر (معاينة كورس تفاعلية) ===== */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             className="relative hidden lg:block order-1 lg:order-2"
           >
-            {/* حلقة خارجية متقطعة بتلف */}
-            <div className="absolute inset-[-30px] rounded-full border border-dashed border-emerald-500/15 animate-spin-slow pointer-events-none" />
-            <div className="absolute inset-[-65px] rounded-full border border-emerald-500/8 animate-spin-slow-reverse pointer-events-none" style={{ borderStyle: "dashed" }} />
+            {/* خلفية جمالية متوهجة */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-600/10 to-green-500/5 rounded-3xl blur-2xl pointer-events-none" />
 
-            {/* البطاقة الرئيسية بإطار متدرج متحرك */}
-            <div className="relative rounded-[2rem] p-[1.5px] bg-gradient-to-br from-emerald-500/50 via-neutral-800/60 to-green-600/30 shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
-              <div className="relative rounded-[calc(2rem-1.5px)] bg-[#0d130f] overflow-hidden aspect-[4/4.4]">
-                {/* توهج داخلي */}
-                <div className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] rounded-full bg-emerald-500/15 blur-[80px]" />
+            {/* البطاقة الرئيسية التفاعلية */}
+            <div className="relative rounded-3xl bg-[#121814]/90 border border-neutral-800/80 shadow-2xl overflow-hidden backdrop-blur-xl p-6">
+              
+              {/* شريط علوي للبطاقة */}
+              <div className="flex items-center justify-between pb-5 border-b border-neutral-800/80 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                </div>
+                <span className="text-xs text-neutral-400 font-mono flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  معاينة الأقسام الحية
+                </span>
+              </div>
 
-                {/* أيقونة القسم النشط في المنتصف */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
-                  <motion.div
-                    key={deptIndex}
-                    initial={{ scale: 0.7, opacity: 0, rotate: -12 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                    className="w-28 h-28 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-emerald-900/20 border border-emerald-500/25 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.2)]"
-                  >
-                    <ActiveIcon className="w-14 h-14 text-emerald-300" />
-                  </motion.div>
-                  <p className="text-neutral-400 text-sm font-medium">كورسات {deptNames[deptIndex]}</p>
+              {/* محتوى القسم المتغير بناءً على الآلة الكاتبة */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={deptIndex}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  {/* رأس الكورس المعروض */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-900/30 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                      <ActiveIcon className="w-8 h-8 text-emerald-400" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-xs font-semibold">
+                          {ActiveDept.coursesCount}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-amber-400 font-medium">
+                          <Star className="w-3.5 h-3.5 fill-current" /> 4.9
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-white">{ActiveDept.name}</h3>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-neutral-400 leading-relaxed bg-black/20 p-4 rounded-xl border border-neutral-800/50">
+                    {ActiveDept.desc}
+                  </p>
+
+                  {/* مميزات سريعة للكورس */}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div className="flex items-center gap-2.5 text-xs text-neutral-300 bg-white/[0.02] p-3 rounded-xl border border-neutral-800">
+                      <BookOpen className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>تطبيق عملي مباشر</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-neutral-300 bg-white/[0.02] p-3 rounded-xl border border-neutral-800">
+                      <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>محتوى مرن ومحدث</span>
+                    </div>
+                  </div>
+
+                  {/* زر الانتقال للقسم */}
                   <Link
-                    to={`/courses?department=${encodeURIComponent(deptNames[deptIndex])}`}
-                    className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition-colors group"
+                    to={`/courses?department=${encodeURIComponent(ActiveDept.name)}`}
+                    className="flex items-center justify-between w-full p-4 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 font-semibold text-sm transition-all group mt-2"
                   >
-                    استكشف القسم
+                    <span>استكشف كورسات {ActiveDept.name}</span>
                     <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                   </Link>
-                </div>
+                </motion.div>
+              </AnimatePresence>
 
-                {/* شريط التقدم علوي شكل Course Player */}
-                <div className="absolute top-0 inset-x-0 h-1 bg-neutral-800">
-                  <motion.div
-                    key={deptIndex}
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 2.6, ease: "linear" }}
-                    className="h-full bg-gradient-to-l from-emerald-400 to-green-600"
-                  />
-                </div>
-              </div>
             </div>
 
             {/* بطاقة الشهادة العائمة */}
             <motion.div
-              animate={{ y: [-10, 10, -10] }}
+              animate={{ y: [-8, 8, -8] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-4 -right-8 bg-[#101711]/95 backdrop-blur-md border border-neutral-800 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-xl z-10"
+              className="absolute -top-5 -right-6 bg-[#121814]/95 backdrop-blur-md border border-neutral-800 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-2xl z-10"
             >
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
-                <Award className="w-5 h-5 text-amber-400" />
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
+                <Award className="w-4 h-4 text-amber-400" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white leading-none">شهادة معتمدة</p>
-                <p className="text-[11px] text-neutral-500 mt-1.5">مع كل كورس تكمله</p>
+                <p className="text-xs font-bold text-white">شهادة معتمدة</p>
+                <p className="text-[10px] text-neutral-400">تفتح لك أبواب العمل</p>
               </div>
             </motion.div>
 
             {/* بطاقة المجتمع العائمة */}
             <motion.div
-              animate={{ y: [10, -10, 10] }}
+              animate={{ y: [8, -8, 8] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-              className="absolute -bottom-4 -left-6 bg-[#101711]/95 backdrop-blur-md border border-neutral-800 rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-xl z-10"
+              className="absolute -bottom-5 -left-6 bg-[#121814]/95 backdrop-blur-md border border-neutral-800 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-2xl z-10"
             >
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center">
-                <Users className="w-5 h-5 text-emerald-400" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center">
+                <Users className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white leading-none">+5,000 مهندس</p>
-                <p className="text-[11px] text-neutral-500 mt-1.5">في مجتمعنا الزراعي</p>
+                <p className="text-xs font-bold text-white">+5,000 مهندس</p>
+                <p className="text-[10px] text-neutral-400">في مجتمعنا الزراعي</p>
               </div>
             </motion.div>
+
           </motion.div>
         </div>
       </div>
@@ -340,7 +377,6 @@ const HeroSection = () => {
         transition={{ delay: 0.5 }}
         className="relative z-10 border-t border-neutral-800/60 bg-[#0a0f0b]/80 backdrop-blur-sm py-5 overflow-hidden"
       >
-        {/* تدرجات تعتيم على الأطراف */}
         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#090D0A] to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#090D0A] to-transparent z-10 pointer-events-none" />
 
