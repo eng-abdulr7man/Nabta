@@ -35,7 +35,7 @@ const HeroSection = () => {
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium"
         >
           <ShieldCheck className="w-4 h-4" />
-          المنصة الزراعية الأولى في العالم العربي
+          المنصة الزراعية الأقوي في العالم العربي
         </motion.div>
 
         {/* العنوان الرئيسي الضخم */}
@@ -46,7 +46,7 @@ const HeroSection = () => {
           className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.2]"
         >
           {firstName ? (
-            <>مرحباً بك، <span className="text-emerald-400">{firstName}</span></>
+            <>مرحباً بك، <span className="text-emerald-400">{firstName}</span> ارتقِ</>
           ) : (
             "ارتقِ بمهاراتك الزراعية"
           )}
