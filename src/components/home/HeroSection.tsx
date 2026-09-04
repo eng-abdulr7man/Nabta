@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom"; // أضفنا useNavigate هنا
+import { Link } from "react-router-dom";
 import {
   ArrowLeft,
   Play,
@@ -19,25 +19,23 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/animal-production.jpg"; // صورة الإنتاج الحيواني
 
 // قائمة التخصصات التي ستتبدل في العنوان
+// أقسام كليات الزراعة المعتمدة
 const specialties = [
-  "الزراعة الحديثة",
-  "الزراعة المائية",
-  "الزراعة العضوية",
-  "تنسيق الحدائق",
-  "تغذية النباتات",
-  "وقاية النبات",
-  "إنتاج المحاصيل",
   "الإنتاج الحيواني",
   "الإنتاج الداجني",
+  "الثروة السمكية",
+  "الإنتاج النباتي والمحاصيل",
+  "علوم البساتين",
+  "وقاية النبات",
   "علوم التربة",
+  "الاقتصاد الزراعي",
   "الهندسة الزراعية",
-  "البيوت المحمية",
-  "إدارة المزارع",
-  "الري والصرف",
-  "التكنولوجيا الزراعية",
+  "تصنيع الأغذية",
+  "الألبان وتكنولوجيا تصنيعها",
+  "تكنولوجيا الأعلاف",
 ];
 
 // مميزات الثقة أسفل الهيرو
@@ -57,7 +55,6 @@ const ratingPoints = [
 
 const HeroDarkSection = () => {
   const { user, profile } = useAuth();
-  const navigate = useNavigate(); // تهيئة useNavigate للانتقال السريع
   const [showPopup, setShowPopup] = useState(false);
   const [currentSpecialty, setCurrentSpecialty] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -217,7 +214,7 @@ const HeroDarkSection = () => {
                   "بك"
                 )}
                 <br />
-                طور مهاراتك في
+                احترف تخصص
                 <span className="inline-grid [grid-template-areas:'text'] mt-2 min-h-[1.4em]">
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -241,8 +238,8 @@ const HeroDarkSection = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="text-lg text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed"
               >
-                كورسات عملية بشهادات معتمدة، يقدمها خبراء ومهندسون متخصصون.
-                تعلم في وقتك وبسرعتك الخاصة، وابدأ رحلتك المهنية في الزراعة الذكية والمستدامة.
+                كورسات عملية بشهادات معتمدة، يقدمها أعضاء هيئة تدريس وخبراء من كليات الزراعة.
+                تعلم في وقتك وبسرعتك الخاصة، واحترف تخصصك من الإنتاج الحيواني إلى تصنيع الأغذية.
               </motion.p>
 
               {/* شريط البحث */}
@@ -252,11 +249,10 @@ const HeroDarkSection = () => {
                 transition={{ duration: 0.5, delay: 0.25 }}
                 onSubmit={(e) => {
                   e.preventDefault();
-                  // استخدام navigate بدلاً من window.location لانتقال أسرع
                   if (searchQuery.trim()) {
-                    navigate(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
+                    window.location.href = `/courses?search=${encodeURIComponent(searchQuery.trim())}`;
                   } else {
-                    navigate("/courses");
+                    window.location.href = "/courses";
                   }
                 }}
                 className="flex items-center gap-2 bg-[#101711] border border-neutral-800 focus-within:border-emerald-500/50 rounded-2xl p-2 max-w-xl mx-auto lg:mx-0 transition-colors shadow-lg"
@@ -344,7 +340,7 @@ const HeroDarkSection = () => {
                 <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay z-10" />
                 <img
                   src={heroBg}
-                  alt="تعلم الزراعة الحديثة"
+                  alt="كورسات الإنتاج الحيواني والألبان"
                   className="w-full h-full object-cover object-center"
                 />
               </div>
