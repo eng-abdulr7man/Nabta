@@ -15,12 +15,13 @@ const HeroSection = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.trim();
-    navigate(q ? `/courses?search=${encodeURIComponent(q)}` : "/courses");
+    // صفحة الكورسات بتقرأ param اسمه "q" — لازم نبعت نفس الاسم بالظبط
+    navigate(q ? `/courses?q=${encodeURIComponent(q)}` : "/courses");
   };
 
   return (
     <section className="relative min-h-[90vh] flex flex-col justify-center items-center bg-[#070908] text-white px-4 overflow-hidden pt-24 pb-16">
-      
+
       {/* خلفية هادئة جداً بدون إزعاج بصري */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[400px] bg-emerald-600/10 blur-[140px] pointer-events-none rounded-full" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950/20 via-transparent to-transparent pointer-events-none" />
