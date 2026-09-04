@@ -266,4 +266,4 @@ const AiChatWidget = () => {
   );
 };
 
-export Date export default AiChatWidget; // (استبدل السطر ده بـ export default AiChatWidget;)
+export default AiChatWidget; // (استبدل السطر ده بـ export default AiChatWidget;)
