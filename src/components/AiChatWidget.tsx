@@ -4,28 +4,25 @@ import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, Trash2, Lock } fr
 import { Link } from "react-router-dom"; 
 import { useAuth } from "@/contexts/AuthContext"; 
 
-const GROQ_API_KEY = "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";
+const GEMINI_API_KEY = "AQ.Ab8RN6LEZcqE43PA_It5bAR0DYe8jtf3D6WYMN5PtEPEZMK9wA";
 
 interface Message {
-  role: "system" | "user" | "assistant";
+  role: "user" | "assistant";
   content: string;
 }
 
 const WELCOME_MESSAGE = "أهلاً بك يا هندسة في أكاديمية نبتة! 🌱 أنا مستشارك الزراعي الذكي. قول لي، إيه أخبار الزرع أو المحصول معاك النهاردة، وإيه المشكلة أو الاستفسار اللي حابب نناقشه؟";
 
-const SYSTEM_PROMPT: Message = {
-  role: "system",
-  content: `أنت "مستشار نبتة الذكي"، الخبير الزراعي الأول وهندسة الزراعة الحديثة في أكاديمية "نبتة". 
-  لديك خبرة عريقة تزيد عن 20 عاماً في إدارة المزارع، الزراعة المحمية (الصوب)، الهيدروبونيك، معالجة التربة، وبرامج التسميد والمكافحة.
+const SYSTEM_PROMPT_TEXT = `أنت "مستشار نبتة الذكي"، الخبير الزراعي الأول وهندسة الزراعة الحديثة في أكاديمية "نبتة". 
+لديك خبرة عريقة تزيد عن 20 عاماً في إدارة المزارع، الزراعة المحمية (الصوب)، الهيدروبونيك، معالجة التربة، وبرامج التسميد والمكافحة في مصر والمنطقة.
 
-  ### قواعد الرد الاحترافي:
-  1. **الأسلوب:** خاطب المستخدم دائماً بـ "يا هندسة" أو "يا فندم" بلغة مصرية احترافية، راقية، ودافئة تعكس خبرة حقيقية في الغيط.
-  2. **التشخيص الذكي (لا تتسرع في الحل):** إذا كانت تفاصيل مشكلة المستخدم ناقصة، اسأله بذكاء عن: (نوع المحصول، عمر النبات، نوع التربة طينية/رملية، نظام الري ومواعيده، وطبيعة الأعراض الظاهرة).
-  3. **هيكلة الردود (عند توفر التفاصيل):** عندما يطرح المستخدم مشكلة واضحة وتتوفر بياناتها، رتب إجابتك بشكل علمي وعملي ومنسق:
-     - 🔬 **التشخيص الفني:** تحليل مبدئي لسبب المشكلة.
-     - 💡 **التوصيات العملية (خطوة بخطوة):** برنامج علاج أو تسميد أو ري دقيق ومكتوب بنقاط واضحة.
-     - ⚠️ **محاذير هامة:** أخطاء شائعة يجب تجنبها لحماية المحصول.`
-};
+### قواعد الرد الاحترافي:
+1. **الأسلوب:** خاطب المستخدم دائماً بـ "يا هندسة" أو "يا فندم" بلغة مصرية احترافية، راقية، ودافئة تعكس خبرة حقيقية في الغيط.
+2. **التشخيص الذكي (لا تتسرع في الحل):** إذا كانت تفاصيل مشكلة المستخدم ناقصة، اسأله بذكاء عن: (نوع المحصول، عمر النبات، نوع التربة طينية/رملية، نظام الري ومواعيده، وطبيعة الأعراض الظاهرة).
+3. **هيكلة الردود (عند توفر التفاصيل):** عندما يطرح المستخدم مشكلة واضحة وتتوفر بياناتها، رتب إجابتك بشكل علمي وعملي ومنسق:
+   - 🔬 **التشخيص الفني:** تحليل مبدئي لسبب المشكلة.
+   - 💡 **التوصيات العملية (خطوة بخطوة):** برنامج علاج أو تسميد أو ري دقيق ومكتوب بنقاط واضحة.
+   - ⚠️ **محاذير هامة:** أخطاء شائعة يجب تجنبها لحماية المحصول.`;
 
 const AiChatWidget = () => {
   const { user } = useAuth(); 
@@ -47,7 +44,7 @@ const AiChatWidget = () => {
     setMessages([{ role: "assistant", content: WELCOME_MESSAGE }]);
   };
 
-  // 🌟 دالة الإرسال المُحدثة مع تتبع الأخطاء بدقة في الـ Console 🌟
+  // 🌟 دالة الإرسال المتوافقة مع Google Gemini API 🌟
   const sendMessageToAi = async (messageText: string) => {
     if (!messageText.trim() || !user) return;
 
@@ -58,52 +55,53 @@ const AiChatWidget = () => {
     const exitWords = ["شكرا", "مع السلامة", "سلام", "قفلنا", "شكراً", "تم", "تسلم"];
     const isExit = exitWords.some(word => messageText.toLowerCase().includes(word));
 
-    // أفضل وأحدث الموديلات المستقرة على Groq
-    const activeModels = [
-      "llama-3.3-70b-versatile",
-      "llama-3.1-8b-instant"
-    ];
-
-    let responseData = null;
-
     try {
-      const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
+      // تجهيز تاريخ المحادثة بالهيكل الذي يطلبه Gemini API (user / model)
+      const chatHistory = messages
+        .filter(msg => msg.content !== WELCOME_MESSAGE)
+        .map(msg => ({
+          role: msg.role === "assistant" ? "model" : "user",
+          parts: [{ text: msg.content }]
+        }));
 
-      for (const modelName of activeModels) {
-        try {
-          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${GROQ_API_KEY}`,
-              "Content-Type": "application/json",
+      // إضافة الرسالة الحالية للمصفوفة
+      const contents = [
+        ...chatHistory,
+        { role: "user", parts: [{ text: messageText }] }
+      ];
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: { text: SYSTEM_PROMPT_TEXT }
             },
-            body: JSON.stringify({
-              model: modelName,
-              messages: [SYSTEM_PROMPT, ...chatHistory, userMessage],
+            contents: contents,
+            generationConfig: {
               temperature: 0.6,
-            }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.choices?.[0]?.message) {
-              responseData = data.choices[0].message.content;
-              break; 
             }
-          } else {
-            // طباعة سبب الرفض من السيرفر لو الكีย์ فيه مشكلة
-            const errText = await response.text();
-            console.error(`Groq API Error on model ${modelName}:`, response.status, errText);
-          }
-        } catch (modelErr) {
-          console.warn(`Network/Fetch failed for model ${modelName}:`, modelErr);
+          }),
         }
+      );
+
+      if (!response.ok) {
+        const errData = await response.text();
+        console.error("Gemini API Error:", response.status, errData);
+        throw new Error("Failed to fetch from Gemini API");
       }
 
-      if (responseData) {
+      const data = await response.json();
+      const aiResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (aiResponseText) {
         setMessages((prev) => [...prev, {
           role: "assistant",
-          content: responseData,
+          content: aiResponseText,
         }]);
 
         if (isExit) {
@@ -113,13 +111,13 @@ const AiChatWidget = () => {
           }, 5000);
         }
       } else {
-        throw new Error("All active models failed or API Key is invalid.");
+        throw new Error("Invalid response structure from Gemini");
       }
     } catch (error) {
       console.error("Fatal AI Chat Error:", error);
       setMessages((prev) => [...prev, { 
         role: "assistant", 
-        content: "معلش يا هندسة، واجهنا مشكلة في الاتصال بخدمة الذكاء الاصطناعي. افتح الـ Console (F12) عشان تشوف تفاصيل الخطأ بدقة، وغالباً المشكلة بتكون في صلاحية أو رصيد مفتاح الـ API." 
+        content: "معلش يا هندسة، واجهنا مشكلة بسيطة في الاتصال بخدمة جوجل. جرب تبعث الرسالة تاني وهكون معاك." 
       }]);
     } finally {
       setIsLoading(false);
@@ -166,7 +164,7 @@ const AiChatWidget = () => {
                   <Sparkles className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-sm">مستشار نبتة الذكي (خبير معتمد)</h3>
+                  <h3 className="text-white font-bold text-sm">مستشار نبتة الذكي (Gemini Pro)</h3>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -225,7 +223,7 @@ const AiChatWidget = () => {
                   {isLoading && (
                     <div className="flex gap-2 items-center p-4">
                       <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
-                      <span className="text-xs text-neutral-400">جاري فحص البيانات وتحضير الاستشارة الفنية...</span>
+                      <span className="text-xs text-neutral-400">جاري فحص البيانات وتحضير الاستشارة الفنية عبر Gemini...</span>
                     </div>
                   )}
                   <div ref={messagesEndRef} />
@@ -268,4 +266,4 @@ const AiChatWidget = () => {
   );
 };
 
-export default AiChatWidget;
+export Date export default AiChatWidget; // (استبدل السطر ده بـ export default AiChatWidget;)
