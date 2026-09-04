@@ -13,20 +13,18 @@ interface Message {
 
 const WELCOME_MESSAGE = "أهلاً بك يا هندسة في أكاديمية نبتة! 🌱 أنا مستشارك الزراعي الذكي. قول لي، إيه أخبار الزرع أو المحصول معاك النهاردة، وإيه المشكلة أو الاستفسار اللي حابب نناقشه؟";
 
-// 🌟 النظام المطور والمحترف للمستشار الزراعي الذكي 🌟
 const SYSTEM_PROMPT: Message = {
   role: "system",
   content: `أنت "مستشار نبتة الذكي"، الخبير الزراعي الأول وهندسة الزراعة الحديثة في أكاديمية "نبتة". 
-  لديك خبرة عريقة تزيد عن 20 عاماً في إدارة المزارع، الزراعة المحمية (الصوب)، الهيدروبونيك، معالجة التربة، وبرامج التسميد والمكافحة في مصر والمنطقة.
+  لديك خبرة عريقة تزيد عن 20 عاماً في إدارة المزارع، الزراعة المحمية (الصوب)، الهيدروبونيك، معالجة التربة، وبرامج التسميد والمكافحة.
 
   ### قواعد الرد الاحترافي:
-  1. **الأسلوب:** خاطب المستخدم دائماً بـ "يا هندسة" أو "يا فندم" بلغة مصرية احترافية، راقية، ودافئة تعكس خبرة حقيقية في "الغيط".
-  2. **التشخيص الذكي (لا تتسرع في الحل):** إذا كانت تفاصيل مشكلة المستخدم ناقصة، **لا تعطِ إجابة عشوائية**. اسأله بذكاء عن: (نوع المحصول، عمر النبات، نوع التربة طينية/رملية، نظام الري ومواعيده، وطبيعة الأعراض الظاهرة).
+  1. **الأسلوب:** خاطب المستخدم دائماً بـ "يا هندسة" أو "يا فندم" بلغة مصرية احترافية، راقية، ودافئة تعكس خبرة حقيقية في الغيط.
+  2. **التشخيص الذكي (لا تتسرع في الحل):** إذا كانت تفاصيل مشكلة المستخدم ناقصة، اسأله بذكاء عن: (نوع المحصول، عمر النبات، نوع التربة طينية/رملية، نظام الري ومواعيده، وطبيعة الأعراض الظاهرة).
   3. **هيكلة الردود (عند توفر التفاصيل):** عندما يطرح المستخدم مشكلة واضحة وتتوفر بياناتها، رتب إجابتك بشكل علمي وعملي ومنسق:
      - 🔬 **التشخيص الفني:** تحليل مبدئي لسبب المشكلة.
      - 💡 **التوصيات العملية (خطوة بخطوة):** برنامج علاج أو تسميد أو ري دقيق ومكتوب بنقاط واضحة.
-     - ⚠️ **محاذير هامة:** أخطاء شائعة يجب تجنبها لحماية المحصول.
-  4. **الختام الدافئ:** إذا شعرت أن المحادثة تصل للنهاية (مثل: شكراً، تمام، سلام، تسلم)، رد بتحية ختامية راقية تليق ببراند "نبتة".`
+     - ⚠️ **محاذير هامة:** أخطاء شائعة يجب تجنبها لحماية المحصول.`
 };
 
 const AiChatWidget = () => {
@@ -49,22 +47,21 @@ const AiChatWidget = () => {
     setMessages([{ role: "assistant", content: WELCOME_MESSAGE }]);
   };
 
-  // 🌟 دالة الإرسال مع نظام تجربة عدة موديلات لتفادي خطأ 404 وضمان الاستقرار 🌟
+  // 🌟 دالة الإرسال المُحدثة مع تتبع الأخطاء بدقة في الـ Console 🌟
   const sendMessageToAi = async (messageText: string) => {
     if (!messageText.trim() || !user) return;
 
     const userMessage: Message = { role: "user", content: messageText };
-    
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
     const exitWords = ["شكرا", "مع السلامة", "سلام", "قفلنا", "شكراً", "تم", "تسلم"];
     const isExit = exitWords.some(word => messageText.toLowerCase().includes(word));
 
-    const availableModels = [
-      "llama-3.1-70b-versatile",
-      "llama-3.1-8b-instant",
-      "llama3-70b-8192"
+    // أفضل وأحدث الموديلات المستقرة على Groq
+    const activeModels = [
+      "llama-3.3-70b-versatile",
+      "llama-3.1-8b-instant"
     ];
 
     let responseData = null;
@@ -72,7 +69,7 @@ const AiChatWidget = () => {
     try {
       const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
 
-      for (const modelName of availableModels) {
+      for (const modelName of activeModels) {
         try {
           const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
@@ -83,7 +80,7 @@ const AiChatWidget = () => {
             body: JSON.stringify({
               model: modelName,
               messages: [SYSTEM_PROMPT, ...chatHistory, userMessage],
-              temperature: 0.6, // تقليل الـ temperature قليلاً لجعل الردود أكثر تركيزاً واحترافية
+              temperature: 0.6,
             }),
           });
 
@@ -93,9 +90,13 @@ const AiChatWidget = () => {
               responseData = data.choices[0].message.content;
               break; 
             }
+          } else {
+            // طباعة سبب الرفض من السيرفر لو الكีย์ فيه مشكلة
+            const errText = await response.text();
+            console.error(`Groq API Error on model ${modelName}:`, response.status, errText);
           }
         } catch (modelErr) {
-          console.warn(`Model ${modelName} failed, trying next...`);
+          console.warn(`Network/Fetch failed for model ${modelName}:`, modelErr);
         }
       }
 
@@ -112,10 +113,14 @@ const AiChatWidget = () => {
           }, 5000);
         }
       } else {
-        throw new Error("All models failed");
+        throw new Error("All active models failed or API Key is invalid.");
       }
     } catch (error) {
-      setMessages((prev) => [...prev, { role: "assistant", content: "معلش يا هندسة، حصل دروب مؤقت في الشبكة. اكتب لي سؤالك تاني وهكون معاك فوراً." }]);
+      console.error("Fatal AI Chat Error:", error);
+      setMessages((prev) => [...prev, { 
+        role: "assistant", 
+        content: "معلش يا هندسة، واجهنا مشكلة في الاتصال بخدمة الذكاء الاصطناعي. افتح الـ Console (F12) عشان تشوف تفاصيل الخطأ بدقة، وغالباً المشكلة بتكون في صلاحية أو رصيد مفتاح الـ API." 
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +181,6 @@ const AiChatWidget = () => {
               </div>
             </div>
 
-            {/* التحقق من تسجيل الدخول */}
             {!user ? (
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
                 <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
@@ -205,7 +209,6 @@ const AiChatWidget = () => {
               </div>
             ) : (
               <>
-                {/* Chat Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
                   {messages.map((msg, idx) => (
                     <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
@@ -228,14 +231,13 @@ const AiChatWidget = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input Form */}
                 <div className="p-4 bg-[#121A15] border-t border-white/5">
                   <div className="relative flex items-center">
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                      placeholder="اكتب استشارتك الزراعية هنا (مثلاً: عندي اصفرار في أوراق الطماطم...)"
+                      placeholder="اكتب استشارتك الزراعية هنا..."
                       className="w-full bg-[#0a0f0c] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white text-sm resize-none h-[52px] outline-none focus:border-emerald-500 text-right"
                       dir="rtl"
                     />
