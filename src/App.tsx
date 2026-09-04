@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { lazy, Suspense, useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -73,6 +74,14 @@ const Loading = () => (
   </div>
 );
 
+// Apple-style page transition: a gentle fade + upward drift, no jarring slides.
+const pageTransition = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] as const },
+};
+
 const AuthListener = () => {
   const navigate = useNavigate();
 
@@ -103,8 +112,28 @@ const App = () => (
           <AiChatWidget />
           <ScrollToTop />
           
-          <Suspense fallback={<Loading />}>
-            <Routes>
+          <AnimatedRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+// Separated so it can call useLocation() (needs to be inside <BrowserRouter>)
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={location.pathname}
+          initial={pageTransition.initial}
+          animate={pageTransition.animate}
+          exit={pageTransition.exit}
+          transition={pageTransition.transition}
+        >
+          <Routes location={location}>
               {/* --- Public Routes --- */}
               <Route path="/" element={<Index />} />
               <Route path="/articles" element={<ArticlesPage />} />
@@ -149,14 +178,13 @@ const App = () => (
               <Route path="/admin/youtube-import" element={<ProtectedRoute adminOnly><AdminYoutubeImport /></ProtectedRoute>} />
               <Route path="/admin/library" element={<ProtectedRoute adminOnly><AdminLibraryManager /></ProtectedRoute>} />
               
-              {/* --- 404 --- */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+            {/* --- 404 --- */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+    </Suspense>
+  );
+};
 
 export default App;

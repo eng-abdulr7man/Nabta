@@ -62,7 +62,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806] border-b border-neutral-800 font-tajawal h-20 flex items-center shadow-2xl">
+    <nav className="fixed top-0 right-0 left-0 z-[100] bg-[#050806]/85 backdrop-blur-xl border-b border-neutral-800/60 font-tajawal h-20 pt-safe flex items-center shadow-2xl">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-full">
           
@@ -166,10 +166,11 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            className="fixed inset-0 z-[100] bg-[#050806] lg:hidden flex flex-col pt-24 p-6 overflow-y-auto"
+            exit={{ opacity: 0, x: 24 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed inset-0 z-[100] bg-[#050806]/95 backdrop-blur-xl lg:hidden flex flex-col pt-24 p-6 pb-safe overflow-y-auto"
           >
             {/* البحث موبايل */}
             <form onSubmit={handleSearch} className="relative mb-8">

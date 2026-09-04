@@ -59,7 +59,7 @@ const BottomNav = () => {
 
   return (
     // الشريط العائم: مرفوع من تحت 4px، ومش واخد الشاشة من الأول للآخر
-    <div className="fixed bottom-4 left-4 right-4 z-[100] md:hidden">
+    <div className="fixed left-4 right-4 z-[100] md:hidden" style={{ bottom: "calc(1rem + var(--safe-bottom))" }}>
       
       {/* الحاوية الزجاجية (Glassmorphism Container) */}
       <div className="bg-[#121A15]/90 backdrop-blur-xl border border-neutral-800/60 rounded-2xl flex items-center justify-around p-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">

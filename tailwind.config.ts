@@ -19,8 +19,15 @@ export default {
     },
     extend: {
       fontFamily: {
-        tajawal: ["Tajawal", "sans-serif"],
+        // Glory renders Latin letters/numbers; Arabic glyphs fall through to Tajawal automatically.
+        tajawal: ["Glory", "Tajawal", "sans-serif"],
+        glory: ["Glory", "Tajawal", "sans-serif"],
         animation: { shine: 'shine 1.5s ease-in-out infinite' }, keyframes: { shine: { '100%': { left: '125%' } } }
+      },
+      transitionTimingFunction: {
+        ios: "cubic-bezier(0.4, 0, 0.2, 1)",
+        "ios-out": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        "ios-spring": "cubic-bezier(0.34, 1.26, 0.64, 1)",
       },
       colors: {
         border: "hsl(var(--border))",
