@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ThermometerSun, Wind, Droplets, AlertTriangle, Sparkles, CloudSun, CloudRain, Bot, ArrowLeft } from "lucide-react";
 
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";
 
 interface WeatherData {
   city: string;

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CalendarDays, ThermometerSun, Droplets, ShoppingBag, Bot } from "lucide-react";
+import { CalendarDays, ThermometerSun, Droplets, ShoppingBag, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const GROQ_API_KEY = "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";
 
 interface AiCropData {
   monthName: string;
@@ -16,39 +18,24 @@ interface AiCropData {
   }[];
 }
 
-// بيانات احتياطية احترافية تظهر فوراً إذا حدث أي خطأ في الـ API لضمان استقرار الموقع
-const fallbackData: Record<string, AiCropData> = {
-  default: {
-    monthName: "الشهر الحالي",
-    season: "الموسم الزراعي",
-    temp: "20-30°C",
-    water: "ري منتظم حسب الحاجة",
-    crops: [
-      { name: "الطماطم", icon: "🍅", desc: "تتحمل درجات الحرارة وتنمو بشكل ممتاز في التربة الخصبة." },
-      { name: "البطاطس", icon: "🥔", desc: "تفضل الأجواء المعتدلة وتتطلب تربة جيدة التهوية والصرْف." },
-      { name: "القمح", icon: "🌾", desc: "من أهم المحاصيل الاستراتيجية الشتوية التي تتبنى رياً محسوباً." }
-    ]
-  }
-};
-
 const CropOfTheMonth = () => {
   const [aiData, setAiData] = useState<AiCropData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAiRecommendations = async () => {
       setIsLoading(true);
-      const currentMonth = new Intl.DateTimeFormat('ar-EG', { month: 'long' }).format(new Date());
+      setError(null);
 
-      // مفتاح الـ API الخاص بك (يفضل دائماً وضعه في متغيرات البيئة .env في الإنتاج)
-      const GROQ_API_KEY = "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";
+      const currentMonth = new Intl.DateTimeFormat('ar-EG', { month: 'long' }).format(new Date());
 
       const systemPrompt = `أنت خبير زراعي مصري محترف. الوقت الحالي هو شهر "${currentMonth}".
       بناءً على هذا الشهر والمناخ العام في مصر والشرق الأوسط، اقترح أفضل 3 محاصيل للزراعة الآن.
       يجب أن يكون ردك عبارة عن كائن JSON فقط (بدون أي نصوص إضافية أو علامات Markdown) بهذه الصيغة الدقيقة:
       {
         "monthName": "${currentMonth}",
-        "season": "الفصل الحالي",
+        "season": "الفصل الحالي (مثال: الربيع)",
         "temp": "متوسط الحرارة (مثال: 15-25°C)",
         "water": "احتياج المياه (مثال: ري منتظم)",
         "crops": [
@@ -72,10 +59,6 @@ const CropOfTheMonth = () => {
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-
         const data = await response.json();
         
         if (data.choices?.[0]?.message?.content) {
@@ -86,12 +69,8 @@ const CropOfTheMonth = () => {
           throw new Error("استجابة غير صالحة");
         }
       } catch (err) {
-        console.warn("AI Fetch failed, using fallback data:", err);
-        // التبديل للبيانات الاحتياطية بسلاسة دون إزعاج المستخدم
-        setAiData({
-          ...fallbackData.default,
-          monthName: currentMonth,
-        });
+        console.error("AI Fetch Error:", err);
+        setError("لم نتمكن من جلب التوصيات الذكية حالياً. يرجى المحاولة لاحقاً.");
       } finally {
         setIsLoading(false);
       }
@@ -166,6 +145,10 @@ const CropOfTheMonth = () => {
               </div>
             ))}
           </div>
+        ) : error ? (
+          <div className="text-center bg-red-500/10 border border-red-500/20 rounded-2xl p-8 text-red-400">
+            <p>{error}</p>
+          </div>
         ) : aiData ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {aiData.crops.map((crop, idx) => (
@@ -184,7 +167,10 @@ const CropOfTheMonth = () => {
                   {crop.desc}
                 </p>
                 
+                {/* 🌟 تعديل الأزرار لتكون مثالية على الموبايل 🌟 */}
                 <div className="mt-auto grid grid-cols-2 gap-2 sm:gap-3 border-t border-white/5 pt-5">
+                  
+                  {/* زر اسأل نبتة */}
                   <Button 
                     onClick={() => handleLearnWithAi(crop.name)}
                     variant="outline" 
@@ -194,12 +180,14 @@ const CropOfTheMonth = () => {
                     <span className="truncate">اتعلم زراعته</span>
                   </Button>
 
+                  {/* زر شراء التقاوي */}
                   <Link to={`/marketplace?q=${crop.name}`} className="w-full">
                     <Button className="w-full h-10 sm:h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg sm:rounded-xl gap-1.5 sm:gap-2 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all text-[12px] sm:text-sm px-0">
                       <ShoppingBag className="w-4 h-4 shrink-0 hidden sm:block" /> 
                       <span className="truncate">شراء تقاوي</span>
                     </Button>
                   </Link>
+
                 </div>
               </motion.div>
             ))}

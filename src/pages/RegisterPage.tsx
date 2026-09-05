@@ -46,10 +46,10 @@ const RegisterPage = () => {
       },
     });
 
-    // تحديث جدول profiles بالهاتف كخطوة تأكيدية إضافية 
-    if (authData?.user && !error) {
-       await supabase.from('profiles').update({ phone: phone }).eq('user_id', authData.user.id);
-    }
+    // ملحوظة: رقم الهاتف بيتحفظ تلقائيًا في جدول profiles بواسطة
+    // الـ trigger (handle_new_user) اللي بياخده من raw_user_meta_data
+    // مباشرة عند إنشاء المستخدم، فمفيش داعي لاستدعاء .update() هنا
+    // (كان بيفشل بصمت لو تأكيد الإيميل مفعّل لأن مفيش session وقتها).
 
     setLoading(false);
     

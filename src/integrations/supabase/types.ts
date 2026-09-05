@@ -38,6 +38,24 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           certificate_number: string
@@ -294,6 +312,41 @@ export type Database = {
           },
         ]
       }
+      materials: {
+        Row: {
+          created_at: string
+          drive_url: string
+          id: string
+          subject_id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          drive_url?: string
+          id?: string
+          subject_id: string
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          drive_url?: string
+          id?: string
+          subject_id?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materials_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -324,6 +377,36 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: string
         }
         Relationships: []
       }
@@ -418,6 +501,56 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      subjects: {
+        Row: {
+          academic_year: string
+          created_at: string
+          id: string
+          name: string
+          university_id: string
+        }
+        Insert: {
+          academic_year?: string
+          created_at?: string
+          id?: string
+          name: string
+          university_id: string
+        }
+        Update: {
+          academic_year?: string
+          created_at?: string
+          id?: string
+          name?: string
+          university_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_university_id_fkey"
+            columns: ["university_id"]
+            isOneToOne: false
+            referencedRelation: "universities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      universities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
