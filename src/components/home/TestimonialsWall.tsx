@@ -84,6 +84,7 @@ const TestimonialsWall = () => {
     fetchTopReviews();
   }, []);
 
+  // تكرار العناصر 3 مرات لضمان حركة مستمرة وسلسة بدون فراغات
   const duplicatedReviews = [...reviews, ...reviews, ...reviews];
 
   if (isLoading) return null;
@@ -91,8 +92,10 @@ const TestimonialsWall = () => {
   return (
     <section className="py-24 relative overflow-hidden bg-[#050806] font-tajawal border-t border-white/5">
       
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none" />
+      {/* خلفية جمالية مضيئة */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-emerald-600/10 blur-[140px] rounded-full pointer-events-none" />
 
+      {/* عنوان القسم */}
       <div className="container mx-auto px-4 relative z-10 mb-16 text-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
@@ -100,73 +103,71 @@ const TestimonialsWall = () => {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold mb-4 shadow-sm">
             <MessageSquareHeart className="w-4 h-4" />
             جدار الثقة
           </div>
           <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
-            آراء طلابنا عن <span className="text-emerald-500">نبتة</span>؟
+            آراء طلابنا عن <span className="text-emerald-500">نبتة</span>
           </h2>
           <p className="text-neutral-400 mt-4 text-lg">
-            نفخر بآراء المهندسين والمزارعين في كورساتنا ومنتجاتنا، نجاحك هو هدفنا الأول.
+            نفخر بثقة المهندسين والمزارعين في كورساتنا ومنتجاتنا، نجاحكم في الغيط هو معيارنا الأول.
           </p>
         </motion.div>
       </div>
 
-      <div className="relative w-full overflow-hidden" dir="ltr">
+      {/* شريط التحريك السلس (CSS Marquee) */}
+      <div className="relative w-full overflow-hidden py-4" dir="ltr">
         
-        <div className="absolute top-0 left-0 w-24 h-full bg-gradient-to-r from-[#050806] to-transparent z-20 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-l from-[#050806] to-transparent z-20 pointer-events-none" />
+        {/* تدرجات أطراف الشاشة لإنهاء الحركة بشكل ناعم */}
+        <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-[#050806] via-[#050806]/80 to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-[#050806] via-[#050806]/80 to-transparent z-20 pointer-events-none" />
 
-        <motion.div
-          animate={{ x: ["0%", "-33.33%"] }}
-          transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
-          className="flex gap-6 w-max px-6"
-        >
+        <div className="flex gap-6 w-max marquee-track hover:[animation-play-state:paused]">
           {duplicatedReviews.map((review, idx) => (
             <div 
               key={`${review.id}-${idx}`} 
               dir="rtl"
-              className="w-[320px] md:w-[400px] shrink-0 bg-[#0a0f0c] border border-white/5 rounded-3xl p-6 md:p-8 hover:border-emerald-500/30 hover:bg-[#121A15] transition-colors relative group flex flex-col h-full"
+              className="w-[340px] md:w-[400px] shrink-0 bg-[#0a0f0c] border border-white/5 rounded-3xl p-6 md:p-8 hover:border-emerald-500/40 hover:bg-[#0d1410] transition-all duration-300 relative group flex flex-col justify-between shadow-xl"
             >
-              <Quote className="absolute top-6 left-6 w-10 h-10 text-emerald-500/10 group-hover:text-emerald-500/20 transition-colors rotate-180" />
+              <Quote className="absolute top-6 left-6 w-10 h-10 text-emerald-500/10 group-hover:text-emerald-500/20 transition-colors rotate-180 pointer-events-none" />
               
-              {/* 🌟 النجوم في الهيدر لوحدها 🌟 */}
-              <div className="flex gap-1 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-neutral-700"}`} 
-                  />
-                ))}
+              <div>
+                {/* النجوم */}
+                <div className="flex gap-1 mb-5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-neutral-800"}`} 
+                    />
+                  ))}
+                </div>
+
+                {/* نص التقييم */}
+                <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-6 line-clamp-4">
+                  "{review.comment}"
+                </p>
               </div>
 
-              {/* 🌟 النص أخد مساحته بحرية 🌟 */}
-              <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-6 line-clamp-4 flex-1 min-h-[5rem]">
-                "{review.comment}"
-              </p>
-
-              {/* 🌟 منطقة اليوزر مدمجة مع اسم الكورس 🌟 */}
-              <div className="flex items-center gap-3.5 border-t border-white/5 pt-5 shrink-0">
-                <div className="w-12 h-12 rounded-full bg-emerald-900/30 border border-emerald-500/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+              {/* بيانات صاحب التقييم */}
+              <div className="flex items-center gap-3.5 border-t border-white/5 pt-5 mt-auto">
+                <div className="w-12 h-12 rounded-full bg-emerald-950 border border-emerald-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                   {review.avatar ? (
                     <img src={review.avatar} alt={review.name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-emerald-500 font-bold text-lg">{review.initial}</span>
+                    <span className="text-emerald-400 font-bold text-lg">{review.initial}</span>
                   )}
                 </div>
                 <div className="flex flex-col justify-center overflow-hidden">
-                  <h4 className="text-white font-bold text-sm mb-1.5 truncate">{review.name}</h4>
+                  <h4 className="text-white font-bold text-sm mb-1 truncate">{review.name}</h4>
                   
                   {review.courseTitle ? (
-                    // لو فيه كورس، هيظهر كمرجع تحته
                     <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-neutral-400">
                       <BookOpen className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                      <span className="shrink-0">درس:</span>
+                      <span className="shrink-0">كورس:</span>
                       <span className="text-emerald-400 font-bold truncate">{review.courseTitle}</span>
                     </div>
                   ) : (
-                    // لو مفيش كورس هيظهر إنه عميل موثق
                     <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-emerald-400 font-bold">
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                       <span>طالب وعميل موثق</span>
@@ -176,9 +177,23 @@ const TestimonialsWall = () => {
               </div>
             </div>
           ))}
-        </motion.div>
-
+        </div>
       </div>
+
+      {/* كود CSS المخصص للحركة الناعمة (GPU Accelerated) */}
+      <style>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-33.333%);
+          }
+        }
+        .marquee-track {
+          animation: marquee 35s linear infinite;
+        }
+      `}</style>
     </section>
   );
 };
