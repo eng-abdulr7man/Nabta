@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CalendarDays, ThermometerSun, Droplets, ShoppingBag, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const GROQ_API_KEY = "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";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AiCropData {
   monthName: string;
@@ -28,46 +27,16 @@ const CropOfTheMonth = () => {
       setIsLoading(true);
       setError(null);
 
-      const currentMonth = new Intl.DateTimeFormat('ar-EG', { month: 'long' }).format(new Date());
-
-      const systemPrompt = `أنت خبير زراعي مصري محترف. الوقت الحالي هو شهر "${currentMonth}".
-      بناءً على هذا الشهر والمناخ العام في مصر والشرق الأوسط، اقترح أفضل 3 محاصيل للزراعة الآن.
-      يجب أن يكون ردك عبارة عن كائن JSON فقط (بدون أي نصوص إضافية أو علامات Markdown) بهذه الصيغة الدقيقة:
-      {
-        "monthName": "${currentMonth}",
-        "season": "الفصل الحالي (مثال: الربيع)",
-        "temp": "متوسط الحرارة (مثال: 15-25°C)",
-        "water": "احتياج المياه (مثال: ري منتظم)",
-        "crops": [
-          { "name": "اسم المحصول", "icon": "رمز تعبيري واحد (Emoji)", "desc": "وصف زراعي مشجع ومختصر جداً في 10 كلمات" },
-          { "name": "اسم المحصول", "icon": "رمز تعبيري واحد (Emoji)", "desc": "وصف زراعي مشجع ومختصر جداً في 10 كلمات" },
-          { "name": "اسم المحصول", "icon": "رمز تعبيري واحد (Emoji)", "desc": "وصف زراعي مشجع ومختصر جداً في 10 كلمات" }
-        ]
-      }`;
-
       try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${GROQ_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [{ role: "user", content: systemPrompt }],
-            temperature: 0.3,
-          }),
+        const { data: aiResult, error: aiError } = await supabase.functions.invoke("ai-generate", {
+          body: { action: "crop" },
         });
 
-        const data = await response.json();
-        
-        if (data.choices?.[0]?.message?.content) {
-          let jsonString = data.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
-          const parsedData = JSON.parse(jsonString) as AiCropData;
-          setAiData(parsedData);
-        } else {
-          throw new Error("استجابة غير صالحة");
-        }
+        if (aiError || !aiResult?.content) throw new Error(aiResult?.error || "استجابة غير صالحة");
+
+        let jsonString = aiResult.content.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsedData = JSON.parse(jsonString) as AiCropData;
+        setAiData(parsedData);
       } catch (err) {
         console.error("AI Fetch Error:", err);
         setError("لم نتمكن من جلب التوصيات الذكية حالياً. يرجى المحاولة لاحقاً.");

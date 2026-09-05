@@ -10,9 +10,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
-// 🔑 حط مفتاح الـ API بتاعك هنا عشان الرد الذكي يشتغل
-const GROQ_API_KEY = "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";
-
 const typeConfig: Record<string, { label: string, color: string, bg: string, border: string }> = {
   inquiry: { label: "استفسار", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
   suggestion: { label: "اقتراح", color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20" },
@@ -85,24 +82,16 @@ const AdminMessages = () => {
     if (!selectedMsg) return;
     setIsGeneratingAI(true);
     const userName = selectedMsg.profile?.full_name || "الطالب";
-    const prompt = `أنت موظف دعم فني محترف في منصة "نبتة" للتعليم الزراعي. 
-    اكتب رداً مهذباً جداً وودوداً على هذه الرسالة من ${userName}. 
-    موضوع الرسالة: ${selectedMsg.subject}
-    نص الرسالة: ${selectedMsg.message}
-    تنبيه: اجعل الرد قصيراً، مباشراً، ومكتوباً باللغة العربية الفصحى. لا تضف أي مقدمات أو ملاحظات خارجية.`;
 
     try {
-      const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
-        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }] })
+      const { data, error } = await supabase.functions.invoke("admin-ai", {
+        body: { action: "message-reply", data: { userName, subject: selectedMsg.subject, message: selectedMsg.message } },
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message);
-      setReplyText(data.choices[0].message.content.trim());
+      if (error || !data?.content) throw new Error(data?.error || "فشل توليد الرد");
+      setReplyText(data.content);
       toast({ title: "الذكاء الاصطناعي 🤖", description: "تم توليد الرد بنجاح!" });
     } catch (err) {
-      toast({ title: "فشل توليد الرد", description: "تأكد من مفتاح Groq API.", variant: "destructive" });
+      toast({ title: "فشل توليد الرد", description: "حاول تاني كمان شوية.", variant: "destructive" });
     } finally {
       setIsGeneratingAI(false);
     }

@@ -8,9 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-const YOUTUBE_API_KEY = "AIzaSyAM5K8Aka_MvqfQNRmPITYExIIn9JmMWao";
-const GROQ_API_KEY = "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";
+const YOUTUBE_API_KEY = "AIzaSyAM5K8Aka_MvqfQNRmPITYExIIn9JmMWao"; // ⚠️ لازم تقيّده بـ HTTP referrer في Google Cloud Console — شوف الشرح تحت
 
 const AdminYoutubeImport = () => {
   const [playlistUrl, setPlaylistUrl] = useState("");
@@ -47,25 +45,13 @@ const AdminYoutubeImport = () => {
 
   const generateAIDescription = async (courseName) => {
     setIsGenerating(true);
-    const prompt = `أنت خبير محتوى تعليمي زراعي في منصة نبتة 🌱. اكتب وصفاً تسويقياً احترافياً ومبسطاً لكورس بعنوان '${courseName}' في 4 أسطر احترافية باللغة العربية فقط. بدون مقدمات.`;
-    
-    try {
-      const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [{ role: "user", content: prompt }]
-        })
-      });
-      
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error?.message);
-      return data.choices[0].message.content.trim();
 
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-ai", {
+        body: { action: "course-description", data: { courseName } },
+      });
+      if (error || !data?.content) throw new Error(data?.error || "فشل توليد الوصف");
+      return data.content;
     } catch (error) {
       console.error("AI Error:", error.message);
       toast({ title: "الذكاء الاصطناعي معطل", description: "يرجى كتابة الوصف يدوياً", variant: "destructive" });

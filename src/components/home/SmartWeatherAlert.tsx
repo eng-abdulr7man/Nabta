@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ThermometerSun, Wind, Droplets, AlertTriangle, Sparkles, CloudSun, CloudRain, Bot, ArrowLeft } from "lucide-react";
-
-const GROQ_API_KEY = "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";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WeatherData {
   city: string;
@@ -39,25 +38,11 @@ const SmartWeatherAlert = () => {
         };
         setWeather(wData);
 
-        const systemPrompt = `أنت مستشار زراعي طوارئ في مصر. 
-        الطقس اليوم في مدينة ${wData.city}: الحرارة ${wData.temp} درجة، الرطوبة ${wData.humidity}%، وسرعة الرياح ${wData.windSpeed} كم/ساعة. المطر: ${wData.isRaining ? 'يوجد' : 'لا يوجد'}.
-        اكتب نصيحة زراعية سريعة ومباشرة وتحذيرية للمزارع في جملة واحدة فقط (لا تزيد عن 15 كلمة).`;
-
-        const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${GROQ_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [{ role: "user", content: systemPrompt }],
-            temperature: 0.4,
-          }),
+        const { data: aiResult, error: aiError } = await supabase.functions.invoke("ai-generate", {
+          body: { action: "weather", data: wData },
         });
-
-        const aiDataRaw = await aiRes.json();
-        setAiAdvice(aiDataRaw.choices[0].message.content.replace(/["']/g, ""));
+        if (aiError || !aiResult?.content) throw new Error(aiResult?.error || "استجابة غير صالحة");
+        setAiAdvice(aiResult.content);
         
       } catch (error) {
         console.error("Failed to fetch smart weather", error);
