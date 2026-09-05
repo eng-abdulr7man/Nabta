@@ -4,21 +4,14 @@ import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, Trash2, Lock } fr
 import { Link } from "react-router-dom"; 
 import { useAuth } from "@/contexts/AuthContext"; 
 
-const GROQ_API_KEY = "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";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "system" | "user" | "assistant";
   content: string;
 }
 
-const WELCOME_MESSAGE = "أهلاً بك في نبتة! 🌱 أنا مستشارك الزراعي الذكي. إزاي أقدر أساعدك في مزرعتك أو محصولك النهاردة؟";
-
-const SYSTEM_PROMPT: Message = {
-  role: "system",
-  content: `أنت مستشار زراعي خبير في أكاديمية 'نبتة'. مهمتك مساعدة المهندسين والمزارعين. 
-  1. لا تقدم الحل فوراً؛ اسأل أولاً عن البيانات (المحصول، التربة، الري).
-  2. إذا شعرت أن المستخدم ينهي الحوار (شكراً، سلام، تمام، قفلنا)، رد بتحية ختامية دافئة جداً تليق ببراند نبتة.`
-};
+const WELCOME_MESSAGE = "أهلاً بيك في نبتة يا هندسة! 🌱 أنا مستشارك الزراعي والبيطري، جاهز أساعدك في أي حاجة سواء زرع أو تربية حيوان. احكيلي مشكلتك إيه؟";
 
 const AiChatWidget = () => {
   const { user } = useAuth(); 
@@ -45,7 +38,7 @@ const AiChatWidget = () => {
     if (!messageText.trim() || !user) return;
 
     const userMessage: Message = { role: "user", content: messageText };
-    
+
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
@@ -54,22 +47,18 @@ const AiChatWidget = () => {
 
     try {
       const chatHistory = messages.filter(msg => msg.content !== WELCOME_MESSAGE);
-      
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [SYSTEM_PROMPT, ...chatHistory, userMessage],
-          temperature: 0.7,
-        }),
+
+      // بننادي على الـ Edge Function بتاعتنا مش على OpenRouter مباشرة.
+      // supabase.functions.invoke بيبعت تلقائيًا توكن المستخدم المسجل دخول
+      // في الـ Authorization header، والـ Function هي اللي بتتكلم مع
+      // OpenRouter بمفتاح محفوظ على السيرفر (secret) مش موجود في المتصفح خالص.
+      const { data, error: fnError } = await supabase.functions.invoke("ai-chat", {
+        body: { messages: [...chatHistory, userMessage] },
       });
 
-      const data = await response.json();
-      if (data.choices?.[0]?.message) {
+      if (fnError) throw fnError;
+
+      if (data?.choices?.[0]?.message) {
         setMessages((prev) => [...prev, {
           role: "assistant",
           content: data.choices[0].message.content,
@@ -81,6 +70,8 @@ const AiChatWidget = () => {
             setTimeout(clearChat, 500);
           }, 5000);
         }
+      } else {
+        setMessages((prev) => [...prev, { role: "assistant", content: data?.error || "معلش يا هندسة، حصل خطأ في الرد من المساعد. جرب تاني كمان شوية." }]);
       }
     } catch (error) {
       setMessages((prev) => [...prev, { role: "assistant", content: "معلش يا هندسة، حصل دروب في الشبكة. جرب تاني." }]);
