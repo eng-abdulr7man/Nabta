@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, PlayCircle, Download, Award, GraduationCap, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { BookOpen, PlayCircle, Download, GraduationCap, FileText, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/layout/Navbar";
@@ -47,16 +47,31 @@ const MyCoursesPage = () => {
     enabled: !!user,
   });
 
-  // جلب الملاحظات (تأكد أن اسم الجدول 'notes' أو قم بتعديله حسب قاعدة بياناتك)
+  // جلب الملاحظات من جدول lesson_notes مع ربطها بالدروس والسكشن لمعرفة الكورس التابعة له
   const { data: notesData } = useQuery({
-    queryKey: ["lesson_notes", user?.id],
+    queryKey: ["my-lesson-notes", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("notes")
-        .select("*")
-        .eq("user_id", user!.id);
+        .from("lesson_notes")
+        .select(`
+          id,
+          title,
+          content,
+          video_timestamp,
+          created_at,
+          lesson_id,
+          lessons (
+            id,
+            title,
+            sections (
+              course_id
+            )
+          )
+        `)
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
       if (error) {
-        console.warn("Notes table might not exist or error fetching:", error.message);
+        console.error("Error fetching lesson notes:", error.message);
         return [];
       }
       return data || [];
@@ -142,7 +157,7 @@ const MyCoursesPage = () => {
           {/* الهيدر البسيط */}
           <div className="mb-10">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">كورساتي</h1>
-            <p className="text-neutral-400 text-sm md:text-base">تابع كورساتك، أنجز دروسك، واستعرض ملاحظاتك بكل بساطة.</p>
+            <p className="text-neutral-400 text-sm md:text-base">تابع كورساتك، أنجز دروسك، واستعرض ملاحظاتك المدونة بكل بساطة.</p>
           </div>
 
           {isLoading ? (
@@ -169,8 +184,12 @@ const MyCoursesPage = () => {
                   const cert = getCertificate(course.id);
                   const isCompleted = progress === 100;
                   
-                  // فلترة الملاحظات الخاصة بالكورس الحالي
-                  const courseNotes = (notesData || []).filter((n: any) => n.course_id === course.id);
+                  // فلترة الملاحظات الخاصة بهذا الكورس عن طريق مطابقة course_id القادم من علاقة الدروس والسكشن
+                  const courseNotes = (notesData || []).filter((n: any) => {
+                    const noteCourseId = n.lessons?.sections?.course_id;
+                    return noteCourseId === course.id;
+                  });
+
                   const isNotesOpen = expandedNotes[course.id] || false;
 
                   return (
@@ -223,28 +242,49 @@ const MyCoursesPage = () => {
 
                       </div>
 
-                      {/* قسم الملاحظات المبسط */}
+                      {/* قسم الملاحظات المرتبة ببساطة */}
                       <div className="mt-4 pt-3 border-t border-white/5">
                         <button
                           onClick={() => toggleNotes(course.id)}
                           className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-emerald-400 transition-colors"
                         >
                           <FileText className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>الملاحظات ({courseNotes.length})</span>
+                          <span>الملاحظات المدونة ({courseNotes.length})</span>
                           {isNotesOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                         </button>
 
                         {isNotesOpen && (
-                          <div className="mt-3 space-y-2">
+                          <div className="mt-3 space-y-2.5 max-h-56 overflow-y-auto pr-1">
                             {courseNotes.length === 0 ? (
-                              <p className="text-xs text-neutral-500 italic">لا توجد ملاحظات مسجلة.</p>
+                              <p className="text-xs text-neutral-500 italic">لا توجد ملاحظات مسجلة لهذا الكورس حتى الآن.</p>
                             ) : (
                               courseNotes.map((note: any) => (
-                                <div key={note.id} className="bg-black/30 border border-white/5 rounded-xl p-3 text-xs space-y-1">
-                                  <p className="text-neutral-300 leading-relaxed">{note.content || note.note}</p>
-                                  <span className="text-[10px] text-neutral-500 block">
-                                    {new Date(note.created_at || note.inserted_at).toLocaleDateString("ar-EG")}
-                                  </span>
+                                <div key={note.id} className="bg-black/40 border border-white/5 rounded-xl p-3 text-xs space-y-1">
+                                  <div className="flex items-center justify-between text-emerald-400 font-medium">
+                                    <span>{note.title}</span>
+                                    {note.lessons?.title && (
+                                      <span className="text-neutral-400 text-[11px] truncate max-w-[180px]">
+                                        درس: {note.lessons.title}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-neutral-300 leading-relaxed">{note.content}</p>
+                                  
+                                  <div className="flex items-center justify-between pt-1 text-[10px] text-neutral-500">
+                                    {note.video_timestamp > 0 && (
+                                      <span className="flex items-center gap-1 text-emerald-500/80">
+                                        <Clock className="w-3 h-3" /> عند الدقيقة {Math.floor(note.video_timestamp / 60)}:{Math.floor(note.video_timestamp % 60).toString().padStart(2, '0')}
+                                      </span>
+                                    )}
+                                    <span>
+                                      {new Date(note.created_at).toLocaleDateString("ar-EG", {
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                      })}
+                                    </span>
+                                  </div>
                                 </div>
                               ))
                             )}
