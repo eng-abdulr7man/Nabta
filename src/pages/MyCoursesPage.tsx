@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, CheckCircle, PlayCircle, Download, Award, GraduationCap, ArrowLeft } from "lucide-react";
+import { BookOpen, CheckCircle, PlayCircle, Download, Award, GraduationCap, ArrowLeft, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/layout/Navbar";
@@ -13,6 +14,11 @@ import { downloadCertificatePDF } from "@/lib/generateCertificatePDF";
 
 const MyCoursesPage = () => {
   const { user, profile } = useAuth();
+  const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
+
+  const toggleNotes = (courseId: string) => {
+    setExpandedNotes(prev => ({ ...prev, [courseId]: !prev[courseId] }));
+  };
 
   const { data: enrollments, isLoading } = useQuery({
     queryKey: ["my-enrollments", user?.id],
@@ -35,6 +41,21 @@ const MyCoursesPage = () => {
         .from("lesson_progress")
         .select("lesson_id, completed")
         .eq("user_id", user!.id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // جلب الملاحظات الخاصة بالمستخدم
+  const { data: notesData } = useQuery({
+    queryKey: ["my-notes", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notes")
+        .select("id, course_id, lesson_id, content, created_at, lessons(title)")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -122,9 +143,7 @@ const MyCoursesPage = () => {
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10 max-w-6xl">
           
-          {/* ======================================= */}
           {/* الهيدر */}
-          {/* ======================================= */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
@@ -139,16 +158,11 @@ const MyCoursesPage = () => {
                <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-emerald-600">كورساتي</span>
             </h1>
             <p className="text-lg md:text-xl text-neutral-400 leading-relaxed">
-              تابع تقدمك، استكمل دروسك، واحصل على شهاداتك فور إتمامك للمسارات التدريبية.
+              تابع تقدمك، استكمل دروسك، واحصل على شهاداتك وملاحظاتك المدونة بكل سهولة.
             </p>
           </motion.div>
 
-          {/* ======================================= */}
-          {/* المحتوى */}
-          {/* ======================================= */}
           {isLoading ? (
-            
-            // --- حالة التحميل (Premium Skeletons) ---
             <div className="space-y-6">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="bg-gradient-to-r from-[#0a0f0c] to-[#0f1712] border border-white/5 rounded-[2rem] p-6 h-auto sm:h-48 flex flex-col sm:flex-row gap-6 animate-pulse shadow-xl">
@@ -161,16 +175,12 @@ const MyCoursesPage = () => {
                 </div>
               ))}
             </div>
-
           ) : !enrollments || enrollments.length === 0 ? (
-            
-            // --- حالة خلو الصفحة (Empty State) ---
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center py-32 px-4 text-center bg-gradient-to-b from-[#0a0f0c] to-[#050806] border border-dashed border-neutral-800 rounded-[2.5rem] shadow-2xl max-w-3xl mx-auto mt-8"
             >
-              {/* أنيميشن طفو للأيقونة */}
               <motion.div 
                 animate={{ y: [0, -12, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
@@ -190,10 +200,7 @@ const MyCoursesPage = () => {
                 </Button>
               </Link>
             </motion.div>
-
           ) : (
-            
-            // --- عرض الكورسات المسجلة (Progress Cards) ---
             <div className="space-y-6">
               <AnimatePresence>
                 {enrollments.map((enrollment: any, i: number) => {
@@ -202,6 +209,10 @@ const MyCoursesPage = () => {
                   const progress = getProgress(course.id);
                   const cert = getCertificate(course.id);
                   const isCompleted = progress === 100;
+                  
+                  // فلترة الملاحظات الخاصة بهذا الكورس فقط
+                  const courseNotes = (notesData || []).filter((n: any) => n.course_id === course.id);
+                  const isNotesOpen = expandedNotes[course.id] || false;
 
                   return (
                     <motion.div
@@ -211,7 +222,6 @@ const MyCoursesPage = () => {
                       transition={{ delay: i * 0.05 }}
                       className="group bg-gradient-to-r from-[#0a0f0c] to-[#0f1712] border border-white/5 rounded-[2rem] p-5 sm:p-6 hover:border-emerald-500/30 transition-all duration-500 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10 relative overflow-hidden"
                     >
-                      {/* شريط الإضاءة العلوي للكارت المكتمل */}
                       {isCompleted && (
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 opacity-50" />
                       )}
@@ -259,13 +269,12 @@ const MyCoursesPage = () => {
                             </div>
                             <Progress 
                               value={progress} 
-                              // تخصيص الـ Progress عشان ياخد تدرج لوني وضل
                               className="h-2.5 bg-neutral-800 overflow-hidden rounded-full [&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:to-emerald-300 [&>div]:shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
                             />
                           </div>
                         </div>
 
-                        {/* زر المتابعة/البدء (موبايل وتابلت بيترصوا لوحدهم) */}
+                        {/* زر المتابعة/البدء */}
                         <div className="shrink-0 w-full sm:w-auto mt-2 sm:mt-0 self-end sm:self-center">
                           <Link to={`/courses/${course.id}/learn`} className="block">
                             <Button 
@@ -287,11 +296,55 @@ const MyCoursesPage = () => {
                         </div>
                       </div>
 
-                      {/* ======================================= */}
+                      {/* --- قسم الملاحظات الشخصية المرتبة --- */}
+                      <div className="mt-6 pt-4 border-t border-white/5">
+                        <div className="flex items-center justify-between">
+                          <button
+                            onClick={() => toggleNotes(course.id)}
+                            className="flex items-center gap-2 text-sm font-semibold text-neutral-300 hover:text-emerald-400 transition-colors"
+                          >
+                            <FileText className="w-4 h-4 text-emerald-400" />
+                            <span>ملاحظاتي المدونة ({courseNotes.length})</span>
+                            {isNotesOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </button>
+                        </div>
+
+                        {isNotesOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-4 space-y-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar"
+                          >
+                            {courseNotes.length === 0 ? (
+                              <p className="text-xs text-neutral-500 italic py-2">لا توجد ملاحظات مسجلة لهذا الكورس حتى الآن.</p>
+                            ) : (
+                              courseNotes.map((note: any) => (
+                                <div key={note.id} className="bg-[#050806]/60 border border-white/5 rounded-xl p-3 text-sm space-y-1">
+                                  {note.lessons?.title && (
+                                    <span className="text-xs font-bold text-emerald-400 block">
+                                      درس: {note.lessons.title}
+                                    </span>
+                                  )}
+                                  <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">{note.content}</p>
+                                  <span className="text-[10px] text-neutral-500 block text-left">
+                                    {new Date(note.created_at).toLocaleDateString("ar-EG", {
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit"
+                                    })}
+                                  </span>
+                                </div>
+                              ))
+                            )}
+                          </motion.div>
+                        )}
+                      </div>
+
                       {/* منطقة الشهادة (VIP Banner) */}
-                      {/* ======================================= */}
                       {cert && (
-                        <div className="mt-8 pt-5 border-t border-white/5">
+                        <div className="mt-6 pt-5 border-t border-white/5">
                           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-emerald-900/20 to-transparent border border-emerald-500/20 rounded-2xl p-4 md:px-6 md:py-4">
                             <div className="flex items-center gap-3 w-full sm:w-auto">
                               <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center shrink-0">
