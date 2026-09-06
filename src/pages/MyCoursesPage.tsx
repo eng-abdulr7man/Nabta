@@ -49,7 +49,7 @@ const MyCoursesPage = () => {
 
   // جلب الملاحظات (تأكد أن اسم الجدول 'notes' أو قم بتعديله حسب قاعدة بياناتك)
   const { data: notesData } = useQuery({
-    queryKey: ["my-notes", user?.id],
+    queryKey: ["lesson_notes", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("notes")
