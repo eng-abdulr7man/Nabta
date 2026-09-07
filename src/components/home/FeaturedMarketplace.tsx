@@ -28,7 +28,9 @@ const FeaturedMarketplace = () => {
     fetchLatestProducts();
   }, []);
 
-  const handleCopyLink = (productId: string) => {
+  const handleCopyLink = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     const productUrl = `${window.location.origin}/marketplace`;
     navigator.clipboard.writeText(productUrl);
     setCopiedId(productId);
@@ -117,6 +119,26 @@ const FeaturedMarketplace = () => {
                   <div className="absolute top-2.5 right-2.5 bg-background/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-border text-[11px] font-medium text-primary">
                     {product.category}
                   </div>
+
+                  {/* زر نسخ الرابط */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleCopyLink(e, product.id)}
+                    className="absolute top-2.5 left-2.5 bg-background/90 backdrop-blur-md hover:bg-background text-foreground px-2 py-1 rounded-lg border border-border/60 shadow-sm transition-all flex items-center gap-1 text-[11px] font-medium z-10"
+                    title="نسخ رابط المنتج"
+                  >
+                    {copiedId === product.id ? (
+                      <>
+                        <Check className="w-3 h-3 text-primary" />
+                        <span className="text-[10px]">تم</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-[10px]">نسخ</span>
+                      </>
+                    )}
+                  </button>
                 </div>
 
                 {/* تفاصيل المنتج */}
@@ -134,37 +156,17 @@ const FeaturedMarketplace = () => {
                       <span className="text-lg font-bold text-primary tabular-nums">{product.price} ج.م</span>
                     </div>
 
-                    <div className="space-y-2">
-                      <a 
-                        href={`https://wa.me/201019715490?text=أريد طلب: ${product.name}`}
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="w-full block"
-                      >
-                        <Button className="w-full h-10 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl gap-2 text-xs font-semibold transition-all">
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          <span>اطلب عبر واتساب</span>
-                        </Button>
-                      </a>
-
-                      <Button 
-                        variant="outline" 
-                        onClick={() => handleCopyLink(product.id)}
-                        className="w-full h-9 bg-card border-border hover:border-primary hover:bg-primary/5 text-foreground rounded-xl gap-2 text-xs font-medium transition-all"
-                      >
-                        {copiedId === product.id ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-primary">تم نسخ الرابط</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                            <span>نسخ رابط المنتج</span>
-                          </>
-                        )}
+                    <a 
+                      href={`https://wa.me/201019715490?text=أريد طلب: ${product.name}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full block"
+                    >
+                      <Button className="w-full h-10 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl gap-2 text-xs font-semibold transition-all">
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>اطلب عبر واتساب</span>
                       </Button>
-                    </div>
+                    </a>
                   </div>
                 </div>
               </motion.div>
