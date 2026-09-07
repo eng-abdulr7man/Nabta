@@ -9,7 +9,7 @@ import {
   useLessonsCount,
   useCourseRating,
 } from "@/hooks/useCourses";
-import { useToast } from "@/hooks/use-toast"; // إضافة إشعارات التوست
+import { useToast } from "@/hooks/use-toast";
 
 interface CourseCardProps {
   id: string;
@@ -45,22 +45,22 @@ const CourseCard = ({
 
   const Icon = spec ? getSpecIcon(spec.icon) : BookOpen;
 
-  // دالة المشاركة (نسخ الرابط)
+  // دالة المشاركة بأسلوب بشري طبيعي
   const handleShare = (e: React.MouseEvent) => {
-    e.preventDefault(); // منع تفعيل الـ Link
-    e.stopPropagation(); // منع انتشار الحدث
+    e.preventDefault();
+    e.stopPropagation();
     
     const courseUrl = `${window.location.origin}/courses/${id}`;
     
     navigator.clipboard.writeText(courseUrl).then(() => {
       toast({
-        title: "تم نسخ الرابط! 🔗",
-        description: "الرابط جاهز للمشاركة مع أصدقائك.",
+        title: "تمام، اتنسخ الرابط.",
+        description: "تقدر تشاركه مع زمايلك دلوقتي.",
       });
     }).catch(() => {
       toast({
-        title: "خطأ",
-        description: "لم نتمكن من نسخ الرابط.",
+        title: "حصلت مشكلة",
+        description: "معرفناش ننسخ الرابط، جرب تاني.",
         variant: "destructive"
       });
     });
@@ -68,29 +68,29 @@ const CourseCard = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{
-        delay: index * 0.07,
-        duration: 0.45,
+        delay: index * 0.05,
+        duration: 0.35,
         ease: "easeOut",
       }}
       viewport={{ once: true }}
       className="h-full"
     >
       <Link to={`/courses/${id}`} className="block group h-full">
-        <div className="relative h-full flex flex-col rounded-[2rem] overflow-hidden border border-border bg-muted shadow-lg hover:shadow-2xl hover: hover:border-primary/20 transition-all duration-300 hover:-translate-y-1">
+        <div className="relative h-full flex flex-col rounded-2xl overflow-hidden border border-border bg-card shadow-sm hover:border-primary/50 transition-all duration-200">
 
-          {/* Image Section */}
-          <div className="relative w-full aspect-[4/3] sm:aspect-video bg-muted overflow-hidden shrink-0">
+          {/* صورة الكورس */}
+          <div className="relative w-full aspect-video bg-muted overflow-hidden shrink-0">
 
-            {/* زر المشاركة (Share) */}
+            {/* زر المشاركة */}
             <button 
               onClick={handleShare}
               title="مشاركة الكورس"
-              className="absolute top-3 left-3 z-20 bg-black/50 hover:bg-primary backdrop-blur-md p-2.5 rounded-full border border-border hover:border-primary transition-all duration-300 shadow-lg opacity-90 group-hover:opacity-100"
+              className="absolute top-3 left-3 z-20 bg-background/90 hover:bg-background p-2 rounded-xl border border-border text-foreground transition-all shadow-sm"
             >
-              <Share2 className="w-4 h-4 text-foreground" />
+              <Share2 className="w-3.5 h-3.5" />
             </button>
 
             {!imgLoaded && thumbnail_url && (
@@ -98,73 +98,67 @@ const CourseCard = ({
             )}
 
             {thumbnail_url ? (
-              <>
-                <img
-                  src={thumbnail_url}
-                  alt={title}
-                  loading="lazy"
-                  onLoad={() => setImgLoaded(true)}
-                  className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
-                    imgLoaded ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-                {/* ضل متدرج لتوضيح النصوص لو فيه */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0c] via-transparent to-transparent opacity-90 z-10 pointer-events-none" />
-              </>
+              <img
+                src={thumbnail_url}
+                alt={title}
+                loading="lazy"
+                onLoad={() => setImgLoaded(true)}
+                className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                  imgLoaded ? "opacity-100" : "opacity-0"
+                }`}
+              />
             ) : (
-              <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-emerald-900/10 to-transparent">
-                <BookOpen className="w-16 h-16 text-primary/20" />
+              <div className="flex items-center justify-center w-full h-full bg-muted">
+                <BookOpen className="w-10 h-10 text-muted-foreground/40" />
               </div>
             )}
           </div>
 
-          {/* Content */}
-          <div className="p-5 md:p-6 flex flex-col flex-1 relative z-20 -mt-3 bg-muted rounded-t-3xl">
+          {/* محتوى الكورس */}
+          <div className="p-4 md:p-5 flex flex-col flex-1 justify-between">
 
-            <div className="mb-auto space-y-2.5">
-              <h3 className="font-bold text-xl line-clamp-2 group-hover:text-primary transition-colors text-foreground leading-snug">
+            <div>
+              <div className="mb-2.5 flex items-center justify-between">
+                {spec && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-muted text-primary border border-border">
+                    <Icon className="w-3 h-3" />
+                    {spec.name}
+                  </span>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  بواسطة <strong className="text-foreground">{instructor}</strong>
+                </span>
+              </div>
+
+              <h3 className="font-bold text-base line-clamp-1 group-hover:text-primary transition-colors text-foreground mb-1.5">
                 {title}
               </h3>
 
-              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                 {description}
               </p>
             </div>
 
-            <div className="mt-4 space-y-3">
-              <p className="text-xs text-muted-foreground">
-                بواسطة <span className="text-foreground font-bold">{instructor}</span>
-              </p>
+            {/* الإحصائيات السفلية */}
+            <div className="flex items-center justify-between pt-4 mt-4 border-t border-border text-xs text-muted-foreground font-medium">
+              
+              <div className="flex items-center gap-1">
+                <BookOpen className="w-3.5 h-3.5 text-primary" />
+                <span>{lessonsCount ?? 0} درس</span>
+              </div>
 
-              {/* Specialization */}
-              {spec && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold bg-accent text-primary border border-primary/20">
-                  <Icon className="w-3.5 h-3.5" />
-                  {spec.name}
+              <div className="flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-primary" />
+                <span>{enrolledCount ?? 0} طالب</span>
+              </div>
+
+              {ratingData && ratingData.avg > 0 && (
+                <div className="flex items-center gap-1 text-foreground">
+                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                  <span>{ratingData.avg.toFixed(1)}</span>
                 </div>
               )}
 
-              {/* Stats */}
-              <div className="flex items-center justify-between pt-4 border-t border-border text-xs font-medium">
-                
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <BookOpen className="w-4 h-4 text-primary/70" />
-                  <span>{lessonsCount ?? 0} درس</span>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Users className="w-4 h-4 text-primary/70" />
-                  <span>{enrolledCount ?? 0} طالب</span>
-                </div>
-
-                {ratingData && ratingData.avg > 0 && (
-                  <div className="flex items-center gap-1.5 text-foreground">
-                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <span>{ratingData.avg.toFixed(1)}</span>
-                  </div>
-                )}
-
-              </div>
             </div>
 
           </div>
@@ -173,5 +167,7 @@ const CourseCard = ({
     </motion.div>
   );
 };
+
+CourseCard.displayName = "CourseCard";
 
 export default CourseCard;
