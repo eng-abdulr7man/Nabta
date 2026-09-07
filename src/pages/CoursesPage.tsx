@@ -48,10 +48,7 @@ const CoursesPage = () => {
             transition={{ duration: 0.4 }}
             className="mb-8 lg:mb-10"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-muted border border-border text-primary text-xs font-medium mb-3">
-              <BookOpen className="w-3.5 h-3.5" />
-              مكتبة الكورسات
-            </div>
+           
             <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight mb-3">
               استكشف <span className="text-primary">برامجنا التدريبية</span>
             </h1>
