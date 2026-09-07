@@ -51,13 +51,13 @@ const AdminActivityLog = () => {
     if (action.includes("حذف") || action.includes("إزالة")) 
       return { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", icon: Trash2 };
     if (action.includes("إضافة") || action.includes("إنشاء") || action.includes("تسجيل")) 
-      return { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", icon: PlusCircle };
+      return { color: "text-primary", bg: "bg-accent", border: "border-primary/20", icon: PlusCircle };
     if (action.includes("تحديث") || action.includes("تعديل")) 
       return { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", icon: Edit };
     if (action.includes("دخول") || action.includes("خروج")) 
       return { color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20", icon: LogIn };
     
-    return { color: "text-neutral-400", bg: "bg-neutral-800/50", border: "border-neutral-700/50", icon: Activity };
+    return { color: "text-muted-foreground", bg: "bg-muted/50", border: "border-border/50", icon: Activity };
   };
 
   return (
@@ -65,24 +65,24 @@ const AdminActivityLog = () => {
       <div className="max-w-6xl mx-auto space-y-8 p-2 font-tajawal" dir="rtl">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0a0f0c] p-6 rounded-[2rem] border border-neutral-800/60 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl -z-10" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted p-6 rounded-[2rem] border border-border shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-accent blur-3xl -z-10" />
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3">
-              <Activity className="w-8 h-8 text-emerald-500" />
+            <h1 className="text-2xl md:text-3xl font-black text-foreground flex items-center gap-3">
+              <Activity className="w-8 h-8 text-primary" />
               مراقب النظام (سجل النشاطات)
             </h1>
-            <p className="text-neutral-500 text-sm font-bold mt-2">تتبع كل شاردة وواردة تحدث داخل منصة نبتة لحظة بلحظة.</p>
+            <p className="text-muted-foreground text-sm font-bold mt-2">تتبع كل شاردة وواردة تحدث داخل منصة نبتة لحظة بلحظة.</p>
           </div>
 
           {/* Search Box */}
           <div className="w-full md:w-96 relative group">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 group-focus-within:text-emerald-500 transition-colors" />
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               placeholder="ابحث عن مستخدم، حدث، أو تفاصيل..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl pr-12 pl-4 py-3.5 text-white focus:border-emerald-500/50 outline-none transition-all placeholder:text-neutral-600 text-sm font-medium shadow-inner"
+              className="w-full bg-muted border border-border rounded-2xl pr-12 pl-4 py-3.5 text-foreground focus:border-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm font-medium shadow-inner"
             />
           </div>
         </div>
@@ -97,12 +97,12 @@ const AdminActivityLog = () => {
         <div className="space-y-4">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-[#0a0f0c] border border-neutral-800/50 h-24 rounded-2xl animate-pulse" />
+              <div key={i} className="bg-muted border border-border h-24 rounded-2xl animate-pulse" />
             ))
           ) : filtered.length === 0 ? (
-            <div className="text-center py-20 bg-[#0a0f0c] rounded-[2rem] border border-neutral-800/50">
+            <div className="text-center py-20 bg-muted rounded-[2rem] border border-border">
               <Terminal className="w-16 h-16 text-neutral-800 mx-auto mb-4" />
-              <p className="text-neutral-500 font-bold text-lg">لا توجد أي نشاطات مسجلة حتى الآن.</p>
+              <p className="text-muted-foreground font-bold text-lg">لا توجد أي نشاطات مسجلة حتى الآن.</p>
             </div>
           ) : (
             <AnimatePresence>
@@ -116,7 +116,7 @@ const AdminActivityLog = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="bg-[#0a0f0c] border border-neutral-800/60 p-5 rounded-2xl shadow-lg hover:border-neutral-700 transition-colors group"
+                    className="bg-muted border border-border p-5 rounded-2xl shadow-lg hover:border-border transition-colors group"
                   >
                     <div className="flex flex-col md:flex-row md:items-start gap-5">
                       
@@ -132,13 +132,13 @@ const AdminActivityLog = () => {
                             <span className={`text-sm font-black px-3 py-1.5 rounded-lg border ${style.bg} ${style.border} ${style.color}`}>
                               {log.action}
                             </span>
-                            <div className="flex items-center gap-1.5 text-sm font-bold text-neutral-300 bg-[#121A15] px-3 py-1.5 rounded-lg border border-neutral-800">
-                              <User className="w-4 h-4 text-emerald-500" />
+                            <div className="flex items-center gap-1.5 text-sm font-bold text-foreground bg-muted px-3 py-1.5 rounded-lg border border-border">
+                              <User className="w-4 h-4 text-primary" />
                               {log.profile?.full_name || "مستخدم مجهول/نظام"}
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-500">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
                             <Clock className="w-3.5 h-3.5" />
                             <span dir="ltr">
                               {new Date(log.created_at).toLocaleString("ar-EG", { 
@@ -151,14 +151,14 @@ const AdminActivityLog = () => {
 
                         {/* Details JSON Block (Beautifully formatted) */}
                         {log.details && Object.keys(log.details).length > 0 && (
-                          <div className="bg-[#050806] border border-neutral-800/80 rounded-xl p-3 mt-2 overflow-x-auto custom-scrollbar">
-                            <div className="text-[10px] text-neutral-600 font-black uppercase mb-2 flex items-center gap-1">
+                          <div className="bg-background border border-border rounded-xl p-3 mt-2 overflow-x-auto custom-scrollbar">
+                            <div className="text-[10px] text-muted-foreground font-black uppercase mb-2 flex items-center gap-1">
                               <Terminal className="w-3 h-3" /> تفاصيل العملية (Payload)
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                               {Object.entries(log.details).map(([key, value]) => (
                                 <div key={key} className="flex flex-col">
-                                  <span className="text-[10px] text-neutral-500 font-mono">{key}:</span>
+                                  <span className="text-[10px] text-muted-foreground font-mono">{key}:</span>
                                   <span className="text-xs font-medium text-emerald-50/70 truncate" title={String(value)}>
                                     {String(value)}
                                   </span>

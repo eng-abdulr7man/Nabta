@@ -99,14 +99,13 @@ const AboutPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
+    <div className="min-h-screen flex flex-col bg-background font-tajawal selection:bg-accent">
       <Navbar />
       
       <main className="flex-1 pt-32 pb-24 md:pb-16 relative overflow-hidden">
         
         {/* إضاءات خلفية (Ambient Glows) */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
-        <div className="absolute top-[40%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-emerald-900/5 blur-[100px] pointer-events-none" />
+
 
         <div className="container mx-auto px-4 max-w-4xl relative z-10">
           
@@ -120,24 +119,24 @@ const AboutPage = () => {
             className="text-center mb-16 space-y-6"
           >
             {/* الشارة العلوية */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-medium shadow-[0_0_20px_rgba(16,185,129,0.05)] mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border text-primary text-sm font-medium  mx-auto">
               <Info className="w-4 h-4" />
               تعرف علينا
             </div>
 
             {/* الأيقونة المركزية */}
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.1)] relative group">
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <Sprout className="w-10 h-10 text-emerald-500 relative z-10" />
+              <div className="w-20 h-20 rounded-2xl bg-muted border border-border flex items-center justify-center  relative group">
+                <div className="absolute inset-0 bg-accent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <Sprout className="w-10 h-10 text-primary relative z-10" />
               </div>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
-              أكاديمية <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">نـَـبْـتـَـة</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight">
+              أكاديمية <span className="text-transparent bg-clip-text text-primary">نـَـبْـتـَـة</span>
             </h1>
             
-            <p className="text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               نحن منصة تعليمية إلكترونية متخصصة في العلوم الزراعية، نهدف إلى نشر المعرفة ودمج التكنولوجيا بالزراعة المستدامة من خلال كورسات احترافية معتمدة.
             </p>
           </motion.div>
@@ -155,17 +154,17 @@ const AboutPage = () => {
               <motion.div
                 key={i}
                 variants={itemVariants}
-                className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 hover:bg-[#121A15] hover:border-emerald-500/30 transition-all duration-300 hover:shadow-[0_10px_30px_rgba(16,185,129,0.05)] hover:-translate-y-1"
+                className="group bg-muted border border-border rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 hover:bg-muted hover:border-primary/20 transition-all duration-300"
               >
                 {/* صندوق الأيقونة */}
-                <div className="w-16 h-16 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-center shrink-0 group-hover:bg-emerald-900/20 group-hover:border-emerald-500/40 transition-all duration-300">
-                  <f.icon className="w-8 h-8 text-emerald-500" />
+                <div className="w-16 h-16 rounded-2xl bg-muted border border-border flex items-center justify-center shrink-0 group-hover:bg-accent group-hover:border-primary/20 transition-all duration-300">
+                  <f.icon className="w-8 h-8 text-primary" />
                 </div>
                 
                 {/* النصوص */}
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">{f.title}</h3>
-                  <p className="text-base text-neutral-400 leading-relaxed">{f.desc}</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{f.title}</h3>
+                  <p className="text-base text-muted-foreground leading-relaxed">{f.desc}</p>
                 </div>
               </motion.div>
             ))}

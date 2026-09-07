@@ -179,30 +179,28 @@ const AdminYoutubeImport = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050806] text-white p-4 md:p-8 font-tajawal overflow-x-hidden relative" dir="rtl">
-      
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10" />
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-8 font-tajawal overflow-x-hidden relative" dir="rtl">
 
       <div className="max-w-7xl mx-auto space-y-10 relative">
         
-        <div className="flex items-center gap-4 border-b border-neutral-800/60 pb-6 bg-[#0a0f0c] p-5 rounded-2xl border border-neutral-800/50 shadow-2xl">
-          <Link to="/admin" className="p-3 bg-[#121A15] border border-neutral-800 rounded-xl text-neutral-400 hover:text-white transition-colors">
+        <div className="flex items-center gap-4 border-b border-border pb-6 bg-muted p-5 rounded-2xl border border-border shadow-2xl">
+          <Link to="/admin" className="p-3 bg-muted border border-border rounded-xl text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight className="w-6 h-6" />
           </Link>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
-              <Sparkles className="w-7 h-7 text-emerald-500" /> استيراد كورس يوتيوب
+            <h1 className="text-2xl md:text-3xl font-black text-foreground flex items-center gap-3 tracking-tight">
+              <Sparkles className="w-7 h-7 text-primary" /> استيراد كورس يوتيوب
             </h1>
-            <p className="text-neutral-500 text-sm font-medium mt-1">توليد تلقائي للمحتوى باستخدام Groq AI</p>
+            <p className="text-muted-foreground text-sm font-medium mt-1">توليد تلقائي للمحتوى باستخدام Groq AI</p>
           </div>
         </div>
 
-        <div className="bg-[#0a0f0c] border border-neutral-800/80 rounded-3xl p-5 md:p-6 shadow-xl relative">
-          <div className="absolute top-0 left-10 w-40 h-1 bg-emerald-600 rounded-full opacity-30" />
+        <div className="bg-muted border border-border rounded-3xl p-5 md:p-6 shadow-xl relative">
+          <div className="absolute top-0 left-10 w-40 h-1 bg-primary rounded-full opacity-30" />
           <div className="flex flex-col md:flex-row gap-4 items-end">
             
             <div className="flex-[2] w-full space-y-2">
-              <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
+              <label className="text-muted-foreground text-sm font-bold flex items-center gap-2 px-1">
                 <Youtube className="w-4 h-4 text-red-500" /> رابط قائمة التشغيل
               </label>
               <input
@@ -211,26 +209,26 @@ const AdminYoutubeImport = () => {
                 placeholder="https://youtube.com/playlist?list=..."
                 value={playlistUrl}
                 onChange={(e) => setPlaylistUrl(e.target.value)}
-                className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl px-5 py-3.5 text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 outline-none transition-all font-mono text-sm placeholder:font-tajawal placeholder:text-neutral-600 placeholder:text-right shadow-inner"
+                className="w-full bg-muted border border-border rounded-2xl px-5 py-3.5 text-foreground focus:border-primary/20 focus:ring-1 focus:ring-primary outline-none transition-all font-mono text-sm placeholder:font-tajawal placeholder:text-muted-foreground placeholder:text-right shadow-inner"
               />
             </div>
 
             <div className="flex-1 w-full space-y-2">
-              <label className="text-neutral-400 text-sm font-bold flex items-center gap-2 px-1">
-                <TreePine className="w-4 h-4 text-emerald-500" /> التخصص (السكيمه)
+              <label className="text-muted-foreground text-sm font-bold flex items-center gap-2 px-1">
+                <TreePine className="w-4 h-4 text-primary" /> التخصص (السكيمه)
               </label>
               <div className="relative">
                 <select
                   value={selectedSpec}
                   onChange={(e) => setSelectedSpec(e.target.value)}
-                  className="w-full bg-[#121A15] border border-neutral-800/80 rounded-2xl pr-5 pl-10 py-3.5 text-sm font-bold text-white outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 appearance-none cursor-pointer transition-all shadow-inner"
+                  className="w-full bg-muted border border-border rounded-2xl pr-5 pl-10 py-3.5 text-sm font-bold text-foreground outline-none focus:border-primary/20 focus:ring-1 focus:ring-primary appearance-none cursor-pointer transition-all shadow-inner"
                 >
-                  <option value="" className="text-neutral-500">اختر التخصص الزراعي...</option>
+                  <option value="" className="text-muted-foreground">اختر التخصص الزراعي...</option>
                   {specializations.map(spec => (
-                    <option key={spec.id} value={spec.id} className="bg-[#0a0f0c] font-bold text-white">{spec.name}</option>
+                    <option key={spec.id} value={spec.id} className="bg-muted font-bold text-foreground">{spec.name}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               </div>
             </div>
 
@@ -238,7 +236,7 @@ const AdminYoutubeImport = () => {
               <Button 
                 onClick={handleFetchPlaylist} 
                 disabled={isLoading || !playlistUrl} 
-                className="w-full md:w-36 h-[52px] bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 flex gap-2"
+                className="w-full md:w-36 h-[52px] bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl font-black text-base shadow-xl transition-all active:scale-95 flex gap-2"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "معاينة"}
               </Button>
@@ -256,27 +254,27 @@ const AdminYoutubeImport = () => {
             >
               
               <div className="lg:col-span-1 space-y-6">
-                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-5 shadow-2xl space-y-5 sticky top-6">
-                  <div className="relative rounded-3xl overflow-hidden border border-neutral-800 group shadow-lg">
+                <div className="bg-muted border border-border rounded-[2rem] p-5 shadow-2xl space-y-5 sticky top-6">
+                  <div className="relative rounded-3xl overflow-hidden border border-border group shadow-lg">
                     <img src={previewData.thumbnail} className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-80" />
                     <div className="absolute bottom-3 left-3 right-3 flex justify-between gap-2">
-                      <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black border border-white/10 flex items-center gap-1.5 shadow-xl">
+                      <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black border border-border flex items-center gap-1.5 shadow-xl">
                         <LayoutGrid className="w-3.5 h-3.5" /> <span>{previewData.lessons.length} درس</span>
                       </div>
-                      <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black text-emerald-400 border border-white/10 flex items-center gap-1.5 shadow-xl">
+                      <div className="bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black text-primary border border-border flex items-center gap-1.5 shadow-xl">
                         <Clock className="w-3.5 h-3.5" /> <span>{previewData.lessons.reduce((a, b) => a + b.duration, 0)} دقيقة</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-[#121A15] p-4 rounded-2xl flex items-center gap-4 border border-neutral-800/50 shadow-inner">
-                    <div className="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center text-emerald-500 font-black text-xl border border-emerald-500/20 shadow-md">
+                  <div className="bg-muted p-4 rounded-2xl flex items-center gap-4 border border-border shadow-inner">
+                    <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-primary font-black text-xl border border-primary/20 shadow-md">
                       <User className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">مقدم الدورة / القناة</p>
-                      <h3 className="text-sm font-black text-white line-clamp-1">{previewData.instructor}</h3>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">مقدم الدورة / القناة</p>
+                      <h3 className="text-sm font-black text-foreground line-clamp-1">{previewData.instructor}</h3>
                     </div>
                   </div>
                 </div>
@@ -284,37 +282,37 @@ const AdminYoutubeImport = () => {
 
               <div className="lg:col-span-2 flex flex-col gap-6">
                 
-                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl -z-10" />
-                  <h2 className="text-xl md:text-3xl font-black text-white leading-tight tracking-tight">{previewData.title}</h2>
-                  <div className="h-1 w-20 bg-emerald-600 rounded-full" />
+                <div className="bg-muted border border-border rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-accent blur-3xl -z-10" />
+                  <h2 className="text-xl md:text-3xl font-black text-foreground leading-tight tracking-tight">{previewData.title}</h2>
+                  <div className="h-1 w-20 bg-primary rounded-full" />
                   
                   <div className="space-y-3">
                     <div className="flex justify-between items-center px-1">
-                      <label className="text-emerald-500 text-xs font-black flex items-center gap-2"><Edit3 className="w-3.5 h-3.5" /> الوصف التعريفي (AI-Generated)</label>
-                      {isGenerating && <span className="text-[10px] text-emerald-500 animate-pulse font-bold flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin"/>جاري الصياغة...</span>}
+                      <label className="text-primary text-xs font-black flex items-center gap-2"><Edit3 className="w-3.5 h-3.5" /> الوصف التعريفي (AI-Generated)</label>
+                      {isGenerating && <span className="text-[10px] text-primary animate-pulse font-bold flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin"/>جاري الصياغة...</span>}
                     </div>
                     <textarea
                       value={previewData.description}
                       onChange={(e) => setPreviewData({...previewData, description: e.target.value})}
                       rows={5}
-                      className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl px-6 py-5 text-neutral-300 text-sm leading-relaxed focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 outline-none resize-none transition-colors shadow-inner font-tajawal placeholder:text-neutral-700"
+                      className="w-full bg-muted border border-border rounded-2xl px-6 py-5 text-foreground text-sm leading-relaxed focus:border-primary/20 focus:ring-1 focus:ring-primary outline-none resize-none transition-colors shadow-inner font-tajawal placeholder:text-neutral-700"
                       placeholder="اكتب وصفاً احترافياً هنا..."
                     />
                   </div>
                 </div>
 
-                <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-5">
-                  <label className="text-neutral-400 text-xs font-black uppercase tracking-widest flex items-center gap-2 px-1"><ListVideo className="w-4 h-4 text-emerald-600" /> محتوى الدورة التدريبية</label>
+                <div className="bg-muted border border-border rounded-[2.5rem] p-6 md:p-8 shadow-2xl space-y-5">
+                  <label className="text-muted-foreground text-xs font-black uppercase tracking-widest flex items-center gap-2 px-1"><ListVideo className="w-4 h-4 text-emerald-600" /> محتوى الدورة التدريبية</label>
                   
                   <div className="flex flex-col gap-2.5 max-h-[350px] overflow-y-auto pr-3 custom-scrollbar">
                     {previewData.lessons.map((lesson) => (
-                      <div key={lesson.video_id} className="flex justify-between items-center p-4 bg-[#121A15] border border-neutral-800/50 rounded-2xl hover:border-emerald-500/30 transition-all duration-300 group shadow-sm active:scale-[0.99]">
-                        <span className="text-sm text-neutral-300 font-medium flex items-center gap-3.5">
-                          <span className="text-neutral-600 font-mono text-xs w-6 text-left">#{lesson.order}</span> 
-                          <span className="line-clamp-1 group-hover:text-white">{lesson.title}</span>
+                      <div key={lesson.video_id} className="flex justify-between items-center p-4 bg-muted border border-border rounded-2xl hover:border-primary/20 transition-all duration-300 group shadow-sm active:scale-[0.99]">
+                        <span className="text-sm text-foreground font-medium flex items-center gap-3.5">
+                          <span className="text-muted-foreground font-mono text-xs w-6 text-left">#{lesson.order}</span> 
+                          <span className="line-clamp-1 group-hover:text-foreground">{lesson.title}</span>
                         </span>
-                        <span className="text-[11px] font-black text-neutral-400 bg-[#0a0f0c] px-2.5 py-1.5 rounded-lg shrink-0 border border-neutral-800 flex items-center gap-1 shadow-md">
+                        <span className="text-[11px] font-black text-muted-foreground bg-muted px-2.5 py-1.5 rounded-lg shrink-0 border border-border flex items-center gap-1 shadow-md">
                           <Clock className="w-3 h-3 text-emerald-600" /> {lesson.duration} د
                         </span>
                       </div>
@@ -322,8 +320,8 @@ const AdminYoutubeImport = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-2 border-t border-neutral-800/50">
-                  <Button onClick={() => setPreviewData(null)} variant="ghost" className="h-16 px-6 rounded-2xl text-neutral-500 bg-[#0a0f0c] border border-neutral-800 hover:bg-neutral-800 hover:text-white transition-all">
+                <div className="flex gap-4 pt-2 border-t border-border">
+                  <Button onClick={() => setPreviewData(null)} variant="ghost" className="h-16 px-6 rounded-2xl text-muted-foreground bg-muted border border-border hover:bg-muted hover:text-foreground transition-all">
                     إلغاء الأمر
                   </Button>
                   <Button onClick={handleImportCourse} disabled={isLoading} className="flex-1 h-16 bg-white text-black hover:bg-neutral-200 rounded-2xl font-black text-xl shadow-2xl flex gap-3 transition-all active:scale-[0.98]">

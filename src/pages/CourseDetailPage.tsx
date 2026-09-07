@@ -146,14 +146,14 @@ const CourseDetailPage = () => {
   // ==========================================
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#050806]">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 pt-32 pb-20">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl space-y-6">
-              <div className="h-8 w-32 bg-[#121A15] rounded-full animate-pulse border border-neutral-800" />
-              <div className="h-12 w-3/4 bg-[#121A15] rounded-2xl animate-pulse border border-neutral-800" />
-              <div className="h-24 w-full bg-[#121A15] rounded-2xl animate-pulse border border-neutral-800" />
+              <div className="h-8 w-32 bg-muted rounded-full animate-pulse border border-border" />
+              <div className="h-12 w-3/4 bg-muted rounded-2xl animate-pulse border border-border" />
+              <div className="h-24 w-full bg-muted rounded-2xl animate-pulse border border-border" />
             </div>
           </div>
         </main>
@@ -166,21 +166,20 @@ const CourseDetailPage = () => {
   // ==========================================
   if (!course) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050806]">
-        <p className="text-neutral-400 text-lg font-medium">عذراً، هذا الكورس غير موجود.</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground text-lg font-medium">عذراً، هذا الكورس غير موجود.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
+    <div className="min-h-screen flex flex-col bg-background font-tajawal selection:bg-accent">
       <Navbar />
       
       <main className="flex-1 pt-32 pb-24 md:pb-16 relative overflow-hidden">
         
         {/* إضاءات خلفية (Ambient Glows) */}
-        <div className="absolute top-[-10%] left-[-5%] w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
-        
+
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-start">
@@ -193,20 +192,20 @@ const CourseDetailPage = () => {
               {/* الهيدر والعنوان */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                 {spec && (
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#121A15] border border-emerald-900/50 text-emerald-400 text-sm font-bold mb-6">
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border border-emerald-900/50 text-primary text-sm font-bold mb-6">
                     <Award className="w-4 h-4" />
                     {spec.name}
                   </span>
                 )}
-                <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-[1.3]">{course.title}</h1>
-                <p className="text-neutral-400 text-lg leading-relaxed mb-6">{course.description}</p>
-                <div className="flex items-center gap-3 text-sm text-neutral-300">
-                  <span className="w-10 h-10 rounded-full bg-emerald-900/20 flex items-center justify-center border border-emerald-500/20">
-                    <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                <h1 className="text-3xl md:text-5xl font-black text-foreground mb-6 leading-[1.3]">{course.title}</h1>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">{course.description}</p>
+                <div className="flex items-center gap-3 text-sm text-foreground">
+                  <span className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-primary/20">
+                    <ShieldCheck className="w-5 h-5 text-primary" />
                   </span>
                   <div>
-                    <p className="text-xs text-neutral-500">مقدم الكورس</p>
-                    <p className="font-bold text-white">{course.instructor}</p>
+                    <p className="text-xs text-muted-foreground">مقدم الكورس</p>
+                    <p className="font-bold text-foreground">{course.instructor}</p>
                   </div>
                 </div>
               </motion.div>
@@ -214,19 +213,19 @@ const CourseDetailPage = () => {
               {/* ماذا ستتعلم */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                className="bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-8 shadow-lg"
+                className="bg-muted border border-border rounded-3xl p-8 shadow-lg"
               >
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#121A15] flex items-center justify-center border border-neutral-800">
-                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center border border-border">
+                    <CheckCircle className="w-5 h-5 text-primary" />
                   </div>
                   ماذا ستتعلم في هذا الكورس؟
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {["فهم الأساسيات والمبادئ العلمية", "تطبيق التقنيات الحديثة", "تحليل البيانات الزراعية", "إدارة المشاريع الزراعية", "حل المشكلات العملية", "الحصول على شهادة إتمام"].map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span className="text-neutral-300 font-medium">{item}</span>
+                      <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                      <span className="text-foreground font-medium">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -234,38 +233,38 @@ const CourseDetailPage = () => {
 
               {/* محتوى الكورس (Syllabus) */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#121A15] flex items-center justify-center border border-neutral-800">
-                    <BookOpen className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center border border-border">
+                    <BookOpen className="w-5 h-5 text-primary" />
                   </div>
                   محتوى الكورس
                 </h2>
                 
                 {(sections || []).length === 0 ? (
-                  <div className="bg-[#121A15] border border-neutral-800 rounded-2xl p-8 text-center">
-                    <p className="text-neutral-500">جاري إعداد محتوى الكورس، سيتم إضافته قريباً.</p>
+                  <div className="bg-muted border border-border rounded-2xl p-8 text-center">
+                    <p className="text-muted-foreground">جاري إعداد محتوى الكورس، سيتم إضافته قريباً.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {(sections || []).map((section, i) => {
                       const sectionLessons = (lessons || []).filter((l) => l.section_id === section.id);
                       return (
-                        <div key={section.id} className="bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-colors">
-                          <div className="px-6 py-4 bg-[#121A15] border-b border-neutral-800/60 flex items-center justify-between">
-                            <h3 className="font-bold text-white text-base">{section.title}</h3>
-                            <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
+                        <div key={section.id} className="bg-muted border border-border rounded-2xl overflow-hidden hover:border-primary/20 transition-colors">
+                          <div className="px-6 py-4 bg-muted border-b border-border flex items-center justify-between">
+                            <h3 className="font-bold text-foreground text-base">{section.title}</h3>
+                            <span className="text-xs font-bold text-primary bg-accent px-3 py-1 rounded-full">
                               {sectionLessons.length} دروس
                             </span>
                           </div>
                           <div className="divide-y divide-neutral-800/40">
                             {sectionLessons.map((lesson) => (
-                              <div key={lesson.id} className="px-6 py-4 flex items-center justify-between group hover:bg-[#121A15]/50 transition-colors">
+                              <div key={lesson.id} className="px-6 py-4 flex items-center justify-between group hover:bg-muted/50 transition-colors">
                                 <div className="flex items-center gap-3">
-                                  <PlayCircle className="w-5 h-5 text-neutral-600 group-hover:text-emerald-500 transition-colors" />
-                                  <span className="text-neutral-300 text-sm font-medium">{lesson.title}</span>
+                                  <PlayCircle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                  <span className="text-foreground text-sm font-medium">{lesson.title}</span>
                                 </div>
                                 {lesson.duration_minutes > 0 && (
-                                  <span className="text-xs text-neutral-500">{lesson.duration_minutes} دقيقة</span>
+                                  <span className="text-xs text-muted-foreground">{lesson.duration_minutes} دقيقة</span>
                                 )}
                               </div>
                             ))}
@@ -278,7 +277,7 @@ const CourseDetailPage = () => {
               </motion.div>
 
               {/* التقييمات */}
-              <div className="pt-8 border-t border-neutral-800/50">
+              <div className="pt-8 border-t border-border">
                 <RatingSection courseId={id!} />
               </div>
               
@@ -292,7 +291,7 @@ const CourseDetailPage = () => {
                 initial={{ opacity: 0, scale: 0.95 }} 
                 animate={{ opacity: 1, scale: 1 }} 
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-[#0a0f0c] border border-neutral-800/80 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl"
+                className="bg-muted border border-border rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl"
               >
                 
                 {/* الأزرار الرئيسية */}
@@ -300,7 +299,7 @@ const CourseDetailPage = () => {
                   {enrollment ? (
                     <Button 
                       onClick={() => navigate(`/courses/${id}/learn`)}
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-14 text-lg font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 text-lg font-bold rounded-xl transition-all  hover:"
                     >
                       <PlayCircle className="w-5 h-5 ml-2" />
                       متابعة التعلم
@@ -309,7 +308,7 @@ const CourseDetailPage = () => {
                     <Button 
                       onClick={handleEnroll} 
                       disabled={enrollMutation.isPending}
-                      className="w-full bg-white hover:bg-emerald-500 text-black hover:text-white h-14 text-lg font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+                      className="w-full bg-white hover:bg-primary/90 text-black hover:text-primary-foreground h-14 text-lg font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:"
                     >
                       {enrollMutation.isPending ? "جاري التسجيل..." : "سجل في الكورس مجاناً"}
                     </Button>
@@ -323,7 +322,7 @@ const CourseDetailPage = () => {
                     className={`w-full h-12 font-bold rounded-xl transition-all group ${
                       isFavorite
                         ? "bg-red-500/10 border-red-500/30 text-red-500 hover:bg-red-500/20"
-                        : "bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white hover:border-emerald-500/50"
+                        : "bg-transparent border-border text-foreground hover:bg-muted hover:text-foreground hover:border-primary/20"
                     }`}
                   >
                     <Heart 
@@ -341,42 +340,42 @@ const CourseDetailPage = () => {
 
                 {/* إحصائيات الكورس المدمجة */}
                 <div className="space-y-5">
-                  <h4 className="font-bold text-white text-base border-b border-neutral-800 pb-2">معلومات الكورس</h4>
+                  <h4 className="font-bold text-foreground text-base border-b border-border pb-2">معلومات الكورس</h4>
                   
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-3 text-neutral-400">
-                      <div className="w-8 h-8 rounded-lg bg-[#121A15] flex items-center justify-center"><Users className="w-4 h-4 text-emerald-500" /></div>
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
                       <span>المشتركين</span>
                     </div>
-                    <span className="font-bold text-white">{enrolledCount || 0} طالب</span>
+                    <span className="font-bold text-foreground">{enrolledCount || 0} طالب</span>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-3 text-neutral-400">
-                      <div className="w-8 h-8 rounded-lg bg-[#121A15] flex items-center justify-center"><BookOpen className="w-4 h-4 text-emerald-500" /></div>
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><BookOpen className="w-4 h-4 text-primary" /></div>
                       <span>الدروس</span>
                     </div>
-                    <span className="font-bold text-white">{totalLessons} درس</span>
+                    <span className="font-bold text-foreground">{totalLessons} درس</span>
                   </div>
 
                   {totalDuration > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-3 text-neutral-400">
-                        <div className="w-8 h-8 rounded-lg bg-[#121A15] flex items-center justify-center"><Clock className="w-4 h-4 text-emerald-500" /></div>
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
                         <span>المدة التقريبية</span>
                       </div>
-                      <span className="font-bold text-white">{Math.round(totalDuration / 60)} ساعة</span>
+                      <span className="font-bold text-foreground">{Math.round(totalDuration / 60)} ساعة</span>
                     </div>
                   )}
 
                   {ratingData && ratingData.avg > 0 && (
                     <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-3 text-neutral-400">
-                        <div className="w-8 h-8 rounded-lg bg-[#121A15] flex items-center justify-center"><Star className="w-4 h-4 text-yellow-500" /></div>
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><Star className="w-4 h-4 text-yellow-500" /></div>
                         <span>التقييم العام</span>
                       </div>
-                      <span className="font-bold text-white flex items-center gap-1">
-                        {ratingData.avg} <span className="text-neutral-500 text-xs">({ratingData.count})</span>
+                      <span className="font-bold text-foreground flex items-center gap-1">
+                        {ratingData.avg} <span className="text-muted-foreground text-xs">({ratingData.count})</span>
                       </span>
                     </div>
                   )}

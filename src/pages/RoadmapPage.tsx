@@ -5,7 +5,7 @@ import Roadmap from "@/components/home/Roadmap";
 
 const RoadmapPage = () => {
   return (
-    <div className="min-h-screen bg-[#050806] flex flex-col font-tajawal selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-background flex flex-col font-tajawal selection:bg-accent">
       <Navbar />
       <main className="flex-1 pt-20">
         <Roadmap />

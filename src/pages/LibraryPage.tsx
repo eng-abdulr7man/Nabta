@@ -67,33 +67,32 @@ const LibraryPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30 text-white" dir="rtl">
+    <div className="min-h-screen flex flex-col bg-background font-tajawal selection:bg-accent text-foreground" dir="rtl">
       <Navbar />
 
       <main className="flex-1 pt-32 pb-20 relative z-10 overflow-x-hidden">
-        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-sm font-bold mb-6">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent border border-primary/20 text-primary text-sm font-bold mb-6">
               <Library className="w-4 h-4" /> المكتبة الأكاديمية
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-              كل مراجعك <span className="text-emerald-500">في مكان واحد</span>
+              كل مراجعك <span className="text-primary">في مكان واحد</span>
             </motion.h1>
           </div>
 
           <div className="max-w-4xl mx-auto mb-16 px-2 relative z-[100]">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 bg-[#0a0f0c] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-visible backdrop-blur-xl">
-              <div className="flex-[2] flex items-center gap-4 px-8 py-5 border-b md:border-b-0 md:border-l border-white/5 group">
-                <Search className="w-5 h-5 text-emerald-500 transition-transform group-focus-within:scale-110" />
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 bg-muted rounded-[2.5rem] border border-border shadow-2xl overflow-visible backdrop-blur-xl">
+              <div className="flex-[2] flex items-center gap-4 px-8 py-5 border-b md:border-b-0 md:border-l border-border group">
+                <Search className="w-5 h-5 text-primary transition-transform group-focus-within:scale-110" />
                 <input 
                   type="text" 
                   placeholder="ابحث عن مادة..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none outline-none text-white font-bold placeholder:text-neutral-700 text-lg"
+                  className="w-full bg-transparent border-none outline-none text-foreground font-bold placeholder:text-neutral-700 text-lg"
                 />
               </div>
               <div className="flex-1 relative" ref={dropdownRef}>
@@ -101,38 +100,38 @@ const LibraryPage = () => {
                   onClick={() => setIsUniMenuOpen(!isUniMenuOpen)}
                   className="flex items-center gap-3 px-8 py-5 cursor-pointer hover:bg-white/[0.02] transition-colors h-full"
                 >
-                  <Building2 className="w-5 h-5 text-emerald-500" />
+                  <Building2 className="w-5 h-5 text-primary" />
                   <div className="flex-1 text-right">
-                    <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider mb-0.5">الجامعة</p>
-                    <p className="text-white font-black text-lg leading-tight truncate max-w-[150px]">
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-0.5">الجامعة</p>
+                    <p className="text-foreground font-black text-lg leading-tight truncate max-w-[150px]">
                       {selectedUni === "all" ? "كل الجامعات" : universities.find(u => u.id === selectedUni)?.name}
                     </p>
                   </div>
-                  <ChevronDown className={`w-5 h-5 text-emerald-500 transition-transform duration-300 ${isUniMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-5 h-5 text-primary transition-transform duration-300 ${isUniMenuOpen ? 'rotate-180' : ''}`} />
                 </div>
 
                 <AnimatePresence>
                   {isUniMenuOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-full right-0 left-0 mt-3 bg-[#0a0f0c] border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden z-[100] backdrop-blur-2xl p-2"
+                      className="absolute top-full right-0 left-0 mt-3 bg-muted border border-border rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden z-[100] backdrop-blur-2xl p-2"
                     >
                       <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                         <button
                           onClick={() => { setSelectedUni("all"); setIsUniMenuOpen(false); }}
-                          className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === "all" ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
+                          className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === "all" ? "bg-accent text-primary" : "hover:bg-muted text-muted-foreground text-right"}`}
                         >
                           <span className="font-bold">كل الجامعات</span>
-                          {selectedUni === "all" && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                          {selectedUni === "all" && <div className="w-2 h-2 rounded-full bg-primary " />}
                         </button>
                         {universities.map((uni) => (
                           <button
                             key={uni.id}
                             onClick={() => { setSelectedUni(uni.id); setIsUniMenuOpen(false); }}
-                            className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === uni.id ? "bg-emerald-500/10 text-emerald-400" : "hover:bg-white/5 text-neutral-400 text-right"}`}
+                            className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all mb-1 ${selectedUni === uni.id ? "bg-accent text-primary" : "hover:bg-muted text-muted-foreground text-right"}`}
                           >
                             <span className="font-bold">{uni.name}</span>
-                            {selectedUni === uni.id && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                            {selectedUni === uni.id && <div className="w-2 h-2 rounded-full bg-primary " />}
                           </button>
                         ))}
                       </div>
@@ -144,7 +143,7 @@ const LibraryPage = () => {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-emerald-500" /></div>
+            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredSubjects.map((subj) => (
@@ -152,19 +151,19 @@ const LibraryPage = () => {
                   key={subj.id}
                   whileHover={{ y: -5 }}
                   onClick={() => setSelectedSubject(subj)}
-                  className="group bg-[#0a0f0c] border border-white/5 rounded-[2.5rem] p-6 cursor-pointer hover:border-emerald-500/40 transition-all duration-500 shadow-xl flex flex-col items-center text-center"
+                  className="group bg-muted border border-border rounded-[2.5rem] p-6 cursor-pointer hover:border-primary/20 transition-all duration-500 shadow-xl flex flex-col items-center text-center"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/5 flex items-center justify-center border border-emerald-500/10 mb-5 group-hover:scale-110 transition-transform mt-2">
-                    <BookOpen className="w-8 h-8 text-emerald-500" />
+                  <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center border border-primary/20 mb-5 group-hover:scale-110 transition-transform mt-2">
+                    <BookOpen className="w-8 h-8 text-primary" />
                   </div>
                   
                   <h3 className="text-xl font-bold mb-4">{subj.name}</h3>
                   
                   <div className="mt-auto flex flex-col gap-2 items-center w-full">
-                    <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-xs font-black w-full border border-emerald-500/10">
+                    <span className="px-3 py-1.5 rounded-xl bg-accent text-primary text-xs font-black w-full border border-primary/20">
                       {subj.academic_year || "الفرقة غير محددة"}
                     </span>
-                    <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider mt-1">
+                    <p className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider mt-1">
                       {subj.universities?.name || "جامعة عامة"}
                     </p>
                   </div>
@@ -180,24 +179,24 @@ const LibraryPage = () => {
           <div className="fixed inset-0 flex items-center justify-center z-[150] px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedSubject(null)} className="absolute inset-0 bg-black/95 backdrop-blur-md" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="relative w-full max-w-2xl bg-[#0a0f0c] border border-white/10 rounded-[3.5rem] p-8 md:p-14 shadow-2xl"
+              className="relative w-full max-w-2xl bg-muted border border-border rounded-[3.5rem] p-8 md:p-14 shadow-2xl"
             >
-              <button onClick={() => setSelectedSubject(null)} className="absolute top-8 left-8 p-3 rounded-2xl bg-white/5 hover:text-rose-400 transition-all"><X className="w-5 h-5" /></button>
+              <button onClick={() => setSelectedSubject(null)} className="absolute top-8 left-8 p-3 rounded-2xl bg-muted hover:text-rose-400 transition-all"><X className="w-5 h-5" /></button>
               <div className="text-center mb-12">
-                <div className="w-20 h-20 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-8 mx-auto"><Sparkles className="w-10 h-10 text-emerald-500" /></div>
+                <div className="w-20 h-20 rounded-[2rem] bg-accent flex items-center justify-center border border-primary/20 mb-8 mx-auto"><Sparkles className="w-10 h-10 text-primary" /></div>
                 <h2 className="text-3xl md:text-5xl font-black mb-4">مادة {selectedSubject.name}</h2>
-                <p className="text-neutral-500 font-bold uppercase text-xs">اختر القسم المطلوب</p>
+                <p className="text-muted-foreground font-bold uppercase text-xs">اختر القسم المطلوب</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { id: "lecture", label: "المحاضرات", icon: FileText, color: "text-blue-400", bg: "bg-blue-500/10" },
-                  { id: "section", label: "السكاشن", icon: PlaySquare, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                  { id: "section", label: "السكاشن", icon: PlaySquare, color: "text-primary", bg: "bg-accent" },
                   { id: "ppt", label: "البوربوينت", icon: Presentation, color: "text-purple-400", bg: "bg-purple-500/10" },
                   { id: "record", label: "التسجيلات", icon: Mic, color: "text-yellow-400", bg: "bg-yellow-500/10" },
                 ].map((item) => (
-                  <button key={item.id} onClick={() => handleOpenMaterialType(item.id)} className="flex flex-col items-center gap-4 p-6 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:border-emerald-500/30 transition-all group active:scale-95">
+                  <button key={item.id} onClick={() => handleOpenMaterialType(item.id)} className="flex flex-col items-center gap-4 p-6 rounded-[2.5rem] bg-white/[0.03] border border-border hover:border-primary/20 transition-all group active:scale-95">
                     <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center group-hover:scale-110 transition-all`}><item.icon className={`w-7 h-7 ${item.color}`} /></div>
-                    <span className="text-white font-black text-xs md:text-sm">{item.label}</span>
+                    <span className="text-foreground font-black text-xs md:text-sm">{item.label}</span>
                   </button>
                 ))}
               </div>

@@ -313,30 +313,30 @@ const LearnPage = () => {
   const isLastLesson = lessons && currentLessonId ? lessons.findIndex((l) => l.id === currentLessonId) === lessons.length - 1 : false;
 
   return (
-    <div className="min-h-screen bg-[#050806] font-tajawal text-white flex flex-col" dir="rtl">
+    <div className="min-h-screen bg-background font-tajawal text-foreground flex flex-col" dir="rtl">
       
       {/* الشريط العلوي الثابت */}
-      <div className="sticky top-0 z-50 h-16 border-b border-neutral-800/60 bg-[#0a0f0c]/90 backdrop-blur-xl flex items-center justify-between px-4 lg:px-8 shadow-sm">
+      <div className="sticky top-0 z-50 h-16 border-b border-border bg-muted/90 backdrop-blur-xl flex items-center justify-between px-4 lg:px-8 shadow-sm">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(`/courses/${id}`)} 
-            className="w-9 h-9 rounded-full flex items-center justify-center bg-[#121A15] border border-neutral-800 text-neutral-400 hover:text-white hover:border-emerald-500/50 transition-all"
+            className="w-9 h-9 rounded-full flex items-center justify-center bg-muted border border-border text-muted-foreground hover:text-foreground hover:border-primary/20 transition-all"
             title="العودة للكورس"
           >
             <ArrowRight className="w-5 h-5" />
           </button>
           <div className="hidden sm:block">
-            <h1 className="font-bold text-sm text-white truncate max-w-[200px] md:max-w-md">{course?.title}</h1>
+            <h1 className="font-bold text-sm text-foreground truncate max-w-[200px] md:max-w-md">{course?.title}</h1>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="flex flex-col items-end">
-            <span className="text-xs font-bold text-emerald-500">{progressPercent}%</span>
+            <span className="text-xs font-bold text-primary">{progressPercent}%</span>
           </div>
           <Progress 
             value={progressPercent} 
-            className="w-24 sm:w-32 h-2.5 bg-neutral-800 overflow-hidden rounded-full [&>div]:bg-emerald-500" 
+            className="w-24 sm:w-32 h-2.5 bg-muted overflow-hidden rounded-full [&>div]:bg-primary" 
           />
         </div>
       </div>
@@ -349,11 +349,11 @@ const LearnPage = () => {
           <div className="w-full lg:w-[65%] xl:w-[70%] flex flex-col gap-6">
             
             {/* مساحة الفيديو */}
-            <div className="w-full bg-black aspect-video rounded-2xl overflow-hidden shadow-2xl border border-neutral-800/50">
+            <div className="w-full bg-black aspect-video rounded-2xl overflow-hidden shadow-2xl border border-border">
               {currentLesson?.video_url ? (
                 <div id="yt-player" className="w-full h-full" />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-neutral-500 gap-3">
+                <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-3">
                   <PlayCircle className="w-12 h-12 opacity-50" />
                   <p>لا يوجد فيديو متاح لهذا الدرس</p>
                 </div>
@@ -361,8 +361,8 @@ const LearnPage = () => {
             </div>
 
             {/* عنوان الدرس وأزرار التحكم */}
-            <div className="bg-[#0a0f0c] rounded-2xl p-5 sm:p-6 border border-neutral-800/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
-              <h2 className="text-xl sm:text-2xl font-black text-white leading-relaxed flex-1">
+            <div className="bg-muted rounded-2xl p-5 sm:p-6 border border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
+              <h2 className="text-xl sm:text-2xl font-black text-foreground leading-relaxed flex-1">
                 {currentLesson?.title}
               </h2>
               
@@ -371,7 +371,7 @@ const LearnPage = () => {
                   <Button 
                     onClick={() => markComplete.mutate(currentLessonId)} 
                     disabled={markComplete.isPending}
-                    className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-11 px-5 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all flex items-center gap-2"
+                    className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 px-5 rounded-xl  transition-all flex items-center gap-2"
                   >
                     {markComplete.isPending ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -384,7 +384,7 @@ const LearnPage = () => {
                 <Button 
                   variant="outline" 
                   onClick={goToNextLesson}
-                  className="flex-1 sm:flex-none bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white h-11 px-5 rounded-xl font-bold transition-all"
+                  className="flex-1 sm:flex-none bg-transparent border-border text-foreground hover:bg-muted hover:text-foreground h-11 px-5 rounded-xl font-bold transition-all"
                 >
                   {isLastLesson ? "إنهاء وعرض الشهادة" : "الدرس التالي"}
                 </Button>
@@ -397,43 +397,43 @@ const LearnPage = () => {
                 href={(currentLesson as any).file_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 rounded-2xl bg-[#0a0f0c] border border-neutral-800/60 hover:border-emerald-500/30 hover:bg-[#121A15] transition-all group w-fit pr-5"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-muted border border-border hover:border-primary/20 hover:bg-muted transition-all group w-fit pr-5"
               >
-                <div className="w-12 h-12 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center group-hover:bg-emerald-500/10 transition-colors">
-                  <FileText className="w-6 h-6 text-emerald-500" />
+                <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:bg-accent transition-colors">
+                  <FileText className="w-6 h-6 text-primary" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">تحميل مرفقات الدرس</span>
-                  <span className="text-xs text-neutral-500 font-sans tracking-wider mt-1">PDF / DOC / ZIP</span>
+                  <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">تحميل مرفقات الدرس</span>
+                  <span className="text-xs text-muted-foreground font-sans tracking-wider mt-1">PDF / DOC / ZIP</span>
                 </div>
               </a>
             )}
 
             {/* الوصف / المحتوى النصي */}
             {currentLesson && (currentLesson as any).content && (
-              <div className="bg-[#0a0f0c] rounded-2xl p-6 sm:p-8 border border-neutral-800/60">
-                <h3 className="text-lg font-bold text-white mb-4 border-b border-neutral-800/50 pb-3">تفاصيل الدرس</h3>
-                <div className="prose prose-sm sm:prose-base prose-invert max-w-none text-neutral-300 leading-loose whitespace-pre-wrap">
+              <div className="bg-muted rounded-2xl p-6 sm:p-8 border border-border">
+                <h3 className="text-lg font-bold text-foreground mb-4 border-b border-border pb-3">تفاصيل الدرس</h3>
+                <div className="prose prose-sm sm:prose-base prose-invert max-w-none text-foreground leading-loose whitespace-pre-wrap">
                   {(currentLesson as any).content}
                 </div>
               </div>
             )}
 
             {/* قسم الملاحظات الذكية (Smart Notes System) */}
-            <div className="bg-[#0a0f0c] rounded-2xl p-6 sm:p-8 border border-neutral-800/60">
-              <div className="flex items-center justify-between mb-6 border-b border-neutral-800/50 pb-4">
+            <div className="bg-muted rounded-2xl p-6 sm:p-8 border border-border">
+              <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <div className="w-10 h-10 rounded-xl bg-accent border border-primary/20 flex items-center justify-center text-primary">
                     <Bookmark className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">ملاحظاتك الذكية للدرس</h3>
-                    <p className="text-xs text-neutral-400">سجل ملاحظاتك واربطها بتوقيت الفيديو الحالي فوراً</p>
+                    <h3 className="text-lg font-bold text-foreground">ملاحظاتك الذكية للدرس</h3>
+                    <p className="text-xs text-muted-foreground">سجل ملاحظاتك واربطها بتوقيت الفيديو الحالي فوراً</p>
                   </div>
                 </div>
                 <Button
                   onClick={handleOpenNoteModal}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-10 px-4 rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-950/40"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-10 px-4 rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-950/40"
                 >
                   <Plus className="w-4 h-4" />
                   إضافة ملاحظة
@@ -446,13 +446,13 @@ const LearnPage = () => {
                   lessonNotes.map((note: any) => (
                     <div 
                       key={note.id}
-                      className="group p-4 rounded-xl bg-[#121A15]/60 border border-neutral-800/60 hover:border-emerald-500/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                      className="group p-4 rounded-xl bg-muted/60 border border-border hover:border-primary/20 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                     >
                       <div className="flex items-start gap-3.5 flex-1">
                         {/* زر التوقيت للانتقال في الفيديو */}
                         <button
                           onClick={() => seekToTime(note.video_timestamp)}
-                          className="mt-0.5 shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all text-xs font-mono font-bold flex items-center gap-1.5"
+                          className="mt-0.5 shrink-0 px-2.5 py-1 rounded-lg bg-accent border border-primary/20 text-primary hover:bg-primary/90 hover:text-primary-foreground transition-all text-xs font-mono font-bold flex items-center gap-1.5"
                           title="الانتقال إلى هذا التوقيت في الفيديو"
                         >
                           <Clock className="w-3.5 h-3.5" />
@@ -460,11 +460,11 @@ const LearnPage = () => {
                         </button>
 
                         <div className="flex flex-col">
-                          <h4 className="font-bold text-white text-sm sm:text-base">{note.title}</h4>
+                          <h4 className="font-bold text-foreground text-sm sm:text-base">{note.title}</h4>
                           {note.content && (
-                            <p className="text-sm text-neutral-300 mt-1 leading-relaxed">{note.content}</p>
+                            <p className="text-sm text-foreground mt-1 leading-relaxed">{note.content}</p>
                           )}
-                          <span className="text-[11px] text-neutral-500 mt-2 font-sans">
+                          <span className="text-[11px] text-muted-foreground mt-2 font-sans">
                             {new Date(note.created_at).toLocaleDateString('ar-EG', {
                               year: 'numeric',
                               month: 'short',
@@ -479,7 +479,7 @@ const LearnPage = () => {
                       {/* زر الحذف */}
                       <button
                         onClick={() => deleteNoteMutation.mutate(note.id)}
-                        className="text-neutral-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/10 transition-colors self-end sm:self-center"
+                        className="text-muted-foreground hover:text-red-400 p-2 rounded-lg hover:bg-red-500/10 transition-colors self-end sm:self-center"
                         title="حذف الملاحظة"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -487,7 +487,7 @@ const LearnPage = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-neutral-500 text-sm border border-dashed border-neutral-800 rounded-xl">
+                  <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-border rounded-xl">
                     لا توجد ملاحظات مسجلة لهذا الدرس حتى الآن. ابدأ بإضافة ملاحظة عند أي دقيقة تهمك في الفيديو!
                   </div>
                 )}
@@ -498,27 +498,27 @@ const LearnPage = () => {
 
           {/* العمود الأيسر (قائمة الدروس الجانبية) */}
           <div className="w-full lg:w-[35%] xl:w-[30%]">
-            <div className="bg-[#0a0f0c] rounded-2xl border border-neutral-800/60 flex flex-col lg:sticky lg:top-24 max-h-[600px] lg:max-h-[calc(100vh-8rem)] overflow-hidden">
+            <div className="bg-muted rounded-2xl border border-border flex flex-col lg:sticky lg:top-24 max-h-[600px] lg:max-h-[calc(100vh-8rem)] overflow-hidden">
               
-              <div className="p-5 border-b border-neutral-800/60 bg-[#121A15]">
-                <h3 className="font-bold text-lg text-white">محتوى الكورس</h3>
-                <p className="text-sm text-neutral-400 mt-1">
+              <div className="p-5 border-b border-border bg-muted">
+                <h3 className="font-bold text-lg text-foreground">محتوى الكورس</h3>
+                <p className="text-sm text-muted-foreground mt-1">
                   التقدم: {completedCount} من {totalLessons} درس
                 </p>
               </div>
               
-              <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-neutral-800 [&::-webkit-scrollbar-track]:bg-transparent">
+              <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-muted [&::-webkit-scrollbar-track]:bg-transparent">
                 {(sections || []).map((section) => {
                   const sectionLessons = (lessons || []).filter((l) => l.section_id === section.id);
                   const isExpanded = expandedSections.has(section.id);
                   return (
-                    <div key={section.id} className="border-b border-neutral-800/40 last:border-0">
+                    <div key={section.id} className="border-b border-border last:border-0">
                       <button
                         onClick={() => toggleSection(section.id)}
-                        className="w-full px-5 py-4 flex items-center justify-between text-sm font-bold text-neutral-300 hover:text-white bg-transparent hover:bg-[#121A15] transition-colors"
+                        className="w-full px-5 py-4 flex items-center justify-between text-sm font-bold text-foreground hover:text-foreground bg-transparent hover:bg-muted transition-colors"
                       >
                         <span className="truncate text-right">{section.title}</span>
-                        {isExpanded ? <ChevronUp className="w-4 h-4 shrink-0 text-emerald-500" /> : <ChevronDown className="w-4 h-4 shrink-0 text-neutral-500" />}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 shrink-0 text-primary" /> : <ChevronDown className="w-4 h-4 shrink-0 text-muted-foreground" />}
                       </button>
                       
                       <AnimatePresence>
@@ -527,7 +527,7 @@ const LearnPage = () => {
                             initial={{ height: 0, opacity: 0 }} 
                             animate={{ height: "auto", opacity: 1 }} 
                             exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden bg-[#050806]"
+                            className="overflow-hidden bg-background"
                           >
                             {sectionLessons.map((lesson) => {
                               const completed = isLessonCompleted(lesson.id);
@@ -538,17 +538,17 @@ const LearnPage = () => {
                                   onClick={() => setCurrentLessonId(lesson.id)}
                                   className={`w-full px-5 py-3.5 flex items-start gap-3 text-sm transition-all border-r-2 ${
                                     isCurrent 
-                                      ? "bg-emerald-900/10 border-emerald-500 text-emerald-400" 
-                                      : "border-transparent text-neutral-400 hover:bg-[#121A15] hover:text-white"
+                                      ? "bg-accent border-emerald-500 text-primary" 
+                                      : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                                   }`}
                                 >
                                   <div className="mt-0.5 shrink-0">
                                     {completed ? (
-                                      <CheckCircle className={`w-4 h-4 ${isCurrent ? 'text-emerald-500' : 'text-emerald-600'}`} />
+                                      <CheckCircle className={`w-4 h-4 ${isCurrent ? 'text-primary' : 'text-emerald-600'}`} />
                                     ) : isCurrent ? (
-                                      <PlayCircle className="w-4 h-4 text-emerald-500" />
+                                      <PlayCircle className="w-4 h-4 text-primary" />
                                     ) : (
-                                      <Circle className="w-4 h-4 text-neutral-600" />
+                                      <Circle className="w-4 h-4 text-muted-foreground" />
                                     )}
                                   </div>
                                   <span className="truncate text-right leading-relaxed font-medium">{lesson.title}</span>
@@ -575,40 +575,40 @@ const LearnPage = () => {
           <motion.div 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-[#0a0f0c] border border-neutral-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col gap-5"
+            className="bg-muted border border-border w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col gap-5"
           >
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+            <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="w-9 h-9 rounded-xl bg-accent border border-primary/20 flex items-center justify-center text-primary">
                   <Edit3 className="w-4 h-4" />
                 </div>
-                <h3 className="font-bold text-lg text-white">إضافة ملاحظة ذكية جديدة</h3>
+                <h3 className="font-bold text-lg text-foreground">إضافة ملاحظة ذكية جديدة</h3>
               </div>
-              <div className="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold">
+              <div className="px-3 py-1 rounded-lg bg-accent border border-primary/20 text-primary font-mono text-xs font-bold">
                 توقيت الفيديو: {formatTime(capturedVideoTime)}
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-neutral-400 mb-2">عنوان الملاحظة *</label>
+                <label className="block text-xs font-bold text-muted-foreground mb-2">عنوان الملاحظة *</label>
                 <input
                   type="text"
                   value={newNoteTitle}
                   onChange={(e) => setNewNoteTitle(e.target.value)}
                   placeholder="مثال: نقطة هامة بخصوص التسميد..."
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-400 mb-2">محتوى أو تفاصيل الملاحظة (اختياري)</label>
+                <label className="block text-xs font-bold text-muted-foreground mb-2">محتوى أو تفاصيل الملاحظة (اختياري)</label>
                 <textarea
                   value={newNoteContent}
                   onChange={(e) => setNewNoteContent(e.target.value)}
                   placeholder="اكتب تفاصيل إضافية تريد تذكرها..."
                   rows={4}
-                  className="w-full bg-[#121A15] border border-neutral-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors resize-none"
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm focus:outline-none focus:border-emerald-500 transition-colors resize-none"
                 />
               </div>
             </div>
@@ -617,14 +617,14 @@ const LearnPage = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowNoteModal(false)}
-                className="bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white rounded-xl"
+                className="bg-transparent border-border text-foreground hover:bg-muted hover:text-foreground rounded-xl"
               >
                 إلغاء
               </Button>
               <Button
                 onClick={() => addNoteMutation.mutate()}
                 disabled={addNoteMutation.isPending}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl px-5"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-5"
               >
                 {addNoteMutation.isPending ? "جاري الحفظ..." : "حفظ الملاحظة"}
               </Button>

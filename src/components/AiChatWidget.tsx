@@ -114,25 +114,25 @@ const AiChatWidget = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-16 md:bottom-20 left-0 w-[350px] md:w-[400px] h-[75vh] max-h-[550px] bg-[#0a0f0c] border border-emerald-500/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
+            className="absolute bottom-16 md:bottom-20 left-0 w-[350px] md:w-[400px] h-[75vh] max-h-[550px] bg-muted border border-primary/20 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-[#121A15] border-b border-white/5 p-4 flex items-center justify-between z-10">
+            <div className="bg-muted border-b border-border p-4 flex items-center justify-between z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                  <Sparkles className="w-5 h-5 text-emerald-400" />
+                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-primary/20">
+                  <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-sm">مستشار نبتة الذكي</h3>
+                  <h3 className="text-foreground font-bold text-sm">مستشار نبتة الذكي</h3>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {user && ( 
-                  <button onClick={clearChat} title="مسح المحادثة" className="text-neutral-500 hover:text-emerald-500 transition-colors">
+                  <button onClick={clearChat} title="مسح المحادثة" className="text-muted-foreground hover:text-primary transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
-                <button onClick={() => setIsOpen(false)} className="text-neutral-500 hover:text-white transition-colors">
+                <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -141,25 +141,25 @@ const AiChatWidget = () => {
             {/* التحقق من تسجيل الدخول */}
             {!user ? (
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
-                <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-                  <Lock className="w-10 h-10 text-emerald-400" />
+                <div className="w-20 h-20 rounded-full bg-accent flex items-center justify-center border border-primary/20 mb-6 ">
+                  <Lock className="w-10 h-10 text-primary" />
                 </div>
-                <h4 className="text-xl text-white font-black mb-3">عذراً، يجب تسجيل الدخول!</h4>
-                <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
+                <h4 className="text-xl text-foreground font-black mb-3">عذراً، يجب تسجيل الدخول!</h4>
+                <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
                   هذه الميزة متاحة فقط لأعضاء أكاديمية نبتة. سجل دخولك الآن لتتمكن من التحدث مع مستشارك الزراعي الذكي.
                 </p>
                 <div className="flex flex-col w-full gap-3">
                   <Link 
                     to="/login" 
                     onClick={() => setIsOpen(false)}
-                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition-all shadow-lg active:scale-[0.98]"
+                    className="w-full py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold transition-all shadow-lg active:scale-[0.98]"
                   >
                     تسجيل الدخول
                   </Link>
                   <Link 
                     to="/register" 
                     onClick={() => setIsOpen(false)}
-                    className="w-full py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold transition-all active:scale-[0.98]"
+                    className="w-full py-3.5 bg-muted border border-border hover:bg-muted text-foreground rounded-xl font-bold transition-all active:scale-[0.98]"
                   >
                     إنشاء حساب جديد
                   </Link>
@@ -171,11 +171,11 @@ const AiChatWidget = () => {
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#0a0f0c] to-[#050806]">
                   {messages.map((msg, idx) => (
                     <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                      <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center ${msg.role === "user" ? "bg-blue-600/20 text-blue-400" : "bg-emerald-600/20 text-emerald-400"}`}>
+                      <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center ${msg.role === "user" ? "bg-blue-600/20 text-blue-400" : "bg-accent text-primary"}`}>
                         {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                       </div>
                       <div className={`max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed ${
-                        msg.role === "user" ? "bg-blue-600 text-white rounded-tr-none text-right" : "bg-[#121A15] text-neutral-200 border border-white/5 rounded-tl-none text-right"
+                        msg.role === "user" ? "bg-blue-600 text-foreground rounded-tr-none text-right" : "bg-muted text-neutral-200 border border-border rounded-tl-none text-right"
                       }`} dir="rtl">
                         {msg.content.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}
                       </div>
@@ -183,28 +183,28 @@ const AiChatWidget = () => {
                   ))}
                   {isLoading && (
                     <div className="flex gap-2 items-center p-4">
-                      <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
-                      <span className="text-xs text-neutral-400">جاري التحليل...</span>
+                      <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                      <span className="text-xs text-muted-foreground">جاري التحليل...</span>
                     </div>
                   )}
                   <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input Form */}
-                <div className="p-4 bg-[#121A15] border-t border-white/5">
+                <div className="p-4 bg-muted border-t border-border">
                   <div className="relative flex items-center">
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
                       placeholder="اسأل مستشارك الزراعي..."
-                      className="w-full bg-[#0a0f0c] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white text-sm resize-none h-[50px] outline-none focus:border-emerald-500 text-right"
+                      className="w-full bg-muted border border-border rounded-xl pl-12 pr-4 py-3 text-foreground text-sm resize-none h-[50px] outline-none focus:border-emerald-500 text-right"
                       dir="rtl"
                     />
                     <button 
                       onClick={handleSendMessage}
                       disabled={isLoading || !input.trim()}
-                      className="absolute left-2 w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white disabled:opacity-50 transition-all hover:bg-emerald-500"
+                      className="absolute left-2 w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground disabled:opacity-50 transition-all hover:bg-primary/90"
                     >
                       <Send className="w-4 h-4" />
                     </button>
@@ -220,7 +220,7 @@ const AiChatWidget = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center shadow-2xl text-white relative z-10"
+        className="w-14 h-14 rounded-full text-primary flex items-center justify-center shadow-2xl text-foreground relative z-10"
       >
         <MessageCircle className="w-6 h-6" />
       </motion.button>

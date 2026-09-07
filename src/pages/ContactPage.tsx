@@ -216,14 +216,14 @@
 //   };
 
 //   return (
-//     <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
+//     <div className="min-h-screen flex flex-col bg-background font-tajawal selection:bg-accent">
 //       <Navbar />
       
 //       <main className="flex-1 pt-32 pb-24 md:pb-16 relative overflow-hidden">
         
 //         {/* إضاءات خلفية (Ambient Glows) */}
-//         <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
-//         <div className="absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-emerald-900/5 blur-[120px] pointer-events-none" />
+//         <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-accent blur-[150px] pointer-events-none" />
+//         <div className="absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-accent blur-[120px] pointer-events-none" />
 
 //         <div className="container mx-auto px-4 relative z-10">
 //           <motion.div 
@@ -235,14 +235,14 @@
             
 //             {/* عنوان الصفحة */}
 //             <div className="text-center mb-10 space-y-4">
-//               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-medium shadow-[0_0_20px_rgba(16,185,129,0.05)] mx-auto">
+//               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border text-primary text-sm font-medium  mx-auto">
 //                 <Mail className="w-4 h-4" />
 //                 تواصل معنا
 //               </div>
-//               <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-//                 نحن هنا <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">لمساعدتك</span>
+//               <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
+//                 نحن هنا <span className="text-transparent bg-clip-text text-primary">لمساعدتك</span>
 //               </h1>
-//               <p className="text-neutral-400 text-lg">أرسل لنا رسالتك وسنقوم بالرد عليك في أقرب وقت ممكن</p>
+//               <p className="text-muted-foreground text-lg">أرسل لنا رسالتك وسنقوم بالرد عليك في أقرب وقت ممكن</p>
 //             </div>
 
 //             {/* التحقق من تسجيل الدخول */}
@@ -250,26 +250,26 @@
 //               // ==========================================
 //               // حالة عدم تسجيل الدخول (Locked State)
 //               // ==========================================
-//               <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-10 text-center space-y-6 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+//               <div className="bg-muted border border-border rounded-3xl p-10 text-center space-y-6 shadow-2xl backdrop-blur-xl relative overflow-hidden">
 //                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
                 
-//                 <div className="w-20 h-20 rounded-2xl bg-[#121A15] border border-neutral-800 flex items-center justify-center mx-auto shadow-inner">
-//                   <LogIn className="w-10 h-10 text-neutral-500" />
+//                 <div className="w-20 h-20 rounded-2xl bg-muted border border-border flex items-center justify-center mx-auto shadow-inner">
+//                   <LogIn className="w-10 h-10 text-muted-foreground" />
 //                 </div>
                 
 //                 <div>
-//                   <p className="text-2xl text-white font-bold mb-2">عذراً، يجب تسجيل الدخول أولاً</p>
-//                   <p className="text-sm text-neutral-400 max-w-sm mx-auto">نحن نحتاج إلى معرفة هويتك لنتمكن من متابعة رسالتك والرد عليك بشكل صحيح.</p>
+//                   <p className="text-2xl text-foreground font-bold mb-2">عذراً، يجب تسجيل الدخول أولاً</p>
+//                   <p className="text-sm text-muted-foreground max-w-sm mx-auto">نحن نحتاج إلى معرفة هويتك لنتمكن من متابعة رسالتك والرد عليك بشكل صحيح.</p>
 //                 </div>
                 
 //                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
 //                   <Link to="/login" className="w-full sm:w-auto">
-//                     <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-12 px-8 font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+//                     <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 font-bold rounded-xl ">
 //                       تسجيل الدخول
 //                     </Button>
 //                   </Link>
 //                   <Link to="/register" className="w-full sm:w-auto">
-//                     <Button variant="outline" className="w-full bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white h-12 px-8 font-bold rounded-xl transition-all">
+//                     <Button variant="outline" className="w-full bg-transparent border-border text-foreground hover:bg-muted hover:text-foreground h-12 px-8 font-bold rounded-xl transition-all">
 //                       إنشاء حساب
 //                     </Button>
 //                   </Link>
@@ -279,11 +279,11 @@
 //               // ==========================================
 //               // نموذج التواصل (Contact Form)
 //               // ==========================================
-//               <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-xl space-y-6">
+//               <div className="bg-muted border border-border rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-xl space-y-6">
                 
 //                 {/* نوع الرسالة */}
 //                 <div>
-//                   <label className="text-sm font-bold text-neutral-300 mb-3 block">نوع الرسالة</label>
+//                   <label className="text-sm font-bold text-foreground mb-3 block">نوع الرسالة</label>
 //                   <div className="flex flex-wrap gap-3">
 //                     {types.map((t) => (
 //                       <button
@@ -291,8 +291,8 @@
 //                         onClick={() => setType(t.value)}
 //                         className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
 //                           type === t.value
-//                             ? "bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-//                             : "bg-[#121A15] border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600"
+//                             ? "bg-primary text-primary-foreground "
+//                             : "bg-muted border border-border text-muted-foreground hover:text-foreground hover:border-neutral-600"
 //                         }`}
 //                       >
 //                         {t.label}
@@ -303,25 +303,25 @@
 
 //                 {/* الموضوع */}
 //                 <div>
-//                   <label className="text-sm font-bold text-neutral-300 mb-2 block">الموضوع</label>
+//                   <label className="text-sm font-bold text-foreground mb-2 block">الموضوع</label>
 //                   <input
 //                     type="text"
 //                     value={subject}
 //                     onChange={(e) => setSubject(e.target.value)}
 //                     placeholder="مثال: استفسار عن الكورس الأساسي"
-//                     className="w-full px-4 py-3.5 rounded-xl bg-[#121A15] border border-neutral-800 text-white text-sm placeholder:text-neutral-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+//                     className="w-full px-4 py-3.5 rounded-xl bg-muted border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/20 focus:ring-1 focus:ring-primary transition-all"
 //                   />
 //                 </div>
 
 //                 {/* الرسالة */}
 //                 <div>
-//                   <label className="text-sm font-bold text-neutral-300 mb-2 block">الرسالة</label>
+//                   <label className="text-sm font-bold text-foreground mb-2 block">الرسالة</label>
 //                   <textarea
 //                     rows={5}
 //                     value={message}
 //                     onChange={(e) => setMessage(e.target.value)}
 //                     placeholder="اكتب تفاصيل رسالتك هنا..."
-//                     className="w-full px-4 py-3.5 rounded-xl bg-[#121A15] border border-neutral-800 text-white text-sm placeholder:text-neutral-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all resize-none"
+//                     className="w-full px-4 py-3.5 rounded-xl bg-muted border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/20 focus:ring-1 focus:ring-primary transition-all resize-none"
 //                   />
 //                 </div>
 
@@ -329,7 +329,7 @@
 //                 <Button
 //                   onClick={handleSubmit}
 //                   disabled={loading}
-//                   className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-14 text-base font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 mt-4"
+//                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 text-base font-bold rounded-xl transition-all  hover: flex items-center justify-center gap-2 mt-4"
 //                 >
 //                   {loading ? (
 //                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -351,14 +351,14 @@
 //                 href="https://wa.me/201019715490" 
 //                 target="_blank" 
 //                 rel="noopener noreferrer" 
-//                 className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl p-5 flex items-center gap-4 hover:bg-[#121A15] hover:border-[#25D366]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg"
+//                 className="group bg-muted border border-border rounded-2xl p-5 flex items-center gap-4 hover:bg-muted hover:border-[#25D366]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg"
 //               >
-//                 <div className="w-12 h-12 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:bg-[#25D366]/10 transition-colors">
+//                 <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:bg-[#25D366]/10 transition-colors">
 //                   <MessageCircle className="w-6 h-6 text-[#25D366]" />
 //                 </div>
 //                 <div>
-//                   <p className="font-bold text-white text-base mb-0.5">واتساب</p>
-//                   <p className="text-xs text-neutral-400">تواصل مباشر وسريع</p>
+//                   <p className="font-bold text-foreground text-base mb-0.5">واتساب</p>
+//                   <p className="text-xs text-muted-foreground">تواصل مباشر وسريع</p>
 //                 </div>
 //               </a>
 
@@ -367,14 +367,14 @@
 //                 href="https://t.me/eng_abdulr7man" 
 //                 target="_blank" 
 //                 rel="noopener noreferrer" 
-//                 className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl p-5 flex items-center gap-4 hover:bg-[#121A15] hover:border-[#0088cc]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg"
+//                 className="group bg-muted border border-border rounded-2xl p-5 flex items-center gap-4 hover:bg-muted hover:border-[#0088cc]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg"
 //               >
-//                 <div className="w-12 h-12 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:bg-[#0088cc]/10 transition-colors">
+//                 <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:bg-[#0088cc]/10 transition-colors">
 //                   <Send className="w-6 h-6 text-[#0088cc]" />
 //                 </div>
 //                 <div>
-//                   <p className="font-bold text-white text-base mb-0.5">تيليجرام</p>
-//                   <p className="text-xs text-neutral-400">دعم فني واستفسارات</p>
+//                   <p className="font-bold text-foreground text-base mb-0.5">تيليجرام</p>
+//                   <p className="text-xs text-muted-foreground">دعم فني واستفسارات</p>
 //                 </div>
 //               </a>
               
@@ -449,14 +449,13 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
+    <div className="min-h-screen flex flex-col bg-background font-tajawal selection:bg-accent">
       <Navbar />
       
       <main className="flex-1 pt-32 pb-24 md:pb-16 relative overflow-hidden">
         
         {/* إضاءات خلفية (Ambient Glows) */}
-        <div className="absolute top-[-10%] right-[-5%] w-[50vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-[20%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/5 blur-[120px] pointer-events-none" />
+
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           
@@ -473,53 +472,53 @@ const ContactPage = () => {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="space-y-6"
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-semibold shadow-[0_0_20px_rgba(16,185,129,0.05)]">
-                  <Mail className="w-4 h-4 text-emerald-400" />
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border text-primary text-sm font-semibold ">
+                  <Mail className="w-4 h-4 text-primary" />
                   دعم متواصل 24/7
                 </div>
                 
-                <h1 className="text-4xl md:text-5xl font-black text-white leading-[1.2] tracking-tight">
+                <h1 className="text-4xl md:text-5xl font-black text-foreground leading-[1.2] tracking-tight">
                   نحن هنا <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600 relative">
+                  <span className="text-transparent bg-clip-text text-primary relative">
                     لمساعدتك دائماً
                     <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-gradient-to-l from-emerald-500 to-transparent rounded-full" />
                   </span>
                 </h1>
                 
-                <p className="text-lg text-neutral-400 leading-relaxed max-w-sm">
+                <p className="text-lg text-muted-foreground leading-relaxed max-w-sm">
                   سواء كان لديك استفسار، مشكلة تقنية، أو اقتراح لتطوير المنصة، فريقنا مستعد لسماعك والرد عليك بأسرع وقت.
                 </p>
 
                 {/* شبكة التواصل المباشر (Bento Grid Style) */}
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <a href="https://wa.me/201019715490" target="_blank" rel="noopener noreferrer" className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl p-5 hover:bg-[#121A15] hover:border-[#25D366]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg flex flex-col items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:bg-[#25D366]/10 transition-colors">
+                  <a href="https://wa.me/201019715490" target="_blank" rel="noopener noreferrer" className="group bg-muted border border-border rounded-2xl p-5 hover:bg-muted hover:border-[#25D366]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg flex flex-col items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:bg-[#25D366]/10 transition-colors">
                       <MessageCircle className="w-5 h-5 text-[#25D366]" />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-sm">واتساب</p>
-                      <p className="text-xs text-neutral-500 mt-0.5">رد سريع جداً</p>
+                      <p className="font-bold text-foreground text-sm">واتساب</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">رد سريع جداً</p>
                     </div>
                   </a>
 
-                  <a href="https://t.me/eng_abdulr7man" target="_blank" rel="noopener noreferrer" className="group bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl p-5 hover:bg-[#121A15] hover:border-[#0088cc]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg flex flex-col items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:bg-[#0088cc]/10 transition-colors">
+                  <a href="https://t.me/eng_abdulr7man" target="_blank" rel="noopener noreferrer" className="group bg-muted border border-border rounded-2xl p-5 hover:bg-muted hover:border-[#0088cc]/40 transition-all duration-300 hover:-translate-y-1 shadow-lg flex flex-col items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:bg-[#0088cc]/10 transition-colors">
                       <Send className="w-5 h-5 text-[#0088cc]" />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-sm">تيليجرام</p>
-                      <p className="text-xs text-neutral-500 mt-0.5">متابعة الدعم الفني</p>
+                      <p className="font-bold text-foreground text-sm">تيليجرام</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">متابعة الدعم الفني</p>
                     </div>
                   </a>
 
-                  <div className="col-span-2 bg-[#0a0f0c] border border-neutral-800/60 rounded-2xl p-5 flex items-center justify-between gap-4">
+                  <div className="col-span-2 bg-muted border border-border rounded-2xl p-5 flex items-center justify-between gap-4">
                      <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center">
-                         <Phone className="w-5 h-5 text-emerald-500" />
+                       <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center">
+                         <Phone className="w-5 h-5 text-primary" />
                        </div>
                        <div>
-                         <p className="font-bold text-white text-sm">رقم الهاتف</p>
-                         <p className="text-sm text-neutral-400 mt-0.5" dir="ltr">01019715490</p>
+                         <p className="font-bold text-foreground text-sm">رقم الهاتف</p>
+                         <p className="text-sm text-muted-foreground mt-0.5" dir="ltr">01019715490</p>
                        </div>
                      </div>
                   </div>
@@ -539,30 +538,29 @@ const ContactPage = () => {
               >
                 {!user ? (
                   // --- حالة عدم تسجيل الدخول (Premium Locked State) ---
-                  <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-10 md:p-14 text-center space-y-8 shadow-2xl backdrop-blur-xl relative overflow-hidden h-full flex flex-col justify-center min-h-[500px]">
+                  <div className="bg-muted border border-border rounded-[2rem] p-10 md:p-14 text-center space-y-8 shadow-2xl backdrop-blur-xl relative overflow-hidden h-full flex flex-col justify-center min-h-[500px]">
                     {/* إضاءة داخلية */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-emerald-900/10 blur-[100px] pointer-events-none rounded-full" />
-                    
-                    <div className="w-24 h-24 rounded-3xl bg-[#121A15] border border-neutral-800 flex items-center justify-center mx-auto shadow-inner relative z-10 group">
-                      <div className="absolute inset-0 bg-emerald-500/10 rounded-3xl blur-md opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                      <LogIn className="w-10 h-10 text-neutral-400 group-hover:text-emerald-500 transition-colors relative z-10" />
+
+                    <div className="w-24 h-24 rounded-3xl bg-muted border border-border flex items-center justify-center mx-auto shadow-inner relative z-10 group">
+                      <div className="absolute inset-0 bg-accent rounded-3xl blur-md opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                      <LogIn className="w-10 h-10 text-muted-foreground group-hover:text-primary transition-colors relative z-10" />
                     </div>
                     
                     <div className="relative z-10">
-                      <h3 className="text-3xl text-white font-black mb-3">سجل دخولك للتواصل</h3>
-                      <p className="text-base text-neutral-400 max-w-sm mx-auto leading-relaxed">
+                      <h3 className="text-3xl text-foreground font-black mb-3">سجل دخولك للتواصل</h3>
+                      <p className="text-base text-muted-foreground max-w-sm mx-auto leading-relaxed">
                         نحن بحاجة لمعرفة هويتك لضمان تقديم أفضل مساعدة ممكنة ومتابعة رسالتك بدقة.
                       </p>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2 relative z-10">
                       <Link to="/login" className="w-full sm:w-auto">
-                        <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-14 px-10 text-base font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-all">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 px-10 text-base font-bold rounded-xl  hover: transition-all">
                           تسجيل الدخول
                         </Button>
                       </Link>
                       <Link to="/register" className="w-full sm:w-auto">
-                        <Button variant="outline" className="w-full bg-transparent border-neutral-700 text-neutral-300 hover:bg-[#121A15] hover:text-white h-14 px-10 text-base font-bold rounded-xl transition-all">
+                        <Button variant="outline" className="w-full bg-transparent border-border text-foreground hover:bg-muted hover:text-foreground h-14 px-10 text-base font-bold rounded-xl transition-all">
                           إنشاء حساب جديد
                         </Button>
                       </Link>
@@ -570,14 +568,14 @@ const ContactPage = () => {
                   </div>
                 ) : (
                   // --- نموذج إرسال الرسالة (The Form) ---
-                  <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2rem] p-8 md:p-12 shadow-2xl backdrop-blur-xl relative">
-                    <h3 className="text-2xl font-bold text-white mb-8 border-b border-neutral-800/50 pb-4">إرسال رسالة مباشرة</h3>
+                  <div className="bg-muted border border-border rounded-[2rem] p-8 md:p-12 shadow-2xl backdrop-blur-xl relative">
+                    <h3 className="text-2xl font-bold text-foreground mb-8 border-b border-border pb-4">إرسال رسالة مباشرة</h3>
                     
                     <div className="space-y-6">
                       
                       {/* نوع الرسالة (Pills) */}
                       <div>
-                        <label className="text-sm font-bold text-neutral-400 mb-3 block">كيف يمكننا مساعدتك؟</label>
+                        <label className="text-sm font-bold text-muted-foreground mb-3 block">كيف يمكننا مساعدتك؟</label>
                         <div className="flex flex-wrap gap-3">
                           {types.map((t) => (
                             <button
@@ -585,8 +583,8 @@ const ContactPage = () => {
                               onClick={() => setType(t.value)}
                               className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
                                 type === t.value
-                                  ? "bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] scale-105"
-                                  : "bg-[#121A15] border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600"
+                                  ? "bg-primary text-primary-foreground  scale-105"
+                                  : "bg-muted border border-border text-muted-foreground hover:text-foreground hover:border-neutral-600"
                               }`}
                             >
                               {t.label}
@@ -597,25 +595,25 @@ const ContactPage = () => {
 
                       {/* الموضوع */}
                       <div>
-                        <label className="text-sm font-bold text-neutral-400 mb-2 block">عنوان الرسالة (الموضوع)</label>
+                        <label className="text-sm font-bold text-muted-foreground mb-2 block">عنوان الرسالة (الموضوع)</label>
                         <input
                           type="text"
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
                           placeholder="اكتب عنواناً يختصر طلبك..."
-                          className="w-full px-5 py-4 rounded-xl bg-[#121A15] border border-neutral-800 text-white text-base placeholder:text-neutral-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+                          className="w-full px-5 py-4 rounded-xl bg-muted border border-border text-foreground text-base placeholder:text-muted-foreground focus:outline-none focus:border-primary/20 focus:ring-1 focus:ring-primary transition-all"
                         />
                       </div>
 
                       {/* الرسالة */}
                       <div>
-                        <label className="text-sm font-bold text-neutral-400 mb-2 block">تفاصيل الرسالة</label>
+                        <label className="text-sm font-bold text-muted-foreground mb-2 block">تفاصيل الرسالة</label>
                         <textarea
                           rows={6}
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
                           placeholder="اشرح لنا استفسارك أو مشكلتك بالتفصيل هنا..."
-                          className="w-full px-5 py-4 rounded-xl bg-[#121A15] border border-neutral-800 text-white text-base placeholder:text-neutral-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all resize-none"
+                          className="w-full px-5 py-4 rounded-xl bg-muted border border-border text-foreground text-base placeholder:text-muted-foreground focus:outline-none focus:border-primary/20 focus:ring-1 focus:ring-primary transition-all resize-none"
                         />
                       </div>
 
@@ -623,7 +621,7 @@ const ContactPage = () => {
                       <Button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white h-14 text-lg font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 mt-4"
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 text-lg font-bold rounded-xl transition-all  hover: flex items-center justify-center gap-2 mt-4"
                       >
                         {loading ? (
                           <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />

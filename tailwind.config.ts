@@ -12,22 +12,17 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1.5rem",
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
       fontFamily: {
-        // Glory renders Latin letters/numbers; Arabic glyphs fall through to Tajawal automatically.
-        tajawal: ["Glory", "Tajawal", "sans-serif"],
-        glory: ["Glory", "Tajawal", "sans-serif"],
-        animation: { shine: 'shine 1.5s ease-in-out infinite' }, keyframes: { shine: { '100%': { left: '125%' } } }
+        tajawal: ["Tajawal", "sans-serif"],
       },
       transitionTimingFunction: {
-        ios: "cubic-bezier(0.4, 0, 0.2, 1)",
-        "ios-out": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        "ios-spring": "cubic-bezier(0.34, 1.26, 0.64, 1)",
+        standard: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -46,6 +41,14 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -89,24 +92,14 @@ export default {
           to: { height: "0", opacity: "0" },
         },
         "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-6px)" },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "slide-up": "slide-up 0.6s ease-out forwards",
-        "float": "float 3s ease-in-out infinite",
+        "fade-in": "fade-in 0.2s ease-out forwards",
       },
     },
   },

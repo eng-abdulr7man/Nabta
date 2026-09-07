@@ -41,17 +41,17 @@ const AdminLayout = ({ children }) => {
   };
 
   const Sidebar = ({ mobile = false }) => (
-    <div className={`flex flex-col h-full bg-[#0a0f0c]/80 backdrop-blur-xl border-l border-white/5 ${mobile ? "w-72" : collapsed ? "w-20" : "w-64"} transition-all duration-500 ease-in-out z-50`}>
+    <div className={`flex flex-col h-full bg-muted/80 backdrop-blur-xl border-l border-border ${mobile ? "w-72" : collapsed ? "w-20" : "w-64"} transition-all duration-500 ease-in-out z-50`}>
       {/* Logo Section */}
-      <div className="p-6 flex items-center justify-between border-b border-white/5">
+      <div className="p-6 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
-            <Sprout className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 rounded-2xl text-primary flex items-center justify-center shadow-lg  shrink-0">
+            <Sprout className="w-6 h-6 text-foreground" />
           </div>
           {(!collapsed || mobile) && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col">
-              <span className="font-tajawal font-black text-white text-base leading-none">نبتة</span>
-              <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-1">Admin Panel</span>
+              <span className="font-tajawal font-black text-foreground text-base leading-none">نبتة</span>
+              <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1">Admin Panel</span>
             </motion.div>
           )}
         </div>
@@ -62,7 +62,7 @@ const AdminLayout = ({ children }) => {
         {sidebarLinks.map((group, gIdx) => (
           <div key={gIdx} className="space-y-2">
             {(!collapsed || mobile) && (
-              <h3 className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.2em] px-4 mb-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-4 mb-4">
                 {group.group}
               </h3>
             )}
@@ -77,23 +77,23 @@ const AdminLayout = ({ children }) => {
                     onClick={() => mobile && setMobileOpen(false)}
                     className={`group relative flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
                       isActive 
-                        ? "text-emerald-400" 
-                        : "text-neutral-500 hover:text-white hover:bg-white/5"
+                        ? "text-primary" 
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`}
                   >
                     {isActive && (
                       <motion.div 
                         layoutId="activeTab"
-                        className="absolute inset-0 bg-emerald-500/10 rounded-2xl border border-emerald-500/20"
+                        className="absolute inset-0 bg-accent rounded-2xl border border-primary/20"
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
-                    <Icon className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-emerald-500" : ""}`} />
+                    <Icon className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-primary" : ""}`} />
                     {(!collapsed || mobile) && (
                       <span className="text-sm font-bold relative z-10">{link.label}</span>
                     )}
                     {isActive && !collapsed && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-auto" />
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-1.5 h-1.5 rounded-full bg-primary mr-auto" />
                     )}
                   </Link>
                 );
@@ -104,8 +104,8 @@ const AdminLayout = ({ children }) => {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="p-4 border-t border-white/5 space-y-2">
-        <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-neutral-500 hover:text-white hover:bg-white/5 transition-all">
+      <div className="p-4 border-t border-border space-y-2">
+        <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
           <ChevronRight className="w-5 h-5" />
           {(!collapsed || mobile) && <span>الخروج من الإدارة</span>}
         </Link>
@@ -121,7 +121,7 @@ const AdminLayout = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#050806] flex font-tajawal text-white selection:bg-emerald-500/30" dir="rtl">
+    <div className="min-h-screen bg-background flex font-tajawal text-foreground selection:bg-accent" dir="rtl">
       {/* Desktop sidebar */}
       <div className="hidden md:flex sticky top-0 h-screen z-50">
         <Sidebar />
@@ -149,31 +149,31 @@ const AdminLayout = ({ children }) => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen max-w-full overflow-hidden">
-        <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-[#0a0f0c]/50 backdrop-blur-xl sticky top-0 z-40">
+        <header className="h-20 border-b border-border flex items-center justify-between px-8 bg-muted/50 backdrop-blur-xl sticky top-0 z-40">
           <div className="flex items-center gap-6">
-            <button className="md:hidden p-2.5 bg-white/5 rounded-xl hover:bg-white/10 transition-colors" onClick={() => setMobileOpen(true)}>
-              <Menu className="w-6 h-6 text-emerald-500" />
+            <button className="md:hidden p-2.5 bg-muted rounded-xl hover:bg-muted transition-colors" onClick={() => setMobileOpen(true)}>
+              <Menu className="w-6 h-6 text-primary" />
             </button>
-            <button className="hidden md:flex p-2 bg-white/5 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10 transition-all" onClick={() => setCollapsed(!collapsed)}>
+            <button className="hidden md:flex p-2 bg-muted rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-all" onClick={() => setCollapsed(!collapsed)}>
               {collapsed ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <div className="hidden sm:flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <h2 className="text-[11px] font-black text-neutral-500 uppercase tracking-[0.2em]">النظام الإداري المركزي</h2>
+              <ShieldCheck className="w-4 h-4 text-primary" />
+              <h2 className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em]">النظام الإداري المركزي</h2>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end hidden xs:flex">
-              <span className="text-sm font-black text-white">{profile?.full_name || "المدير العام"}</span>
+              <span className="text-sm font-black text-foreground">{profile?.full_name || "المدير العام"}</span>
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">صلاحية كاملة</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-[10px] text-primary font-bold uppercase tracking-tighter">صلاحية كاملة</span>
               </div>
             </div>
             <motion.div 
               whileHover={{ scale: 1.05 }}
-              className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#121A15] to-[#1a251e] border border-white/10 flex items-center justify-center text-emerald-500 font-black shadow-lg shadow-black/40 text-lg"
+              className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#121A15] to-[#1a251e] border border-border flex items-center justify-center text-primary font-black shadow-lg shadow-black/40 text-lg"
             >
               {profile?.full_name?.charAt(0) || "A"}
             </motion.div>
@@ -183,8 +183,8 @@ const AdminLayout = ({ children }) => {
         <main className="flex-1 p-6 md:p-10 relative overflow-y-auto custom-scrollbar">
           {/* تأثيرات إضاءة خلفية احترافية */}
           <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/5 blur-[150px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-500/5 blur-[130px] rounded-full" />
+
+
           </div>
           
           <motion.div

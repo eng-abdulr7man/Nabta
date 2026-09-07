@@ -79,22 +79,22 @@ const CourseCard = ({
       className="h-full"
     >
       <Link to={`/courses/${id}`} className="block group h-full">
-        <div className="relative h-full flex flex-col rounded-[2rem] overflow-hidden border border-neutral-800/60 bg-[#0a0f0c] shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-1">
+        <div className="relative h-full flex flex-col rounded-[2rem] overflow-hidden border border-border bg-muted shadow-lg hover:shadow-2xl hover: hover:border-primary/20 transition-all duration-300 hover:-translate-y-1">
 
           {/* Image Section */}
-          <div className="relative w-full aspect-[4/3] sm:aspect-video bg-[#121A15] overflow-hidden shrink-0">
+          <div className="relative w-full aspect-[4/3] sm:aspect-video bg-muted overflow-hidden shrink-0">
 
             {/* زر المشاركة (Share) */}
             <button 
               onClick={handleShare}
               title="مشاركة الكورس"
-              className="absolute top-3 left-3 z-20 bg-black/50 hover:bg-emerald-600 backdrop-blur-md p-2.5 rounded-full border border-white/10 hover:border-emerald-500 transition-all duration-300 shadow-lg opacity-90 group-hover:opacity-100"
+              className="absolute top-3 left-3 z-20 bg-black/50 hover:bg-primary backdrop-blur-md p-2.5 rounded-full border border-border hover:border-primary transition-all duration-300 shadow-lg opacity-90 group-hover:opacity-100"
             >
-              <Share2 className="w-4 h-4 text-white" />
+              <Share2 className="w-4 h-4 text-foreground" />
             </button>
 
             {!imgLoaded && thumbnail_url && (
-              <div className="absolute inset-0 animate-pulse bg-[#1a241c]" />
+              <div className="absolute inset-0 animate-pulse bg-muted" />
             )}
 
             {thumbnail_url ? (
@@ -113,52 +113,52 @@ const CourseCard = ({
               </>
             ) : (
               <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-emerald-900/10 to-transparent">
-                <BookOpen className="w-16 h-16 text-emerald-500/20" />
+                <BookOpen className="w-16 h-16 text-primary/20" />
               </div>
             )}
           </div>
 
           {/* Content */}
-          <div className="p-5 md:p-6 flex flex-col flex-1 relative z-20 -mt-3 bg-[#0a0f0c] rounded-t-3xl">
+          <div className="p-5 md:p-6 flex flex-col flex-1 relative z-20 -mt-3 bg-muted rounded-t-3xl">
 
             <div className="mb-auto space-y-2.5">
-              <h3 className="font-bold text-xl line-clamp-2 group-hover:text-emerald-400 transition-colors text-white leading-snug">
+              <h3 className="font-bold text-xl line-clamp-2 group-hover:text-primary transition-colors text-foreground leading-snug">
                 {title}
               </h3>
 
-              <p className="text-sm text-neutral-400 line-clamp-2 leading-relaxed">
+              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                 {description}
               </p>
             </div>
 
             <div className="mt-4 space-y-3">
-              <p className="text-xs text-neutral-500">
-                بواسطة <span className="text-neutral-300 font-bold">{instructor}</span>
+              <p className="text-xs text-muted-foreground">
+                بواسطة <span className="text-foreground font-bold">{instructor}</span>
               </p>
 
               {/* Specialization */}
               {spec && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold bg-accent text-primary border border-primary/20">
                   <Icon className="w-3.5 h-3.5" />
                   {spec.name}
                 </div>
               )}
 
               {/* Stats */}
-              <div className="flex items-center justify-between pt-4 border-t border-neutral-800/60 text-xs font-medium">
+              <div className="flex items-center justify-between pt-4 border-t border-border text-xs font-medium">
                 
-                <div className="flex items-center gap-1.5 text-neutral-400">
-                  <BookOpen className="w-4 h-4 text-emerald-500/70" />
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <BookOpen className="w-4 h-4 text-primary/70" />
                   <span>{lessonsCount ?? 0} درس</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-neutral-400">
-                  <Users className="w-4 h-4 text-emerald-500/70" />
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Users className="w-4 h-4 text-primary/70" />
                   <span>{enrolledCount ?? 0} طالب</span>
                 </div>
 
                 {ratingData && ratingData.avg > 0 && (
-                  <div className="flex items-center gap-1.5 text-white">
+                  <div className="flex items-center gap-1.5 text-foreground">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <span>{ratingData.avg.toFixed(1)}</span>
                   </div>

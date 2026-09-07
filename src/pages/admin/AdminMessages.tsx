@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 const typeConfig: Record<string, { label: string, color: string, bg: string, border: string }> = {
-  inquiry: { label: "استفسار", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+  inquiry: { label: "استفسار", color: "text-primary", bg: "bg-accent", border: "border-primary/20" },
   suggestion: { label: "اقتراح", color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20" },
   complaint: { label: "شكوى", color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20" },
   support: { label: "دعم فني", color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
@@ -108,29 +108,28 @@ const AdminMessages = () => {
   return (
     <AdminLayout>
       <div className="max-w-6xl mx-auto space-y-8 p-2 font-tajawal relative overflow-x-hidden" dir="rtl">
-        <div className="absolute top-[-5%] right-[-5%] w-[300px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
         {/* 🌟 Header Section 🌟 */}
-        <div className="bg-[#0a0f0c] p-6 md:p-8 rounded-[2rem] border border-neutral-800/60 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="bg-muted p-6 md:p-8 rounded-[2rem] border border-border shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="absolute top-0 left-0 w-40 h-40 bg-blue-500/10 blur-3xl -z-10" />
           <div>
-            <h1 className="text-3xl md:text-4xl font-black text-white flex items-center gap-3 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-black text-foreground flex items-center gap-3 tracking-tight">
               <MessageSquare className="w-8 h-8 text-blue-500" /> مركز الدعم والرسائل
             </h1>
-            <p className="text-neutral-400 font-medium mt-2">نظام متكامل لإدارة تذاكر الدعم الفني، الشكاوى، واستفسارات الطلاب.</p>
+            <p className="text-muted-foreground font-medium mt-2">نظام متكامل لإدارة تذاكر الدعم الفني، الشكاوى، واستفسارات الطلاب.</p>
           </div>
           
-          <div className="bg-[#121A15] border border-neutral-800 px-5 py-3 rounded-2xl flex items-center gap-4 shadow-inner">
+          <div className="bg-muted border border-border px-5 py-3 rounded-2xl flex items-center gap-4 shadow-inner">
             <div className="flex flex-col">
-              <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">تذاكر مفتوحة</span>
-              <span className="text-2xl font-black text-white leading-none mt-1">{unreadCount}</span>
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">تذاكر مفتوحة</span>
+              <span className="text-2xl font-black text-foreground leading-none mt-1">{unreadCount}</span>
             </div>
             {unreadCount > 0 ? (
               <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-500 flex items-center justify-center border border-rose-500/30">
                 <AlertCircle className="w-5 h-5 animate-pulse" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
+              <div className="w-10 h-10 rounded-xl bg-accent text-primary flex items-center justify-center border border-primary/20">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             )}
@@ -148,14 +147,14 @@ const AdminMessages = () => {
             /* 🌟 Ticket Workspace (منطقة العمل والرد) 🌟 */
             <motion.div key="detail" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               
-              <Button variant="ghost" onClick={() => setSelectedMsg(null)} className="gap-2 text-neutral-400 hover:text-white hover:bg-[#121A15] rounded-xl h-12 px-5 font-bold transition-all">
+              <Button variant="ghost" onClick={() => setSelectedMsg(null)} className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl h-12 px-5 font-bold transition-all">
                 <ArrowRight className="w-5 h-5" /> العودة للبريد
               </Button>
 
-              <div className="bg-[#0a0f0c] border border-neutral-800/60 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col">
+              <div className="bg-muted border border-border rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col">
                 
                 {/* رأس التذكرة */}
-                <div className="bg-[#121A15] p-6 md:p-8 border-b border-neutral-800/60 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="bg-muted p-6 md:p-8 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-inner">
                       {selectedMsg.profile?.avatar_url ? (
@@ -163,8 +162,8 @@ const AdminMessages = () => {
                       ) : <User className="w-7 h-7 text-blue-500" />}
                     </div>
                     <div>
-                      <h3 className="font-black text-xl text-white mb-1.5">{selectedMsg.profile?.full_name || "مستخدم مجهول"}</h3>
-                      <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-neutral-400">
+                      <h3 className="font-black text-xl text-foreground mb-1.5">{selectedMsg.profile?.full_name || "مستخدم مجهول"}</h3>
+                      <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-muted-foreground">
                         <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> {selectedMsg.profile?.email || "لا يوجد بريد"}</span>
                         {selectedMsg.profile?.phone && <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> {selectedMsg.profile.phone}</span>}
                       </div>
@@ -174,7 +173,7 @@ const AdminMessages = () => {
                     <span className={`px-4 py-1.5 rounded-lg text-xs font-black border ${typeConfig[selectedMsg.type]?.bg} ${typeConfig[selectedMsg.type]?.border} ${typeConfig[selectedMsg.type]?.color}`}>
                       {typeConfig[selectedMsg.type]?.label || selectedMsg.type}
                     </span>
-                    <span className="text-xs text-neutral-500 font-bold flex items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground font-bold flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5" /> {new Date(selectedMsg.created_at).toLocaleString("ar-EG", { dateStyle: "long", timeStyle: "short" })}
                     </span>
                   </div>
@@ -182,15 +181,15 @@ const AdminMessages = () => {
 
                 {/* محتوى الشكوى */}
                 <div className="p-6 md:p-8">
-                  <h4 className="text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-3">موضوع الرسالة</h4>
-                  <h2 className="font-black text-2xl text-white leading-tight mb-4">{selectedMsg.subject}</h2>
-                  <div className="bg-[#121A15]/50 border border-neutral-800/80 rounded-2xl p-6 shadow-inner">
-                    <p className="text-neutral-300 leading-loose whitespace-pre-wrap font-medium text-sm">{selectedMsg.message}</p>
+                  <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-3">موضوع الرسالة</h4>
+                  <h2 className="font-black text-2xl text-foreground leading-tight mb-4">{selectedMsg.subject}</h2>
+                  <div className="bg-muted/50 border border-border rounded-2xl p-6 shadow-inner">
+                    <p className="text-foreground leading-loose whitespace-pre-wrap font-medium text-sm">{selectedMsg.message}</p>
                   </div>
                 </div>
 
                 {/* 🌟 منطقة الرد (Reply Workspace) 🌟 */}
-                <div className="p-6 md:p-8 bg-[#050806] border-t border-blue-500/20 space-y-4">
+                <div className="p-6 md:p-8 bg-background border-t border-blue-500/20 space-y-4">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-sm font-black text-blue-500 flex items-center gap-2">
                       <MessageSquare className="w-4 h-4" /> صياغة الرد (Workspace)
@@ -198,12 +197,12 @@ const AdminMessages = () => {
                     
                     {/* أزرار الردود الجاهزة والذكاء الاصطناعي */}
                     <div className="flex gap-2 flex-wrap justify-end">
-                      <Button onClick={generateAIReply} disabled={isGeneratingAI} className="bg-purple-600 hover:bg-purple-500 text-white text-xs h-9 rounded-lg gap-1.5 font-bold shadow-lg shadow-purple-900/20">
+                      <Button onClick={generateAIReply} disabled={isGeneratingAI} className="bg-purple-600 hover:bg-purple-500 text-foreground text-xs h-9 rounded-lg gap-1.5 font-bold shadow-lg shadow-purple-900/20">
                         {isGeneratingAI ? <AlertCircle className="w-3.5 h-3.5 animate-spin" /> : <Bot className="w-3.5 h-3.5" />} رد بالذكاء الاصطناعي
                       </Button>
                       {cannedResponses.map((c, idx) => (
-                        <Button key={idx} onClick={() => setReplyText(c.text)} variant="outline" className="text-xs h-9 rounded-lg border-neutral-700 bg-[#121A15] text-neutral-300 hover:text-white hover:border-emerald-500/50 gap-1.5">
-                          <Zap className="w-3 h-3 text-emerald-500" /> {c.title}
+                        <Button key={idx} onClick={() => setReplyText(c.text)} variant="outline" className="text-xs h-9 rounded-lg border-border bg-muted text-foreground hover:text-foreground hover:border-primary/20 gap-1.5">
+                          <Zap className="w-3 h-3 text-primary" /> {c.title}
                         </Button>
                       ))}
                     </div>
@@ -214,7 +213,7 @@ const AdminMessages = () => {
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="اكتب ردك هنا، أو استخدم المساعد الذكي والردود الجاهزة بالأعلى..."
                     rows={4}
-                    className="w-full bg-[#121A15] border border-neutral-800 rounded-2xl p-4 text-white text-sm focus:border-blue-500/50 outline-none resize-none shadow-inner"
+                    className="w-full bg-muted border border-border rounded-2xl p-4 text-foreground text-sm focus:border-blue-500/50 outline-none resize-none shadow-inner"
                   />
 
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
@@ -222,14 +221,14 @@ const AdminMessages = () => {
                     <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                       {selectedMsg.profile?.email && (
                         <a href={`mailto:${selectedMsg.profile.email}?subject=رد من إدارة نبتة: ${selectedMsg.subject}&body=${encodeURIComponent(replyText)}`} className="flex-1 sm:flex-none">
-                          <Button disabled={!replyText} className="w-full bg-blue-600 hover:bg-blue-500 text-white gap-2 font-bold h-12 rounded-xl shadow-lg shadow-blue-900/20">
+                          <Button disabled={!replyText} className="w-full bg-blue-600 hover:bg-blue-500 text-foreground gap-2 font-bold h-12 rounded-xl shadow-lg shadow-blue-900/20">
                             <Mail className="w-4 h-4" /> إرسال بالإيميل
                           </Button>
                         </a>
                       )}
                       {selectedMsg.profile?.phone && (
                         <a href={`https://wa.me/${selectedMsg.profile.phone.replace(/\D/g, "")}?text=${encodeURIComponent(replyText)}`} target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none">
-                          <Button disabled={!replyText} className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white gap-2 font-bold h-12 rounded-xl shadow-lg shadow-[#25D366]/20">
+                          <Button disabled={!replyText} className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-foreground gap-2 font-bold h-12 rounded-xl shadow-sm">
                             <ExternalLink className="w-4 h-4" /> إرسال واتساب
                           </Button>
                         </a>
@@ -237,7 +236,7 @@ const AdminMessages = () => {
                     </div>
                     
                     {/* إنهاء التذكرة (Resolved) */}
-                    <Button onClick={() => { if(window.confirm("هل تم حل مشكلة الطالب وإغلاق التذكرة؟")) resolveMsg.mutate(selectedMsg.id) }} className="w-full sm:w-auto bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white border border-emerald-500/20 h-12 rounded-xl font-bold gap-2 transition-all">
+                    <Button onClick={() => { if(window.confirm("هل تم حل مشكلة الطالب وإغلاق التذكرة؟")) resolveMsg.mutate(selectedMsg.id) }} className="w-full sm:w-auto bg-accent hover:bg-primary/90 text-primary hover:text-primary-foreground border border-primary/20 h-12 rounded-xl font-bold gap-2 transition-all">
                       <CheckCheck className="w-4 h-4" /> تم الحل (إنهاء التذكرة)
                     </Button>
                   </div>
@@ -251,26 +250,26 @@ const AdminMessages = () => {
               
               {/* شريط التبويبات الذكي */}
               <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                <div className="flex items-center gap-2 bg-[#0a0f0c] p-1.5 rounded-2xl border border-neutral-800/60 shadow-lg shrink-0">
-                  <Filter className="w-4 h-4 text-neutral-500 ml-2" />
-                  <Button onClick={() => setActiveFilter("all")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "all" ? "bg-neutral-800 text-white" : "text-neutral-500 hover:text-white"}`}>الكل</Button>
-                  <Button onClick={() => setActiveFilter("unread")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "unread" ? "bg-blue-600 text-white" : "text-neutral-500 hover:text-white"}`}>تذاكر مفتوحة {unreadCount > 0 && `(${unreadCount})`}</Button>
-                  <div className="w-px h-5 bg-neutral-800 mx-1" />
-                  <Button onClick={() => setActiveFilter("complaint")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "complaint" ? "bg-rose-500/20 text-rose-400" : "text-neutral-500 hover:text-rose-400"}`}>الشكاوى</Button>
-                  <Button onClick={() => setActiveFilter("support")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "support" ? "bg-blue-500/20 text-blue-400" : "text-neutral-500 hover:text-blue-400"}`}>الدعم الفني</Button>
-                  <Button onClick={() => setActiveFilter("inquiry")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "inquiry" ? "bg-emerald-500/20 text-emerald-400" : "text-neutral-500 hover:text-emerald-400"}`}>الاستفسارات</Button>
+                <div className="flex items-center gap-2 bg-muted p-1.5 rounded-2xl border border-border shadow-lg shrink-0">
+                  <Filter className="w-4 h-4 text-muted-foreground ml-2" />
+                  <Button onClick={() => setActiveFilter("all")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "all" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"}`}>الكل</Button>
+                  <Button onClick={() => setActiveFilter("unread")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "unread" ? "bg-blue-600 text-foreground" : "text-muted-foreground hover:text-foreground"}`}>تذاكر مفتوحة {unreadCount > 0 && `(${unreadCount})`}</Button>
+                  <div className="w-px h-5 bg-muted mx-1" />
+                  <Button onClick={() => setActiveFilter("complaint")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "complaint" ? "bg-rose-500/20 text-rose-400" : "text-muted-foreground hover:text-rose-400"}`}>الشكاوى</Button>
+                  <Button onClick={() => setActiveFilter("support")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "support" ? "bg-blue-500/20 text-blue-400" : "text-muted-foreground hover:text-blue-400"}`}>الدعم الفني</Button>
+                  <Button onClick={() => setActiveFilter("inquiry")} variant="ghost" className={`h-9 rounded-xl text-xs font-bold px-4 ${activeFilter === "inquiry" ? "bg-accent text-primary" : "text-muted-foreground hover:text-primary"}`}>الاستفسارات</Button>
                 </div>
               </div>
 
               {isLoading ? (
                 <div className="space-y-4">
-                  {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-[#0a0f0c] border border-neutral-800/50 h-28 rounded-3xl animate-pulse" />)}
+                  {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-muted border border-border h-28 rounded-3xl animate-pulse" />)}
                 </div>
               ) : (filteredMessages || []).length === 0 ? (
-                <div className="text-center py-24 bg-[#0a0f0c] border border-neutral-800/50 rounded-[2.5rem]">
+                <div className="text-center py-24 bg-muted border border-border rounded-[2.5rem]">
                   <CheckCheck className="w-16 h-16 text-emerald-900 mx-auto mb-4" />
-                  <h3 className="text-xl font-black text-white mb-2">الصندوق نظيف تماماً!</h3>
-                  <p className="text-neutral-500 text-sm">لا توجد رسائل أو تذاكر حالياً تلبي هذا التصنيف.</p>
+                  <h3 className="text-xl font-black text-foreground mb-2">الصندوق نظيف تماماً!</h3>
+                  <p className="text-muted-foreground text-sm">لا توجد رسائل أو تذاكر حالياً تلبي هذا التصنيف.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -280,28 +279,28 @@ const AdminMessages = () => {
 
                     return (
                       <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} onClick={() => openMessage(msg)}
-                        className={`bg-[#0a0f0c] border p-5 rounded-[1.5rem] cursor-pointer transition-all duration-300 group hover:scale-[1.01] ${isUnread ? 'border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'border-neutral-800/50 hover:border-neutral-700 opacity-75 hover:opacity-100'}`}
+                        className={`bg-muted border p-5 rounded-[1.5rem] cursor-pointer transition-all duration-300 group hover:scale-[1.01] ${isUnread ? 'border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'border-border hover:border-border opacity-75 hover:opacity-100'}`}
                       >
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                           <div className="flex items-start md:items-center gap-4 flex-1 min-w-0">
                             <div className="relative">
-                              {isUnread && <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-[#0a0f0c] animate-pulse z-10" />}
+                              {isUnread && <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-background animate-pulse z-10" />}
                               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${config.bg} ${config.border} ${config.color}`}>
                                 {msg.profile?.avatar_url ? <img src={msg.profile.avatar_url} alt="" className="w-full h-full rounded-2xl object-cover" /> : <User className="w-6 h-6" />}
                               </div>
                             </div>
                             <div className="flex-1 min-w-0 space-y-1">
                               <div className="flex items-center gap-3">
-                                <h3 className={`font-black text-base truncate ${isUnread ? 'text-white' : 'text-neutral-300'}`}>{msg.profile?.full_name || "مستخدم مجهول"}</h3>
+                                <h3 className={`font-black text-base truncate ${isUnread ? 'text-foreground' : 'text-foreground'}`}>{msg.profile?.full_name || "مستخدم مجهول"}</h3>
                                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${config.bg} ${config.border} ${config.color}`}>{config.label}</span>
                               </div>
-                              <h4 className={`text-sm font-bold truncate ${isUnread ? 'text-blue-100' : 'text-neutral-500'}`}>{msg.subject}</h4>
-                              <p className="text-xs text-neutral-500 line-clamp-1">{msg.message}</p>
+                              <h4 className={`text-sm font-bold truncate ${isUnread ? 'text-blue-100' : 'text-muted-foreground'}`}>{msg.subject}</h4>
+                              <p className="text-xs text-muted-foreground line-clamp-1">{msg.message}</p>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between md:justify-end gap-6 md:w-auto w-full border-t border-neutral-800/50 md:border-none pt-4 md:pt-0">
-                            <span className="text-[11px] font-bold text-neutral-500 flex items-center gap-1.5 bg-[#121A15] px-3 py-1.5 rounded-lg border border-neutral-800">
+                          <div className="flex items-center justify-between md:justify-end gap-6 md:w-auto w-full border-t border-border md:border-none pt-4 md:pt-0">
+                            <span className="text-[11px] font-bold text-muted-foreground flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-lg border border-border">
                               <Clock className="w-3.5 h-3.5" />
                               <span dir="ltr">{new Date(msg.created_at).toLocaleDateString("ar-EG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
                             </span>
@@ -312,7 +311,7 @@ const AdminMessages = () => {
                                   <MailOpen className="w-4 h-4" />
                                 </Button>
                               )}
-                              <Button variant="ghost" size="icon" className="h-9 w-9 text-neutral-500 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-colors" onClick={() => { if(window.confirm("هل تم الحل؟")) resolveMsg.mutate(msg.id) }} title="تم الحل وإغلاق">
+                              <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-accent rounded-xl transition-colors" onClick={() => { if(window.confirm("هل تم الحل؟")) resolveMsg.mutate(msg.id) }} title="تم الحل وإغلاق">
                                 <CheckCheck className="w-4 h-4" />
                               </Button>
                             </div>

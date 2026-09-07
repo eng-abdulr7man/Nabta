@@ -5,7 +5,7 @@ import SmartTools from "@/components/tools/SmartTools";
 
 const ToolsPage = () => {
   return (
-    <div className="min-h-screen bg-[#050806] flex flex-col font-tajawal">
+    <div className="min-h-screen bg-background flex flex-col font-tajawal">
       <Navbar />
       <main className="flex-1 pt-20">
         <SmartTools />

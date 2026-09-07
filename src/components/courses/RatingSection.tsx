@@ -101,11 +101,11 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
   return (
     <div className="space-y-8 font-tajawal">
       
-      <div className="flex items-center gap-3 border-b border-neutral-800/50 pb-4">
-        <div className="w-10 h-10 rounded-xl bg-[#121A15] border border-neutral-800 flex items-center justify-center">
+      <div className="flex items-center gap-3 border-b border-border pb-4">
+        <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center">
           <Star className="w-5 h-5 text-yellow-500 fill-yellow-500/20" />
         </div>
-        <h2 className="text-2xl font-bold text-white">التقييمات والمراجعات</h2>
+        <h2 className="text-2xl font-bold text-foreground">التقييمات والمراجعات</h2>
       </div>
 
       {/* ========================================== */}
@@ -114,12 +114,11 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
       {user && (
         <motion.div 
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-[#0a0f0c] border border-neutral-800/60 rounded-3xl p-6 shadow-lg relative overflow-hidden"
+          className="bg-muted border border-border rounded-3xl p-6 shadow-lg relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-900/10 blur-[50px] pointer-events-none" />
-          
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <MessageSquarePlus className="w-5 h-5 text-emerald-500" />
+
+          <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <MessageSquarePlus className="w-5 h-5 text-primary" />
             {myRating ? "تعديل تقييمك السابق" : "شاركنا رأيك في الكورس"}
           </h3>
           
@@ -152,14 +151,14 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={3}
-              className="w-full px-5 py-4 rounded-xl bg-[#121A15] border border-neutral-800 text-white text-sm focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 resize-none transition-all placeholder:text-neutral-600"
+              className="w-full px-5 py-4 rounded-xl bg-muted border border-border text-foreground text-sm focus:outline-none focus:border-primary/20 focus:ring-1 focus:ring-primary resize-none transition-all placeholder:text-muted-foreground"
             />
             
             {/* زر الإرسال */}
             <Button
               onClick={() => submitRating.mutate()}
               disabled={submitRating.isPending || selectedRating === 0}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 h-12 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 h-12 rounded-xl transition-all  hover:"
             >
               {submitRating.isPending ? "جاري الحفظ..." : myRating ? "حفظ التعديلات" : "نشر التقييم"}
             </Button>
@@ -171,12 +170,12 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
       {/* قائمة التقييمات للطلاب */}
       {/* ========================================== */}
       {isLoadingRatings ? (
-         <div className="text-center text-neutral-500 py-8 animate-pulse">جاري تحميل التقييمات...</div>
+         <div className="text-center text-muted-foreground py-8 animate-pulse">جاري تحميل التقييمات...</div>
       ) : (ratings || []).length === 0 ? (
-        <div className="text-center py-12 bg-[#121A15]/50 border border-dashed border-neutral-800 rounded-3xl">
+        <div className="text-center py-12 bg-muted/50 border border-dashed border-border rounded-3xl">
           <Star className="w-12 h-12 text-neutral-700 mx-auto mb-4" />
-          <p className="text-neutral-400 font-medium">لا توجد تقييمات حتى الآن.</p>
-          {!user && <p className="text-sm text-neutral-500 mt-2">سجل دخولك لتكون أول من يشارك رأيه!</p>}
+          <p className="text-muted-foreground font-medium">لا توجد تقييمات حتى الآن.</p>
+          {!user && <p className="text-sm text-muted-foreground mt-2">سجل دخولك لتكون أول من يشارك رأيه!</p>}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,11 +190,11 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 viewport={{ once: true }}
-                className="bg-[#121A15]/40 border border-white/5 p-5 rounded-2xl hover:border-emerald-500/20 transition-colors"
+                className="bg-muted/40 border border-border p-5 rounded-2xl hover:border-primary/20 transition-colors"
               >
                 <div className="flex items-center gap-4 mb-3">
                   {/* صورة الطالب */}
-                  <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-900/20 border border-emerald-500/20 flex items-center justify-center overflow-hidden text-emerald-500 font-bold text-lg">
+                  <div className="w-12 h-12 shrink-0 rounded-full bg-accent border border-primary/20 flex items-center justify-center overflow-hidden text-primary font-bold text-lg">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                     ) : (
@@ -204,7 +203,7 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
                   </div>
                   
                   <div className="flex-1">
-                    <p className="text-base font-bold text-white mb-1 truncate">
+                    <p className="text-base font-bold text-foreground mb-1 truncate">
                       {r.profile?.full_name || "متعلم في نبتة"}
                     </p>
                     <div className="flex gap-1" dir="ltr">
@@ -221,12 +220,12 @@ const RatingSection = ({ courseId }: RatingSectionProps) => {
                 </div>
                 
                 {r.comment && (
-                  <p className="text-sm text-neutral-400 leading-relaxed whitespace-pre-wrap border-t border-white/5 pt-3 mt-3">
+                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap border-t border-border pt-3 mt-3">
                     {r.comment}
                   </p>
                 )}
                 
-                <span className="text-[10px] text-neutral-600 block mt-3">
+                <span className="text-[10px] text-muted-foreground block mt-3">
                   {new Date(r.created_at).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" })}
                 </span>
               </motion.div>

@@ -85,14 +85,13 @@ const SpecializationsPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050806] font-tajawal selection:bg-emerald-500/30">
+    <div className="min-h-screen flex flex-col bg-background font-tajawal selection:bg-accent">
       <Navbar />
       
       <main className="flex-1 pt-32 pb-24 md:pb-16 relative overflow-hidden">
         
         {/* إضاءات خلفية (Ambient Glows) */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[70vw] h-[50vw] rounded-full bg-emerald-900/10 blur-[150px] pointer-events-none" />
-        
+
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           
           {/* ======================================= */}
@@ -104,14 +103,14 @@ const SpecializationsPage = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-16 space-y-4"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#121A15] border border-neutral-800 text-emerald-400 text-sm font-medium shadow-[0_0_20px_rgba(16,185,129,0.05)] mx-auto mb-2">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border border-border text-primary text-sm font-medium  mx-auto mb-2">
               <Layers className="w-4 h-4" />
               مسارات التعلم
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight mb-4">
-              التخصصات <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">الزراعية</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight mb-4">
+              التخصصات <span className="text-transparent bg-clip-text text-primary">الزراعية</span>
             </h1>
-            <p className="text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               اكتشف التخصصات المختلفة، تصفح الكورسات المتاحة في كل مجال، واختر مسارك المهني نحو احتراف الزراعة الحديثة.
             </p>
           </motion.div>
@@ -124,11 +123,11 @@ const SpecializationsPage = () => {
             // --- حالة التحميل (Premium Skeletons) ---
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="bg-[#0a0f0c] border border-neutral-800/50 rounded-3xl p-6 sm:p-8 h-[260px] flex flex-col justify-between animate-pulse shadow-lg">
-                  <div className="w-14 h-14 rounded-2xl bg-[#121A15] border border-neutral-800" />
+                <div key={i} className="bg-muted border border-border rounded-3xl p-6 sm:p-8 h-[260px] flex flex-col justify-between animate-pulse shadow-lg">
+                  <div className="w-14 h-14 rounded-2xl bg-muted border border-border" />
                   <div className="space-y-4">
-                    <div className="h-6 w-3/4 bg-[#121A15] rounded-md" />
-                    <div className="h-4 w-1/2 bg-[#121A15] rounded-md" />
+                    <div className="h-6 w-3/4 bg-muted rounded-md" />
+                    <div className="h-4 w-1/2 bg-muted rounded-md" />
                   </div>
                 </div>
               ))}

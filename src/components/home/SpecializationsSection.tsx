@@ -86,25 +86,25 @@
 
 //   if (isLoading) {
 //     return (
-//       <section className="relative py-24 bg-[#090D0A] overflow-hidden">
+//       <section className="relative py-24 bg-background overflow-hidden">
 //         <div className="container mx-auto px-4 lg:px-8 relative z-10">
 //           {/* Skeleton Header */}
 //           <div className="text-center mb-16 flex flex-col items-center">
-//             <div className="h-8 w-48 bg-neutral-800 rounded-full mb-6 animate-pulse" />
-//             <div className="h-10 w-64 md:w-96 bg-neutral-800 rounded-xl mb-4 animate-pulse" />
-//             <div className="h-4 w-48 bg-neutral-800 rounded-md animate-pulse" />
+//             <div className="h-8 w-48 bg-muted rounded-full mb-6 animate-pulse" />
+//             <div className="h-10 w-64 md:w-96 bg-muted rounded-xl mb-4 animate-pulse" />
+//             <div className="h-4 w-48 bg-muted rounded-md animate-pulse" />
 //           </div>
 //           {/* Skeleton Cards */}
 //           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 //             {Array.from({ length: 8 }).map((_, i) => (
 //               <div 
 //                 key={i} 
-//                 className="bg-[#121A15] border border-neutral-800/50 rounded-3xl p-6 h-48 flex flex-col justify-between animate-pulse"
+//                 className="bg-muted border border-border rounded-3xl p-6 h-48 flex flex-col justify-between animate-pulse"
 //               >
-//                 <div className="w-14 h-14 bg-neutral-800 rounded-2xl" />
+//                 <div className="w-14 h-14 bg-muted rounded-2xl" />
 //                 <div className="space-y-3">
-//                   <div className="h-5 w-3/4 bg-neutral-800 rounded-md" />
-//                   <div className="h-4 w-1/2 bg-neutral-800/50 rounded-md" />
+//                   <div className="h-5 w-3/4 bg-muted rounded-md" />
+//                   <div className="h-4 w-1/2 bg-muted/50 rounded-md" />
 //                 </div>
 //               </div>
 //             ))}
@@ -115,11 +115,11 @@
 //   }
 
 //   return (
-//     <section className="relative py-24 bg-[#090D0A] overflow-hidden">
+//     <section className="relative py-24 bg-background overflow-hidden">
       
 //       {/* إضاءة خلفية خفيفة لربط القسم بالهيرو */}
 //       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-emerald-900/50 to-transparent" />
-//       <div className="absolute top-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
+//       <div className="absolute top-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-accent blur-[120px] pointer-events-none" />
 
 //       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         
@@ -131,14 +131,14 @@
 //           transition={{ duration: 0.6 }}
 //           className="text-center mb-16 space-y-4"
 //         >
-//           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-800/50 border border-neutral-700 text-neutral-300 text-sm font-medium mx-auto">
-//             <Layers className="w-4 h-4 text-emerald-400" />
+//           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted/50 border border-border text-foreground text-sm font-medium mx-auto">
+//             <Layers className="w-4 h-4 text-primary" />
 //             مسارات التعلم
 //           </span>
-//           <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-//             استكشف <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-600">التخصصات الزراعية</span>
+//           <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
+//             استكشف <span className="text-transparent bg-clip-text text-primary">التخصصات الزراعية</span>
 //           </h2>
-//           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
+//           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 //             اختر التخصص الذي يناسب طموحك المهني، وابدأ رحلة التعلم مع أفضل الخبراء في المجال.
 //           </p>
 //         </motion.div>
@@ -194,7 +194,7 @@ const SpecializationCard = ({ id, name, description, coursesCount, index }) => {
     <Link to={`/courses?spec=${id}`} className="block h-full outline-none">
       <motion.div
         onMouseMove={handleMouseMove}
-        className="group relative h-full bg-[#121A15] border border-neutral-800/60 rounded-3xl p-6 sm:p-8 overflow-hidden transition-all duration-500 hover:border-emerald-500/50 hover:shadow-[0_0_40px_rgba(16,185,129,0.1)] cursor-pointer min-w-[280px] lg:min-w-0"
+        className="group relative h-full bg-muted border border-border rounded-3xl p-6 sm:p-8 overflow-hidden transition-all duration-500 hover:border-primary/20 hover: cursor-pointer min-w-[280px] lg:min-w-0"
       >
         {/* تأثير الإضاءة السحرية */}
         <div 
@@ -206,24 +206,24 @@ const SpecializationCard = ({ id, name, description, coursesCount, index }) => {
 
         <div className="relative z-10 flex flex-col h-full justify-between">
           <div>
-            <div className="w-14 h-14 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-950/50 group-hover:border-emerald-500/30 transition-all duration-300">
-              <Leaf className="w-7 h-7 text-emerald-500" strokeWidth={1.5} />
+            <div className="w-14 h-14 rounded-2xl bg-muted border border-border flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent group-hover:border-primary/20 transition-all duration-300">
+              <Leaf className="w-7 h-7 text-primary" strokeWidth={1.5} />
             </div>
             
-            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+            <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
               {name || "اسم التخصص"}
             </h3>
             
           
           </div>
 
-          <div className="mt-8 flex items-center justify-between border-t border-neutral-800/50 pt-4 overflow-hidden">
-            <div className="flex items-center gap-2 text-neutral-500 group-hover:text-neutral-300 transition-colors">
+          <div className="mt-8 flex items-center justify-between border-t border-border pt-4 overflow-hidden">
+            <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
               <BookOpen className="w-4 h-4" />
               <span className="text-sm font-medium">{coursesCount} كورسات</span>
             </div>
 
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent text-primary opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
               <ArrowLeft className="w-4 h-4" />
             </div>
           </div>
@@ -258,15 +258,15 @@ const SpecializationsSection = () => {
 
   if (isLoading) {
     return (
-      <section className="relative py-24 bg-[#090D0A] overflow-hidden">
+      <section className="relative py-24 bg-background overflow-hidden">
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="text-center mb-16 flex flex-col items-center">
-            <div className="h-8 w-48 bg-neutral-800 rounded-full mb-6 animate-pulse" />
-            <div className="h-10 w-64 md:w-96 bg-neutral-800 rounded-xl mb-4 animate-pulse" />
+            <div className="h-8 w-48 bg-muted rounded-full mb-6 animate-pulse" />
+            <div className="h-10 w-64 md:w-96 bg-muted rounded-xl mb-4 animate-pulse" />
           </div>
           <div className="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="min-w-[280px] lg:min-w-0 bg-[#121A15] border border-neutral-800/50 rounded-3xl p-6 h-[260px] animate-pulse" />
+              <div key={i} className="min-w-[280px] lg:min-w-0 bg-muted border border-border rounded-3xl p-6 h-[260px] animate-pulse" />
             ))}
           </div>
         </div>
@@ -275,11 +275,10 @@ const SpecializationsSection = () => {
   }
 
   return (
-    <section className="relative py-24 bg-[#090D0A] overflow-hidden">
+    <section className="relative py-24 bg-background overflow-hidden">
       
       {/* إضاءات الخلفية */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-emerald-900/30 to-transparent" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-900/10 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         
@@ -291,14 +290,14 @@ const SpecializationsSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 space-y-4"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-800/50 border border-neutral-700 text-neutral-300 text-sm font-medium mx-auto shadow-inner">
-            <Layers className="w-4 h-4 text-emerald-400" />
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted/50 border border-border text-foreground text-sm font-medium mx-auto shadow-inner">
+            <Layers className="w-4 h-4 text-primary" />
             مسارات التعلم
           </span>
-          <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-            اختر <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-400 to-green-600">تخصصك الزراعي</span>
+          <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
+            اختر <span className="text-transparent bg-clip-text text-primary">تخصصك الزراعي</span>
           </h2>
-          <p className="text-lg text-neutral-400 max-w-xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
             منصتنا توفر لك مسارات تعليمية متكاملة مصممة خصيصاً لتناسب احتياجات سوق العمل الزراعي الحديث.
           </p>
         </motion.div>

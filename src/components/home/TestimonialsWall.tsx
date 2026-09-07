@@ -90,10 +90,9 @@ const TestimonialsWall = () => {
   if (isLoading) return null;
 
   return (
-    <section className="py-24 relative overflow-hidden bg-[#050806] font-tajawal border-t border-white/5">
+    <section className="py-24 relative overflow-hidden bg-background font-tajawal border-t border-border">
       
       {/* خلفية جمالية مضيئة */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-emerald-600/10 blur-[140px] rounded-full pointer-events-none" />
 
       {/* عنوان القسم */}
       <div className="container mx-auto px-4 relative z-10 mb-16 text-center">
@@ -103,14 +102,14 @@ const TestimonialsWall = () => {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent border border-primary/20 text-primary text-sm font-bold mb-4 shadow-sm">
             <MessageSquareHeart className="w-4 h-4" />
             جدار الثقة
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
-            آراء طلابنا عن <span className="text-emerald-500">نبتة</span>
+          <h2 className="text-3xl md:text-5xl font-black text-foreground leading-tight">
+            آراء طلابنا عن <span className="text-primary">نبتة</span>
           </h2>
-          <p className="text-neutral-400 mt-4 text-lg">
+          <p className="text-muted-foreground mt-4 text-lg">
             نفخر بثقة المهندسين والمزارعين في كورساتنا ومنتجاتنا، نجاحكم في الغيط هو معيارنا الأول.
           </p>
         </motion.div>
@@ -128,9 +127,9 @@ const TestimonialsWall = () => {
             <div 
               key={`${review.id}-${idx}`} 
               dir="rtl"
-              className="w-[340px] md:w-[400px] shrink-0 bg-[#0a0f0c] border border-white/5 rounded-3xl p-6 md:p-8 hover:border-emerald-500/40 hover:bg-[#0d1410] transition-all duration-300 relative group flex flex-col justify-between shadow-xl"
+              className="w-[340px] md:w-[400px] shrink-0 bg-muted border border-border rounded-3xl p-6 md:p-8 hover:border-primary/20 hover:bg-muted transition-all duration-300 relative group flex flex-col justify-between shadow-xl"
             >
-              <Quote className="absolute top-6 left-6 w-10 h-10 text-emerald-500/10 group-hover:text-emerald-500/20 transition-colors rotate-180 pointer-events-none" />
+              <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/10 group-hover:text-primary/20 transition-colors rotate-180 pointer-events-none" />
               
               <div>
                 {/* النجوم */}
@@ -144,31 +143,30 @@ const TestimonialsWall = () => {
                 </div>
 
                 {/* نص التقييم */}
-                <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-6 line-clamp-4">
-                  "{review.comment}"
+                <p className="text-foreground text-sm md:text-base leading-relaxed mb-6 line-clamp-4"> "{review.comment}"
                 </p>
               </div>
 
               {/* بيانات صاحب التقييم */}
-              <div className="flex items-center gap-3.5 border-t border-white/5 pt-5 mt-auto">
-                <div className="w-12 h-12 rounded-full bg-emerald-950 border border-emerald-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+              <div className="flex items-center gap-3.5 border-t border-border pt-5 mt-auto">
+                <div className="w-12 h-12 rounded-full bg-accent border border-primary/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                   {review.avatar ? (
                     <img src={review.avatar} alt={review.name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-emerald-400 font-bold text-lg">{review.initial}</span>
+                    <span className="text-primary font-bold text-lg">{review.initial}</span>
                   )}
                 </div>
                 <div className="flex flex-col justify-center overflow-hidden">
-                  <h4 className="text-white font-bold text-sm mb-1 truncate">{review.name}</h4>
+                  <h4 className="text-foreground font-bold text-sm mb-1 truncate">{review.name}</h4>
                   
                   {review.courseTitle ? (
-                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-neutral-400">
-                      <BookOpen className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-muted-foreground">
+                      <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span className="shrink-0">كورس:</span>
-                      <span className="text-emerald-400 font-bold truncate">{review.courseTitle}</span>
+                      <span className="text-primary font-bold truncate">{review.courseTitle}</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-emerald-400 font-bold">
+                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-primary font-bold">
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                       <span>طالب وعميل موثق</span>
                     </div>

@@ -21,7 +21,7 @@ const journeySteps = [
     title: "2. اختار سكتك (التخصص)",
     desc: "سواء هيدروبونيك، لاندسكيب، أو وقاية.. نقي الحتة اللي بتحبها واغوص في أسرارها.",
     icon: BookOpenCheck,
-    gradient: "from-emerald-500 to-teal-400",
+    gradient: "",
     badge: "الخطوة التانية"
   },
   {
@@ -42,10 +42,9 @@ const journeySteps = [
 
 const Roadmap = () => {
   return (
-    <section className="py-24 md:py-32 bg-[#070B08] relative overflow-hidden font-tajawal text-white">
+    <section className="py-24 md:py-32 bg-background relative overflow-hidden font-tajawal text-foreground">
       
        {/* إضاءة خفيفة في الخلفية */}
-       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-600/5 blur-[160px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
@@ -57,14 +56,14 @@ const Roadmap = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs sm:text-sm font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent border border-primary/20 text-primary text-xs sm:text-sm font-semibold mb-4">
               <Compass className="w-4 h-4" />
               طريقك للنجاح خطوة بخطوة
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.2]">
-              إزاي تبني <span className="text-transparent bg-clip-text bg-gradient-to-l from-emerald-300 via-emerald-400 to-green-500">مستقبلك الزراعي؟</span>
+              إزاي تبني <span className="text-transparent bg-clip-text text-primary">مستقبلك الزراعي؟</span>
             </h2>
-            <p className="text-neutral-400 text-base sm:text-lg mt-4 leading-relaxed font-normal">
+            <p className="text-muted-foreground text-base sm:text-lg mt-4 leading-relaxed font-normal">
               مشوار الألف ميل بيبدأ بخطوة.. وهنا هنمشي معاك لحد ما تبقي مهندس شاطر ومحترف في مجالك.
             </p>
           </motion.div>
@@ -88,31 +87,31 @@ const Roadmap = () => {
                   transition={{ delay: idx * 0.12, duration: 0.5 }}
                   className="group flex flex-col h-full"
                 >
-                  <div className="relative flex flex-col flex-1 p-6 sm:p-7 rounded-3xl bg-[#0F1611]/90 border border-neutral-800/80 hover:border-emerald-500/40 transition-all duration-300 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 backdrop-blur-xl overflow-hidden">
+                  <div className="relative flex flex-col flex-1 p-6 sm:p-7 rounded-3xl bg-card/90 border border-border hover:border-primary/20 transition-all duration-300 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover: backdrop-blur-xl overflow-hidden">
                     
                     {/* رقم المرحلة */}
-                    <span className="absolute top-3 left-4 text-7xl font-black text-white/[0.02] group-hover:text-emerald-500/[0.05] transition-colors pointer-events-none select-none">
+                    <span className="absolute top-3 left-4 text-7xl font-black text-foreground/[0.02] group-hover:text-primary/[0.05] transition-colors pointer-events-none select-none">
                       0{idx + 1}
                     </span>
 
                     {/* الأيقونة والشاّرة */}
                     <div className="mb-6 flex items-center justify-between">
                       <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.gradient} p-[1px] shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <div className="w-full h-full bg-[#0F1611] rounded-[15px] flex items-center justify-center">
-                          <Icon className="w-6 h-6 text-white" />
+                        <div className="w-full h-full bg-card rounded-[15px] flex items-center justify-center">
+                          <Icon className="w-6 h-6 text-foreground" />
                         </div>
                       </div>
-                      <span className="text-[11px] font-semibold text-neutral-400 bg-neutral-900 px-3 py-1 rounded-full border border-neutral-800">
+                      <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
                         {step.badge}
                       </span>
                     </div>
 
                     {/* النصوص */}
                     <div className="space-y-2.5 mt-auto">
-                      <h3 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                         {step.title}
                       </h3>
-                      <p className="text-neutral-400 text-sm leading-relaxed">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         {step.desc}
                       </p>
                     </div>
@@ -133,7 +132,7 @@ const Roadmap = () => {
           className="mt-16 text-center"
         >
           <Link to="/courses">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-9 h-14 rounded-2xl text-base font-semibold gap-3 shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] transition-all group">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-9 h-14 rounded-2xl text-base font-semibold gap-3  transition-all group">
               ابدأ أول خطوة.. استكشف الكورسات
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             </Button>
