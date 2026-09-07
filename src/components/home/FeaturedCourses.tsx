@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen } from "lucide-react";
-import CourseCard from "@/components/courses/CourseCard";
+import { ArrowLeft } from "lucide-react";
 import { useCourses } from "@/hooks/useCourses";
 
 const FeaturedCourses = () => {
@@ -8,15 +7,12 @@ const FeaturedCourses = () => {
 
   if (isLoading) {
     return (
-      <section className="py-12 bg-background border-b border-border/40">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="flex items-center justify-between mb-6">
-            <div className="h-6 w-36 bg-muted rounded animate-pulse" />
-            <div className="h-5 w-20 bg-muted rounded animate-pulse" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <section className="py-10 bg-background border-b border-border">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <div className="h-5 w-28 bg-muted rounded mb-4 animate-pulse" />
+          <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-card border border-border/60 rounded-xl h-72 animate-pulse" />
+              <div key={i} className="h-16 bg-muted/60 rounded animate-pulse" />
             ))}
           </div>
         </div>
@@ -24,52 +20,58 @@ const FeaturedCourses = () => {
     );
   }
 
-  const featuredList = (courses || []).slice(0, 3);
+  const featuredList = (courses || []).slice(0, 4);
 
   if (featuredList.length === 0) {
     return (
-      <section className="py-12 bg-background border-b border-border/40">
-        <div className="container mx-auto px-4 max-w-5xl" dir="rtl">
-          <div className="text-center py-12 border border-dashed border-border/60 rounded-xl bg-muted/10">
-            <BookOpen className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm font-medium text-foreground">مفيش كورسات متاحة دلوقتي</p>
-            <p className="text-xs text-muted-foreground mt-1">تابعنا، بنجهز محتوى جديد قريب.</p>
-          </div>
+      <section className="py-10 bg-background border-b border-border">
+        <div className="container mx-auto px-4 max-w-3xl text-center" dir="rtl">
+          <p className="text-xs text-muted-foreground">مفيش كورسات متاحة دلوقتي.. بنجهّز محتوى جديد.</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="py-14 md:py-20 bg-background border-b border-border/40">
-      <div className="container mx-auto px-4 max-w-5xl" dir="rtl">
+    <section className="py-12 md:py-16 bg-background border-b border-border">
+      <div className="container mx-auto px-4 max-w-3xl" dir="rtl">
         
-        {/* رأس القسم */}
-        <div className="flex items-center justify-between mb-8">
+        {/* رأس القسم البسيط */}
+        <div className="flex items-center justify-between mb-6 pb-3 border-b border-border/60">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">
-              الكورسات المميزة
-            </h2>
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">
-              أبرز البرامج التدريبية المتاحة لتبدأ بها.
-            </p>
+            <h2 className="text-sm font-bold text-foreground">الكورسات المتاحة</h2>
           </div>
 
           <Link
             to="/courses"
-            className="inline-flex items-center gap-1 text-xs md:text-sm font-medium text-primary hover:underline transition-all"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
           >
             <span>عرض الكل</span>
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-3 h-3" />
           </Link>
         </div>
 
-        {/* شبكة متجاوبة وآمنة 100% على الموبايل (عمود واحد للموبايل، وعمودين/ثلاثة للشاشات الكبيرة) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {featuredList.map((course, i) => (
-            <div key={course.id} className="h-full">
-              <CourseCard {...course} index={i} />
-            </div>
+        {/* قائمة نصية منظمة (تجنب تماماً شكل الكروت والـ AI SaaS) */}
+        <div className="divide-y divide-border/60">
+          {featuredList.map((course: any) => (
+            <Link
+              key={course.id}
+              to={`/courses/${course.id}`}
+              className="py-3.5 flex items-center justify-between gap-4 group hover:bg-muted/20 px-2 -mx-2 rounded transition-colors"
+            >
+              <div className="space-y-0.5">
+                <h3 className="text-xs md:text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {course.title || course.name}
+                </h3>
+                <p className="text-[11px] text-muted-foreground line-clamp-1">
+                  {course.description || course.subtitle || "شرح تفصيلي للمنهج العملي."}
+                </p>
+              </div>
+
+              <span className="text-[11px] text-muted-foreground shrink-0 font-normal">
+                {course.price ? `${course.price} ج.م` : "مجانـاً"}
+              </span>
+            </Link>
           ))}
         </div>
 
