@@ -93,10 +93,7 @@ const TestimonialsWall = () => {
         
         {/* عنوان القسم */}
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
-            <MessageSquareHeart className="w-3.5 h-3.5" />
-            <span>جدار الثقة</span>
-          </div>
+         
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
             إيه بيقوله طلابنا عن <span className="text-primary">نبتة</span>؟
           </h2>
