@@ -11,9 +11,9 @@ const SpecializationsSection = () => {
       <section className="py-16 bg-background font-tajawal border-b border-border/40">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="h-7 w-40 bg-muted rounded mb-8 animate-pulse" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex lg:grid lg:grid-cols-4 gap-4 overflow-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-6 h-48 animate-pulse" />
+              <div key={i} className="min-w-[280px] lg:min-w-0 bg-card border border-border rounded-2xl p-6 h-48 animate-pulse shrink-0" />
             ))}
           </div>
         </div>
@@ -22,7 +22,7 @@ const SpecializationsSection = () => {
   }
 
   return (
-    <section className="py-16 md:py-20 bg-background font-tajawal border-b border-border/40">
+    <section className="py-16 md:py-20 bg-background font-tajawal border-b border-border/40 overflow-hidden">
       <div className="container mx-auto px-4 max-w-6xl" dir="rtl">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground tracking-tight">
@@ -33,14 +33,15 @@ const SpecializationsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* سكرول أفقي على الموبايل والتابلت، وجريد منظم على الكمبيوتر */}
+        <div className="flex lg:grid lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]">
           {(specializations || []).map((spec) => {
             const coursesCount = counts?.[spec.id] || 0;
             return (
               <Link
                 key={spec.id}
                 to={`/courses?spec=${spec.id}`}
-                className="group bg-card border border-border rounded-2xl p-6 flex flex-col justify-between hover:border-foreground/20 transition-all shadow-sm"
+                className="group bg-card border border-border rounded-2xl p-6 flex flex-col justify-between hover:border-foreground/20 transition-all shadow-sm min-w-[280px] sm:min-w-[310px] lg:min-w-0 snap-start shrink-0"
               >
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary mb-5 group-hover:bg-primary/10 transition-colors">
