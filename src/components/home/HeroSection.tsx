@@ -18,9 +18,9 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="px-4 py-12 md:py-16">
-      <div className="container mx-auto max-w-xl text-center space-y-5">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+    <section className="px-4 py-16 md:py-24 border-b border-border/40 bg-card/20">
+      <div className="container mx-auto max-w-3xl text-center space-y-8">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
           {firstName ? (
             <>أهلاً بيك، {firstName}</>
           ) : (
@@ -28,36 +28,36 @@ const HeroSection = () => {
           )}
         </h1>
 
-        <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto">
+        <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
           كورسات ومحتوى عملي في التخصصات الزراعية، ومتجر لأدوات ومستلزمات شغلك.
         </p>
 
         <form
           onSubmit={handleSearch}
-          className="flex items-center bg-background border border-input rounded-lg px-3 py-1.5 max-w-md mx-auto"
+          className="flex items-center bg-background border border-input rounded-xl p-2.5 max-w-xl mx-auto shadow-sm focus-within:border-primary transition-colors"
         >
-          <Search className="w-4 h-4 text-muted-foreground ml-2 shrink-0" />
+          <Search className="w-5 h-5 text-muted-foreground mx-3 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ابحث عن كورس أو تخصص..."
-            className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm py-1"
+            placeholder="ابحث عن كورس أو تخصص زراعي..."
+            className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-base py-1.5 min-w-0"
           />
-          <Button type="submit" size="sm" className="mr-2">
+          <Button type="submit" size="default" className="px-6 rounded-lg font-medium text-sm">
             بحث
           </Button>
         </form>
 
-        <div className="flex items-center justify-center gap-3 pt-1">
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           <Link to="/courses">
-            <Button size="sm">
+            <Button size="default" className="px-6 py-2.5 rounded-lg font-medium">
               شوف الكورسات
             </Button>
           </Link>
           {!user && (
             <Link to="/register">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="default" className="px-6 py-2.5 rounded-lg font-medium">
                 اعمل حساب جديد
               </Button>
             </Link>
