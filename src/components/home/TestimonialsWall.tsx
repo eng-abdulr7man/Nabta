@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, Quote, MessageSquareHeart, BookOpen, CheckCircle2 } from "lucide-react";
+import { Star, MessageSquareHeart, BookOpen, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const FALLBACK_REVIEWS = [
@@ -8,7 +8,8 @@ const FALLBACK_REVIEWS = [
   { id: "f2", name: "محمود سعد", initial: "م", rating: 5, comment: "اشتريت تقاوي الطماطم من المتجر والإنتاجية كانت ممتازة. شكراً نبتة على المصداقية!", courseTitle: "" },
   { id: "f3", name: "د. فاطمة علي", initial: "ف", rating: 4, comment: "المستشار الذكي ساعدني كتير في تشخيص نقص العناصر في محصولي ووفر عليا وقت طويل.", courseTitle: "تسميد المحاصيل الحقلية" },
   { id: "f4", name: "يوسف إبراهيم", initial: "ي", rating: 5, comment: "منصة متكاملة فعلاً، من التعليم لتوفير المستلزمات. أنصح بها بشدة لكل مهندس ومزارع.", courseTitle: "إدارة المزارع الذكية" },
-  { id: "f5", name: "كريم حسن", initial: "ك", rating: 5, comment: "شرح المهندسين في الكورسات مبسط جداً، والشهادة فرقت معايا في شغلي.", courseTitle: "لاندسكيب وتنسيق حدائق" }
+  { id: "f5", name: "كريم حسن", initial: "ك", rating: 5, comment: "شرح المهندسين في الكورسات مبسط جداً، والشهادة فرقت معايا في شغلي.", courseTitle: "لاندسكيب وتنسيق حدائق" },
+  { id: "f6", name: "سارة عبد الله", initial: "س", rating: 5, comment: "التجربة ممتازة وسهلة، وكل حاجة واضحة ومرتبة بعناية.", courseTitle: "وقاية النباتات" }
 ];
 
 const TestimonialsWall = () => {
@@ -23,7 +24,7 @@ const TestimonialsWall = () => {
           .select("*")
           .gte("rating", 4)
           .order("created_at", { ascending: false })
-          .limit(8);
+          .limit(6);
 
         if (ratingsError) throw ratingsError;
 
@@ -84,114 +85,85 @@ const TestimonialsWall = () => {
     fetchTopReviews();
   }, []);
 
-  // تكرار العناصر 3 مرات لضمان حركة مستمرة وسلسة بدون فراغات
-  const duplicatedReviews = [...reviews, ...reviews, ...reviews];
-
   if (isLoading) return null;
 
   return (
-    <section className="py-24 relative overflow-hidden bg-background font-tajawal border-t border-border">
-      
-      {/* خلفية جمالية مضيئة */}
-
-      {/* عنوان القسم */}
-      <div className="container mx-auto px-4 relative z-10 mb-16 text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          whileInView={{ opacity: 1, y: 0 }} 
-          viewport={{ once: true }}
-          className="max-w-2xl mx-auto"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent border border-primary/20 text-primary text-sm font-bold mb-4 shadow-sm">
-            <MessageSquareHeart className="w-4 h-4" />
-            جدار الثقة
-          </div>
-          <h2 className="text-3xl md:text-5xl font-black text-foreground leading-tight">
-            آراء طلابنا عن <span className="text-primary">نبتة</span>
-          </h2>
-          <p className="text-muted-foreground mt-4 text-lg">
-            نفخر بثقة المهندسين والمزارعين في كورساتنا ومنتجاتنا، نجاحكم في الغيط هو معيارنا الأول.
-          </p>
-        </motion.div>
-      </div>
-
-      {/* شريط التحريك السلس (CSS Marquee) */}
-      <div className="relative w-full overflow-hidden py-4" dir="ltr">
+    <section className="py-20 bg-background font-tajawal border-t border-border/60">
+      <div className="container mx-auto px-4 max-w-7xl">
         
-        {/* تدرجات أطراف الشاشة لإنهاء الحركة بشكل ناعم */}
-        <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-[#050806] via-[#050806]/80 to-transparent z-20 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-[#050806] via-[#050806]/80 to-transparent z-20 pointer-events-none" />
+        {/* عنوان القسم */}
+        <div className="max-w-2xl mx-auto text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+            <MessageSquareHeart className="w-3.5 h-3.5" />
+            <span>جدار الثقة</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+            إيه بيقوله طلابنا عن <span className="text-primary">نبتة</span>؟
+          </h2>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+            نجاحكم في الغيط ومعيار الجودة اللي بنقدمه هو انعكاس لثقتكم.
+          </p>
+        </div>
 
-        <div className="flex gap-6 w-max marquee-track hover:[animation-play-state:paused]">
-          {duplicatedReviews.map((review, idx) => (
-            <div 
-              key={`${review.id}-${idx}`} 
-              dir="rtl"
-              className="w-[340px] md:w-[400px] shrink-0 bg-muted border border-border rounded-3xl p-6 md:p-8 hover:border-primary/20 hover:bg-muted transition-all duration-300 relative group flex flex-col justify-between shadow-xl"
+        {/* شبكة عرض الآراء (هادئة، منظمة، وبدون حركة مشتتة) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" dir="rtl">
+          {reviews.map((review, idx) => (
+            <motion.div
+              key={review.id || idx}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.05, duration: 0.3 }}
+              className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between hover:border-primary/40 transition-all"
             >
-              <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/10 group-hover:text-primary/20 transition-colors rotate-180 pointer-events-none" />
-              
               <div>
                 {/* النجوم */}
-                <div className="flex gap-1 mb-5">
+                <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star 
                       key={i} 
-                      className={`w-4 h-4 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-neutral-800"}`} 
+                      className={`w-3.5 h-3.5 ${i < review.rating ? "text-amber-500 fill-amber-500" : "text-muted"}`} 
                     />
                   ))}
                 </div>
 
                 {/* نص التقييم */}
-                <p className="text-foreground text-sm md:text-base leading-relaxed mb-6 line-clamp-4"> "{review.comment}"
+                <p className="text-foreground text-sm leading-relaxed mb-6">
+                  "{review.comment}"
                 </p>
               </div>
 
               {/* بيانات صاحب التقييم */}
-              <div className="flex items-center gap-3.5 border-t border-border pt-5 mt-auto">
-                <div className="w-12 h-12 rounded-full bg-accent border border-primary/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+              <div className="flex items-center gap-3 border-t border-border/60 pt-4 mt-auto">
+                <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
                   {review.avatar ? (
                     <img src={review.avatar} alt={review.name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-primary font-bold text-lg">{review.initial}</span>
+                    <span className="text-primary font-bold text-sm">{review.initial}</span>
                   )}
                 </div>
                 <div className="flex flex-col justify-center overflow-hidden">
-                  <h4 className="text-foreground font-bold text-sm mb-1 truncate">{review.name}</h4>
+                  <h4 className="text-foreground font-semibold text-xs mb-1 truncate">{review.name}</h4>
                   
                   {review.courseTitle ? (
-                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-muted-foreground">
-                      <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <BookOpen className="w-3 h-3 text-primary shrink-0" />
                       <span className="shrink-0">كورس:</span>
-                      <span className="text-primary font-bold truncate">{review.courseTitle}</span>
+                      <span className="text-primary font-medium truncate">{review.courseTitle}</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-[11px] md:text-xs text-primary font-bold">
-                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <div className="flex items-center gap-1 text-[11px] text-primary font-medium">
+                      <CheckCircle2 className="w-3 h-3 shrink-0" />
                       <span>طالب وعميل موثق</span>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
 
-      {/* كود CSS المخصص للحركة الناعمة (GPU Accelerated) */}
-      <style>{`
-        @keyframes marquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-33.333%);
-          }
-        }
-        .marquee-track {
-          animation: marquee 35s linear infinite;
-        }
-      `}</style>
+      </div>
     </section>
   );
 };
