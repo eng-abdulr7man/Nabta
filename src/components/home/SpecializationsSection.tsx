@@ -70,4 +70,4 @@ const SpecializationsSection = () => {
   );
 };
 
-export Title SpecializationsSection;
+export SpecializationsSection;
