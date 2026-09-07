@@ -1,143 +1,102 @@
-
-// export default Roadmap;
 import { motion } from "framer-motion";
 import { 
   Zap, Sprout, BookOpenCheck, Trophy, 
-  ArrowLeft, Compass 
+  ArrowLeft 
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-// الخطوات بلغة مصرية بسيطة وقريبة للواقع
 const journeySteps = [
   {
-    title: "1. البداية من الصفر (الأساسيات)",
-    desc: "هنبسطلك علوم التربة، الطقس، وإزاي النبات بيكبر، عشان نبني عندك أرضية قوية مع أكفأ الخبراء.",
+    title: "1. الأساسيات",
+    desc: "هنبسطلك علوم التربة، الطقس، ونمو النبات من غير تعقيد عشان نبني أرضية صح.",
     icon: Sprout,
-    gradient: "from-blue-500 to-cyan-400",
-    badge: "الخطوة الأولى"
+    badge: "البداية"
   },
   {
-    title: "2. اختار سكتك (التخصص)",
-    desc: "سواء هيدروبونيك، لاندسكيب، أو وقاية.. نقي الحتة اللي بتحبها واغوص في أسرارها.",
+    title: "2. التخصص",
+    desc: "اختار السكة اللي تحبها.. سواء هيدروبونيك، وقاية، أو إدارة مزارع.",
     icon: BookOpenCheck,
-    gradient: "",
-    badge: "الخطوة التانية"
+    badge: "المسار"
   },
   {
-    title: "3. انزل للغيط والشغل العملي",
-    desc: "هتشوف بعينك تجارب حقيقية جوه مزارع كبييرة، وإزاي بنحل المشاكل اللي بتطلع للمهندس في الشغل.",
+    title: "3. الشغل العملي",
+    desc: "هتشوف بعينك تطبيق حقيقي جوه المزارع وإزاي بنحل المشاكل الواقعية.",
     icon: Zap,
-    gradient: "from-amber-500 to-orange-400",
-    badge: "الخطوة التالتة"
+    badge: "التطبيق"
   },
   {
-    title: "4. اقطف ثمرة تعبك (الاحتراف)",
-    desc: "خد شهادة معتمدة تثبت كفاءتك، وابقى جاهز تدير مزارع وتكون استشاري زراعي معروف.",
+    title: "4. الاحتراف",
+    desc: "تطلع جاهز تدير شغلك وتكون مهندس فاهم ومتمكن في مجالك.",
     icon: Trophy,
-    gradient: "from-purple-500 to-indigo-400",
-    badge: "محطة الوصول"
+    badge: "الهدف"
   }
 ];
 
 const Roadmap = () => {
   return (
-    <section className="py-24 md:py-32 bg-background relative overflow-hidden font-tajawal text-foreground">
-      
-       {/* إضاءة خفيفة في الخلفية */}
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section className="py-20 bg-background font-tajawal text-foreground border-t border-border/40">
+      <div className="container mx-auto px-4 max-w-6xl">
         
         {/* رأس القسم */}
-        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent border border-primary/20 text-primary text-xs sm:text-sm font-semibold mb-4">
-              <Compass className="w-4 h-4" />
-              طريقك للنجاح خطوة بخطوة
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.2]">
-              إزاي تبني <span className="text-transparent bg-clip-text text-primary">مستقبلك الزراعي؟</span>
-            </h2>
-            <p className="text-muted-foreground text-base sm:text-lg mt-4 leading-relaxed font-normal">
-              مشوار الألف ميل بيبدأ بخطوة.. وهنا هنمشي معاك لحد ما تبقي مهندس شاطر ومحترف في مجالك.
-            </p>
-          </motion.div>
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+            خطوات التعلم
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            هنتعلم إزاي سوا؟
+          </h2>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            من أول ما تبدأ من الصفر لحد ما تقف على رجلك وتشتغل باحتراف.
+          </p>
         </div>
 
         {/* الكروت */}
-        <div className="relative">
-          
-          {/* خط التوصيل الأفقي للشاشات الكبيرة */}
-          <div className="hidden lg:block absolute top-[45%] left-12 right-12 h-[2px] bg-gradient-to-r from-blue-500/30 via-emerald-500/30 to-purple-500/30 z-0 pointer-events-none" />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-            {journeySteps.map((step, idx) => {
-              const Icon = step.icon;
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.12, duration: 0.5 }}
-                  className="group flex flex-col h-full"
-                >
-                  <div className="relative flex flex-col flex-1 p-6 sm:p-7 rounded-3xl bg-card/90 border border-border hover:border-primary/20 transition-all duration-300 hover:-translate-y-2 shadow-xl hover:shadow-2xl hover: backdrop-blur-xl overflow-hidden">
-                    
-                    {/* رقم المرحلة */}
-                    <span className="absolute top-3 left-4 text-7xl font-black text-foreground/[0.02] group-hover:text-primary/[0.05] transition-colors pointer-events-none select-none">
-                      0{idx + 1}
-                    </span>
-
-                    {/* الأيقونة والشاّرة */}
-                    <div className="mb-6 flex items-center justify-between">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.gradient} p-[1px] shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <div className="w-full h-full bg-card rounded-[15px] flex items-center justify-center">
-                          <Icon className="w-6 h-6 text-foreground" />
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
-                        {step.badge}
-                      </span>
-                    </div>
-
-                    {/* النصوص */}
-                    <div className="space-y-2.5 mt-auto">
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                        {step.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        {step.desc}
-                      </p>
-                    </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {journeySteps.map((step, idx) => {
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1, duration: 0.4 }}
+                className="flex flex-col h-full bg-card border border-border rounded-2xl p-6 relative group hover:border-primary/40 transition-colors"
+              >
+                {/* رأس الكارت */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <Icon className="w-5 h-5" />
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                  <span className="text-xs font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-md">
+                    {step.badge}
+                  </span>
+                </div>
+
+                {/* المحتوى */}
+                <div className="space-y-2 mt-auto">
+                  <h3 className="text-lg font-bold text-foreground">
+                    {step.title}
+                  </h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
+                    {step.desc}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* زر الانتقال */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-16 text-center"
-        >
+        <div className="mt-12 text-center">
           <Link to="/courses">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-9 h-14 rounded-2xl text-base font-semibold gap-3  transition-all group">
-              ابدأ أول خطوة.. استكشف الكورسات
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <Button variant="outline" className="border-border hover:bg-primary hover:text-primary-foreground px-8 h-12 rounded-xl text-sm font-medium gap-2 transition-all">
+              <span>استكشف الكورسات المتاحة</span>
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-        </motion.div>
+        </div>
 
       </div>
     </section>
