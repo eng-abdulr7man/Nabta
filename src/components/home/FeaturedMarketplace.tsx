@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ShoppingBag, ArrowLeft, MessageCircle, Tag } from "lucide-react";
+import { ShoppingBag, ArrowLeft, MessageCircle, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 const FeaturedMarketplace = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLatestProducts = async () => {
@@ -27,6 +28,13 @@ const FeaturedMarketplace = () => {
     fetchLatestProducts();
   }, []);
 
+  const handleCopyLink = (productId: string) => {
+    const productUrl = `${window.location.origin}/marketplace`;
+    navigator.clipboard.writeText(productUrl);
+    setCopiedId(productId);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   return (
     <section className="py-20 bg-background font-tajawal">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -39,15 +47,11 @@ const FeaturedMarketplace = () => {
             viewport={{ once: true }}
             className="max-w-2xl"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
-              <Tag className="w-3.5 h-3.5" />
-              سوق نبتة
-            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
-              أحدث <span className="text-primary">المنتجات والتقاوي</span>
+              أحدث <span className="text-primary">التقاوي والمستلزمات</span>
             </h2>
             <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-              أفضل المستلزمات الزراعية الموثوقة لتضمن أعلى جودة لمحصولك.
+              أفضل المنتجات الزراعية الموثوقة لتضمن أعلى جودة لمحصولك.
             </p>
           </motion.div>
 
@@ -82,7 +86,7 @@ const FeaturedMarketplace = () => {
         ) : products.length === 0 ? (
           <div className="text-center py-16 bg-card border border-dashed border-border rounded-2xl">
             <ShoppingBag className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm">لم يتم إضافة منتجات للمتجر بعد.</p>
+            <p className="text-muted-foreground text-sm">مفيش منتجات متوفرة دلوقتي. تابعنا قريب.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" dir="rtl">
@@ -130,16 +134,37 @@ const FeaturedMarketplace = () => {
                       <span className="text-lg font-bold text-primary tabular-nums">{product.price} ج.م</span>
                     </div>
 
-                    <a 
-                      href={`https://wa.me/201019715490?text=أريد طلب: ${product.name}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="w-full block"
-                    >
-                      <Button className="w-full h-10 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl gap-2 text-xs font-semibold transition-all">
-                        <MessageCircle className="w-3.5 h-3.5" />
-                        <span>اطلب عبر واتساب</span>
+                    <div className="space-y-2">
+                      <a 
+                        href={`https://wa.me/201019715490?text=أريد طلب: ${product.name}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full block"
+                      >
+                        <Button className="w-full h-10 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl gap-2 text-xs font-semibold transition-all">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>اطلب عبر واتساب</span>
+                        </Button>
+                      </a>
+
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleCopyLink(product.id)}
+                        className="w-full h-9 bg-card border-border hover:border-primary hover:bg-primary/5 text-foreground rounded-xl gap-2 text-xs font-medium transition-all"
+                      >
+                        {copiedId === product.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-primary">تم نسخ الرابط</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                            <span>نسخ رابط المنتج</span>
+                          </>
+                        )}
                       </Button>
-                    </a>
+                    </div>
                   </div>
                 </div>
               </motion.div>
