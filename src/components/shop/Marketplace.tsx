@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom"; // 🌟 استدعاء الـ Search Params
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Trash2, ShoppingBag, MessageCircle, 
@@ -10,25 +10,25 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 
-const categoryIcons: Record<string, any> = { "أسمدة": Leaf, "مبيدات فطري": Bug, "مبيدات حشري": Bug, "تقاوي": Sprout, "أدوات ري": Droplets, "الكل": LayoutGrid
+const categoryIcons: Record<string, any> = { 
+  "أسمدة": Leaf, 
+  "مبيدات فطري": Bug, 
+  "مبيدات حشري": Bug, 
+  "تقاوي": Sprout, 
+  "أدوات ري": Droplets, 
+  "الكل": LayoutGrid
 };
 
 const Marketplace = () => {
   const { user, isAdmin } = useAuth();
-  
-  // 🌟 قراءة كلمة البحث الممررة في الرابط 🌟
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   
   const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  
   const [dbCategories, setDbCategories] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
-  
-  // 🌟 وضع الكلمة الابتدائية في شريط البحث 🌟
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  
   const [loading, setLoading] = useState(true);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,10 +78,10 @@ const Marketplace = () => {
   };
 
   useEffect(() => { 
-    fetchProducts(); fetchCategories();
+    fetchProducts(); 
+    fetchCategories();
   }, []);
 
-  // 🌟 نظام الفلترة بيطبق تلقائي بناءً على الـ searchQuery والـ Category 🌟
   useEffect(() => {
     let result = products;
     if (activeCategory !== "all") result = result.filter(p => p.category === activeCategory);
@@ -103,7 +103,7 @@ const Marketplace = () => {
     else {
       const { data } = supabase.storage.from('media').getPublicUrl(filePath);
       setImageUrl(data.publicUrl);
-      toast.success("الصورة جاهزة! 📸");
+      toast.success("الصورة جاهزة 📸");
     }
     setUploading(false);
   };
@@ -138,8 +138,9 @@ const Marketplace = () => {
       
       if (error) toast.error("حدث خطأ أثناء التعديل");
       else {
-        toast.success("تم التعديل بنجاح! ✏️");
-        setIsModalOpen(false); fetchProducts();
+        toast.success("تم التعديل بنجاح");
+        setIsModalOpen(false); 
+        fetchProducts();
       }
     } else {
       const { error } = await supabase.from("products").insert([
@@ -148,8 +149,9 @@ const Marketplace = () => {
       
       if (error) toast.error("حدث خطأ أثناء الإضافة");
       else {
-        toast.success("تم النشر بنجاح! 🚀");
-        setIsModalOpen(false); fetchProducts();
+        toast.success("تم النشر بنجاح");
+        setIsModalOpen(false); 
+        fetchProducts();
       }
     }
   };
@@ -165,8 +167,9 @@ const Marketplace = () => {
     const { error } = await supabase.from("categories").insert([{ name: newCategoryName.trim() }]);
     if (error) toast.error("حدث خطأ، ممكن يكون القسم موجود بالفعل!");
     else {
-      toast.success("تم إضافة القسم بنجاح 📂");
-      setNewCategoryName(""); fetchCategories();
+      toast.success("تم إضافة القسم بنجاح");
+      setNewCategoryName(""); 
+      fetchCategories();
     }
   };
 
@@ -187,8 +190,10 @@ const Marketplace = () => {
     if (catError) toast.error("حدث خطأ، ممكن الاسم يكون مستخدم.");
     else {
       await supabase.from("products").update({ category: editCategoryName.trim() }).eq("category", oldName);
-      toast.success("تم تعديل القسم بنجاح ✨");
-      setEditingCategoryId(null); fetchCategories(); fetchProducts(); 
+      toast.success("تم تعديل القسم بنجاح");
+      setEditingCategoryId(null); 
+      fetchCategories(); 
+      fetchProducts(); 
     }
   };
 
@@ -196,139 +201,140 @@ const Marketplace = () => {
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-background text-foreground font-tajawal pt-24 md:pt-32 pb-16 md:pb-20 relative overflow-x-hidden" dir="rtl">
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
-
-        <div className="container mx-auto px-4 relative z-10 max-w-7xl">
+      <div className="min-h-screen bg-background text-foreground font-tajawal pt-24 md:pt-28 pb-16" dir="rtl">
+        <div className="container mx-auto px-4 max-w-7xl">
           
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-10 gap-4 md:gap-6">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="w-full md:w-auto">
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black mb-2 flex items-center gap-2 md:gap-3">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-border pb-6">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-1 tracking-tight">
                 سوق <span className="text-primary">نبتة</span>
               </h1>
-              <p className="text-muted-foreground text-sm md:text-lg">مستلزمات الإنتاج الزراعي بين يديك.</p>
-            </motion.div>
+              <p className="text-muted-foreground text-sm md:text-base">مستلزمات الإنتاج الزراعي والخدمات الميدانية.</p>
+            </div>
             
             {isAdmin && (
-              <motion.button 
-                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+              <button 
                 onClick={openAddModal}
-                className="w-full md:w-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 md:px-8 py-3.5 md:py-4 rounded-xl md:rounded-full font-bold text-sm md:text-base shadow-lg  transition-all mt-2 md:mt-0"
+                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm"
               >
-                <Plus className="w-5 h-5" /> إضافة صنف جديد
-              </motion.button>
+                <Plus className="w-4 h-4" /> إضافة صنف جديد
+              </button>
             )}
           </div>
 
-          <div className="mb-6 md:mb-8 max-w-xl relative">
-            <div className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none">
-              <Search className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
+          {/* Search Bar */}
+          <div className="mb-6 max-w-lg relative">
+            <div className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted-foreground">
+              <Search className="w-4 h-4" />
             </div>
             <input 
               type="text"
-              placeholder="ابحث عن منتج..."
+              placeholder="ابحث عن صنف، مبيد، أو مستلزم..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-muted text-foreground pr-10 pl-4 py-3.5 md:py-4 rounded-xl md:rounded-2xl border border-border focus:border-emerald-500 outline-none shadow-inner transition-colors text-sm md:text-base"
+              className="w-full bg-card text-foreground pr-10 pl-4 py-3 rounded-xl border border-border focus:border-primary outline-none transition-colors text-sm"
             />
           </div>
 
-          <div className="flex flex-nowrap items-center gap-2 md:gap-3 mb-8 md:mb-12 pb-2 overflow-x-auto no-scrollbar scroll-smooth">
-            <div className="flex-shrink-0 flex items-center gap-1.5 bg-muted px-3 md:px-4 py-2 md:py-2.5 rounded-xl border border-border shadow-inner">
-              <Filter className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-              <span className="text-xs md:text-sm text-muted-foreground font-bold ml-1">تصفية:</span>
+          {/* Categories Filter */}
+          <div className="flex items-center gap-2 mb-8 pb-2 overflow-x-auto no-scrollbar">
+            <div className="flex-shrink-0 flex items-center gap-1.5 bg-card px-3 py-2 rounded-xl border border-border text-muted-foreground text-xs font-medium">
+              <Filter className="w-3.5 h-3.5 text-primary" />
+              <span>التصنيف:</span>
             </div>
             
             {dbCategories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex-shrink-0 flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold transition-all whitespace-nowrap border text-xs md:text-sm ${
+                className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors border text-xs md:text-sm ${
                   activeCategory === cat.id 
-                    ? "bg-primary border-emerald-500 text-primary-foreground shadow-lg " 
-                    : "bg-muted/50 border-border text-muted-foreground hover:border-primary/20 hover:text-foreground"
+                    ? "bg-primary border-primary text-primary-foreground shadow-sm" 
+                    : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-border/80"
                 }`}
               >
-                <cat.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <cat.icon className="w-4 h-4" />
                 {cat.label}
               </button>
             ))}
 
             {isAdmin && (
-               <button
+              <button
                 onClick={() => setIsManageCategoriesOpen(true)}
-                className="flex-shrink-0 flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold transition-all whitespace-nowrap border bg-muted/50 border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary border-dashed mr-auto"
-               >
-                 <Settings className="w-3.5 h-3.5 md:w-4 md:h-4" /> إدارة الأقسام
-               </button>
+                className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl font-medium border border-dashed border-primary/40 text-primary bg-card hover:bg-primary/5 transition-colors mr-auto text-xs"
+              >
+                <Settings className="w-3.5 h-3.5" /> إدارة الأقسام
+              </button>
             )}
           </div>
 
+          {/* Products Grid */}
           {loading ? (
-            <div className="text-center py-20 md:py-40 text-muted-foreground flex flex-col items-center gap-4">
-              <Loader2 className="animate-spin w-10 h-10 md:w-12 md:h-12 text-primary" />
-              <p className="text-base md:text-lg">جاري التحميل...</p>
+            <div className="text-center py-24 text-muted-foreground flex flex-col items-center gap-3">
+              <Loader2 className="animate-spin w-8 h-8 text-primary" />
+              <p className="text-sm">جاري تحميل المنتجات...</p>
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-20 md:py-32 bg-muted rounded-[1.5rem] md:rounded-[2.5rem] border border-border flex flex-col items-center gap-4 md:gap-6 shadow-2xl">
-              <ShoppingBag className="w-16 h-16 md:w-20 md:h-20 text-neutral-800" />
-              <p className="text-muted-foreground text-lg md:text-xl font-medium">لا توجد منتجات مطابقة.</p>
+            <div className="text-center py-20 bg-card rounded-2xl border border-border flex flex-col items-center gap-3">
+              <ShoppingBag className="w-12 h-12 text-muted-foreground/50" />
+              <p className="text-muted-foreground text-base">لا توجد منتجات مطابقة للبحث.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               <AnimatePresence>
                 {filteredProducts.map((p, idx) => (
                   <motion.div 
                     key={p.id}
-                    layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className="group bg-muted rounded-[1.5rem] md:rounded-[2.5rem] border border-border overflow-hidden hover:border-primary/20 shadow-lg hover:shadow-2xl hover: transition-all relative flex flex-col"
+                    layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, delay: idx * 0.03 }}
+                    className="group bg-card rounded-xl border border-border overflow-hidden hover:border-primary/40 transition-all flex flex-col relative shadow-sm"
                   >
-                    <div className="h-52 md:h-64 bg-muted relative overflow-hidden cursor-pointer" onClick={() => setSelectedProduct(p)}>
+                    <div className="h-48 bg-muted relative overflow-hidden cursor-pointer" onClick={() => setSelectedProduct(p)}>
                       {p.image_url ? (
-                        <>
-                          <img src={p.image_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0c] via-transparent to-transparent opacity-90" />
-                        </>
+                        <img src={p.image_url} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-neutral-800 bg-gradient-to-br from-neutral-900 to-black"><ShoppingBag size={48} /></div>
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted"><ShoppingBag size={32} /></div>
                       )}
-                      <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold text-primary border border-border shadow-lg">
+                      <div className="absolute top-2.5 right-2.5 bg-background/90 px-2.5 py-1 rounded-md text-[11px] font-medium text-foreground border border-border">
                         {p.category}
                       </div>
                     </div>
                     
-                    <div className="p-4 md:p-6 flex flex-col flex-1 relative z-10 -mt-4 bg-muted rounded-t-2xl md:rounded-t-3xl">
-                      <h4 className="text-lg md:text-xl font-bold text-foreground mb-1.5 truncate group-hover:text-primary transition-colors">{p.name}</h4>
-                      <p className="text-muted-foreground text-xs md:text-sm mb-4 line-clamp-2 leading-relaxed">{p.description}</p>
+                    <div className="p-4 flex flex-col flex-1">
+                      <h4 className="text-base font-bold text-foreground mb-1 truncate group-hover:text-primary transition-colors">{p.name}</h4>
+                      <p className="text-muted-foreground text-xs mb-4 line-clamp-2 leading-relaxed">{p.description}</p>
                       
-                      <div className="flex items-center justify-between border-t border-border pt-4 mt-auto">
-                        <span className="text-primary font-black text-xl md:text-2xl tracking-tighter tabular-nums">{p.price}</span>
+                      <div className="flex items-center justify-between border-t border-border pt-3 mt-auto">
+                        <span className="text-primary font-bold text-base tracking-tight tabular-nums">{p.price}</span>
                         
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5">
                           <button 
                             onClick={() => setSelectedProduct(p)}
-                            className="p-2.5 md:p-3 bg-muted hover:bg-accent text-foreground hover:text-primary rounded-xl md:rounded-2xl border border-border transition-all"
+                            className="p-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg border border-border transition-colors"
+                            title="عرض التفاصيل"
                           >
-                            <Eye className="w-4 h-4 md:w-5 md:h-5" />
+                            <Eye className="w-4 h-4" />
                           </button>
                           <a 
                             href={`https://wa.me/201019715490?text=أريد طلب: ${p.name}`}
-                            className="flex items-center gap-1.5 md:gap-2 bg-accent hover:bg-primary text-primary hover:text-primary-foreground px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl border border-primary/20 transition-all text-xs md:text-sm font-bold"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground px-3 py-2 rounded-lg transition-colors text-xs font-medium"
                           >
-                            <MessageCircle className="w-4 h-4" /> اطلب
+                            <MessageCircle className="w-3.5 h-3.5" /> اطلب
                           </a>
                         </div>
                       </div>
                     </div>
                     
                     {isAdmin && (
-                      <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e)=>{ e.stopPropagation(); deleteProduct(p.id); }} className="p-2 bg-red-500/90 hover:bg-red-600 rounded-full text-foreground shadow-lg">
-                          <Trash2 size={14}/>
+                      <div className="absolute top-2.5 left-2.5 flex gap-1.5 opacity-90 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={(e)=>{ e.stopPropagation(); openEditModal(p); }} className="p-1.5 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700">
+                          <Edit2 size={13}/>
                         </button>
-                        <button onClick={(e)=>{ e.stopPropagation(); openEditModal(p); }} className="p-2 bg-blue-500/90 hover:bg-blue-600 rounded-full text-foreground shadow-lg">
-                          <Edit2 size={14}/>
+                        <button onClick={(e)=>{ e.stopPropagation(); deleteProduct(p.id); }} className="p-1.5 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700">
+                          <Trash2 size={13}/>
                         </button>
                       </div>
                     )}
@@ -338,179 +344,154 @@ const Marketplace = () => {
             </div>
           )}
 
-          {/* Modals إدارة الأقسام والمنتجات */}
+          {/* Manage Categories Modal */}
           <AnimatePresence>
             {isManageCategoriesOpen && isAdmin && (
-              <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[160] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 font-tajawal text-right" dir="rtl"
-              >
-                <motion.div 
-                  initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
-                  className="bg-muted w-full max-w-md rounded-[1.5rem] md:rounded-[2.5rem] border border-primary/20 p-5 md:p-8 shadow-2xl relative max-h-[90dvh] flex flex-col"
-                >
-                  <button onClick={() => setIsManageCategoriesOpen(false)} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground bg-muted p-1.5 rounded-full"><X size={18}/></button>
-                  <h3 className="text-foreground font-bold mb-5 flex items-center gap-2 text-lg md:text-xl"> <Settings className="text-primary w-5 h-5" /> إدارة الأقسام</h3>
+              <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 font-tajawal text-right" dir="rtl">
+                <div className="bg-card w-full max-w-md rounded-2xl border border-border p-6 shadow-lg relative max-h-[90vh] flex flex-col">
+                  <button onClick={() => setIsManageCategoriesOpen(false)} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground"><X size={18}/></button>
+                  <h3 className="text-foreground font-bold mb-4 flex items-center gap-2 text-base">
+                    <Settings className="text-primary w-4 h-4" /> إدارة أقسام المنتجات
+                  </h3>
                   
-                  <div className="flex gap-2 mb-6 border-b border-border pb-5">
+                  <div className="flex gap-2 mb-4 border-b border-border pb-4">
                     <input 
                       placeholder="اسم القسم الجديد..." 
                       value={newCategoryName} 
                       onChange={e => setNewCategoryName(e.target.value)} 
-                      className="flex-1 bg-black/40 px-3 py-2.5 rounded-lg border border-border outline-none focus:border-emerald-500 text-foreground text-base" 
+                      className="flex-1 bg-background px-3 py-2 rounded-xl border border-border outline-none focus:border-primary text-foreground text-sm" 
                     />
-                    <button onClick={addCategory} className="bg-primary px-4 py-2.5 rounded-lg text-primary-foreground font-bold hover:bg-primary/90 transition-all text-sm">إضافة</button>
+                    <button onClick={addCategory} className="bg-primary px-4 py-2 rounded-xl text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm">إضافة</button>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto pr-1 space-y-2 no-scrollbar">
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-1">
                     {dbCategories.filter(c => c.id !== 'all').map((cat) => (
-                      <div key={cat.dbId} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg border border-border">
+                      <div key={cat.dbId} className="flex items-center justify-between bg-muted/40 p-2.5 rounded-xl border border-border">
                         {editingCategoryId === cat.dbId ? (
                           <div className="flex items-center gap-2 w-full">
                             <input 
                               value={editCategoryName} 
                               onChange={e => setEditCategoryName(e.target.value)} 
-                              className="flex-1 bg-black/60 px-2 py-1.5 rounded-md border border-primary/20 outline-none text-foreground text-sm" 
+                              className="flex-1 bg-background px-2.5 py-1 rounded-lg border border-primary outline-none text-foreground text-xs" 
                               autoFocus
                             />
-                            <button onClick={() => updateCategory(cat.dbId, cat.label)} className="p-1.5 bg-primary rounded-md text-primary-foreground"><Check size={14}/></button>
-                            <button onClick={() => setEditingCategoryId(null)} className="p-1.5 bg-muted rounded-md text-muted-foreground"><X size={14}/></button>
+                            <button onClick={() => updateCategory(cat.dbId, cat.label)} className="p-1.5 bg-primary rounded-lg text-primary-foreground"><Check size={13}/></button>
+                            <button onClick={() => setEditingCategoryId(null)} className="p-1.5 bg-muted rounded-lg text-muted-foreground"><X size={13}/></button>
                           </div>
                         ) : (
                           <>
-                            <div className="flex items-center gap-2 text-foreground font-medium text-sm">
+                            <div className="flex items-center gap-2 text-foreground font-medium text-xs">
                               <cat.icon className="w-3.5 h-3.5 text-primary" /> {cat.label}
                             </div>
-                            <div className="flex gap-1.5">
-                              <button onClick={() => { setEditingCategoryId(cat.dbId); setEditCategoryName(cat.label); }} className="p-1.5 text-muted-foreground bg-muted rounded-md"><Edit2 size={14}/></button>
-                              <button onClick={() => deleteCategory(cat.dbId, cat.label)} className="p-1.5 text-red-400 bg-red-500/10 rounded-md"><Trash2 size={14}/></button>
+                            <div className="flex gap-1">
+                              <button onClick={() => { setEditingCategoryId(cat.dbId); setEditCategoryName(cat.label); }} className="p-1.5 text-muted-foreground hover:text-foreground"><Edit2 size={13}/></button>
+                              <button onClick={() => deleteCategory(cat.dbId, cat.label)} className="p-1.5 text-red-500 hover:text-red-600"><Trash2 size={13}/></button>
                             </div>
                           </>
                         )}
                       </div>
                     ))}
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             )}
           </AnimatePresence>
 
+          {/* Add / Edit Product Modal */}
           <AnimatePresence>
             {isModalOpen && isAdmin && (
-              <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 font-tajawal text-right" dir="rtl"
-              >
-                <motion.div 
-                  initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
-                  className="bg-muted w-full max-w-xl rounded-[1.5rem] md:rounded-[2.5rem] border border-primary/20 p-5 md:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto no-scrollbar"
-                >
-                  <button onClick={() => setIsModalOpen(false)} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground bg-muted p-1.5 rounded-full z-10"><X size={18}/></button>
+              <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 font-tajawal text-right" dir="rtl">
+                <div className="bg-card w-full max-w-lg rounded-2xl border border-border p-6 shadow-lg relative max-h-[90vh] overflow-y-auto">
+                  <button onClick={() => setIsModalOpen(false)} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground"><X size={18}/></button>
                   
-                  <h3 className="text-foreground font-bold mb-6 flex items-center gap-2 text-lg md:text-2xl"> 
-                    {editingProductId ? <Edit2 className="text-blue-500 w-5 h-5 md:w-6 md:h-6" /> : <Plus className="text-primary w-5 h-5 md:w-6 md:h-6" />} 
-                    {editingProductId ? "تعديل بيانات المنتج" : "إضافة صنف جديد"}
+                  <h3 className="text-foreground font-bold mb-5 flex items-center gap-2 text-lg"> 
+                    {editingProductId ? <Edit2 className="text-primary w-5 h-5" /> : <Plus className="text-primary w-5 h-5" />} 
+                    {editingProductId ? "تعديل المنتج" : "إضافة صنف جديد"}
                   </h3>
                   
-                  <div className="space-y-3 md:space-y-4">
-                    <div className="relative h-32 md:h-40 bg-black/40 border-2 border-dashed border-border rounded-xl md:rounded-2xl flex items-center justify-center overflow-hidden">
+                  <div className="space-y-4">
+                    <div className="relative h-32 bg-background border border-dashed border-border rounded-xl flex items-center justify-center overflow-hidden">
                       {imageUrl ? <img src={imageUrl} className="w-full h-full object-cover" /> : (
                         <div className="text-center">
-                          {uploading ? <Loader2 className="animate-spin mx-auto text-primary" /> : <Camera className="mx-auto text-muted-foreground w-6 h-6 md:w-8 md:h-8 mb-1" />}
-                          <span className="text-xs md:text-sm text-muted-foreground block mt-1">اضغط لرفع صورة المنتج</span>
+                          {uploading ? <Loader2 className="animate-spin mx-auto text-primary" /> : <Camera className="mx-auto text-muted-foreground w-6 h-6 mb-1" />}
+                          <span className="text-xs text-muted-foreground block">اختر صورة المنتج</span>
                         </div>
                       )}
                       <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                     </div>
 
-                    <input placeholder="اسم المنتج" value={newName} onChange={e=>setNewName(e.target.value)} className="w-full bg-black/40 p-3 md:p-4 rounded-lg md:rounded-xl border border-border outline-none focus:border-emerald-500 text-foreground text-base" />
-                    <input placeholder="السعر" value={newPrice} onChange={e=>setNewPrice(e.target.value)} className="w-full bg-black/40 p-3 md:p-4 rounded-lg md:rounded-xl border border-border outline-none focus:border-emerald-500 text-foreground text-base" />
+                    <input placeholder="اسم المنتج" value={newName} onChange={e=>setNewName(e.target.value)} className="w-full bg-background p-3 rounded-xl border border-border outline-none focus:border-primary text-foreground text-sm" />
+                    <input placeholder="السعر" value={newPrice} onChange={e=>setNewPrice(e.target.value)} className="w-full bg-background p-3 rounded-xl border border-border outline-none focus:border-primary text-foreground text-sm" />
                     
-                    <select value={newCategory} onChange={e=>setNewCategory(e.target.value)} className="w-full bg-black/40 p-3 md:p-4 rounded-lg md:rounded-xl border border-border text-foreground outline-none focus:border-emerald-500 appearance-none text-base">
+                    <select value={newCategory} onChange={e=>setNewCategory(e.target.value)} className="w-full bg-background p-3 rounded-xl border border-border text-foreground outline-none focus:border-primary text-sm">
                       {dbCategories.filter(c => c.id !== 'all').map((cat) => (
-                        <option key={cat.id} value={cat.id} className="bg-muted">{cat.label}</option>
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
                       ))}
                     </select>
                     
-                    <textarea placeholder="وصف سريع..." value={newDescription} onChange={e=>setNewDescription(e.target.value)} className="w-full bg-black/40 p-3 md:p-4 rounded-lg md:rounded-xl border border-border outline-none focus:border-emerald-500 h-20 md:h-24 resize-none text-base" />
+                    <textarea placeholder="وصف المنتج..." value={newDescription} onChange={e=>setNewDescription(e.target.value)} className="w-full bg-background p-3 rounded-xl border border-border outline-none focus:border-primary h-24 resize-none text-sm" />
                     
-                    <button onClick={handleSaveProduct} className={`w-full py-3 md:py-4 rounded-xl text-foreground font-bold transition-all text-base md:text-lg shadow-lg ${editingProductId ? 'bg-blue-600 hover:bg-blue-500' : 'bg-primary hover:bg-primary/90'}`}>
-                      {editingProductId ? "حفظ التعديلات" : "نشر الآن"}
+                    <button onClick={handleSaveProduct} className="w-full py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors text-sm shadow-sm">
+                      {editingProductId ? "حفظ التعديلات" : "نشر المنتج"}
                     </button>
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             )}
           </AnimatePresence>
 
+          {/* Product Details Modal */}
           <AnimatePresence>
             {selectedProduct && (
-              <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 font-tajawal text-right" dir="rtl"
-                onClick={() => setSelectedProduct(null)}
-              >
-                <motion.div 
-                  initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-muted w-full max-w-4xl max-h-[90dvh] rounded-[1.5rem] md:rounded-[2rem] border border-border  relative overflow-hidden flex flex-col md:flex-row"
-                >
-                  <button 
-                    onClick={() => setSelectedProduct(null)} 
-                    className="absolute top-3 left-3 z-50 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-black/50 hover:bg-red-500/90 backdrop-blur-md rounded-full text-foreground transition-all border border-border"
-                  >
-                    <X size={18}/>
+              <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 font-tajawal text-right" dir="rtl" onClick={() => setSelectedProduct(null)}>
+                <div onClick={(e) => e.stopPropagation()} className="bg-card w-full max-w-3xl rounded-2xl border border-border relative overflow-hidden flex flex-col md:flex-row shadow-xl">
+                  <button onClick={() => setSelectedProduct(null)} className="absolute top-3 left-3 z-10 w-8 h-8 bg-background/80 hover:bg-muted rounded-full flex items-center justify-center text-foreground border border-border transition-colors">
+                    <X size={16}/>
                   </button>
                   
-                  <div className="w-full md:w-[45%] h-48 sm:h-56 md:h-auto bg-background p-4 md:p-6 flex items-center justify-center shrink-0 border-b md:border-b-0 md:border-l border-border">
-                     <div className="relative w-full h-full max-w-[220px] md:max-w-[280px] aspect-[4/5] rounded-[1rem] md:rounded-[1.5rem] overflow-hidden border border-border shadow-inner bg-black/50 p-2 md:p-4">
-                        {selectedProduct.image_url ? (
-                          <img src={selectedProduct.image_url} className="w-full h-full object-contain filter drop-shadow-xl" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-neutral-800"><ShoppingBag size={64} /></div>
-                        )}
-                     </div>
+                  <div className="w-full md:w-1/2 h-64 md:h-auto bg-muted p-6 flex items-center justify-center border-b md:border-b-0 md:border-l border-border">
+                    <div className="relative w-full h-full max-h-[300px] rounded-xl overflow-hidden bg-background border border-border p-2">
+                      {selectedProduct.image_url ? (
+                        <img src={selectedProduct.image_url} className="w-full h-full object-contain" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground"><ShoppingBag size={48} /></div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="w-full md:w-[55%] p-5 md:p-8 flex flex-col bg-gradient-to-br from-[#0a0f0c] to-[#0f1712] overflow-hidden">
-                    
-                    <div className="shrink-0 mb-3 md:mb-4">
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <div className="flex items-center gap-1 bg-accent text-primary px-2.5 py-1 rounded-lg text-[10px] md:text-xs font-bold border border-primary/20">
-                              <LayoutGrid size={12} /> {selectedProduct.category}
-                            </div>
-                            <div className="flex items-center gap-1 bg-muted text-foreground px-2.5 py-1 rounded-lg text-[10px] md:text-xs font-bold border border-border">
-                              <CheckCircle2 size={12} className="text-primary" /> متوفر
-                            </div>
-                        </div>
-                        <h2 className="text-2xl md:text-4xl font-black text-foreground leading-tight">{selectedProduct.name}</h2>
+                  <div className="w-full md:w-1/2 p-6 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-muted text-primary px-2.5 py-0.5 rounded-md text-xs font-medium border border-border">
+                          {selectedProduct.category}
+                        </span>
+                        <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                          <CheckCircle2 size={12} className="text-primary" /> متوفر للمستلزمات
+                        </span>
+                      </div>
+                      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">{selectedProduct.name}</h2>
+                      <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap mb-6">
+                        {selectedProduct.description || "لا يوجد وصف إضافي متوفر لهذا الصنف."}
+                      </p>
                     </div>
                     
-                    <div className="flex-1 overflow-y-auto pr-1 my-1 md:my-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-accent">
-                       <p className="text-muted-foreground text-sm md:text-base leading-relaxed whitespace-pre-wrap">
-                         {selectedProduct.description || "لا يوجد وصف إضافي."}
-                       </p>
-                    </div>
-                    
-                    <div className="shrink-0 mt-3 md:mt-4 pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="pt-4 border-t border-border flex items-center justify-between gap-4">
                       <div>
-                        <span className="block text-[10px] md:text-xs text-muted-foreground mb-0.5 font-medium">سعر المنتج</span>
-                        <span className="text-primary font-black text-2xl md:text-4xl tabular-nums tracking-tighter">{selectedProduct.price}</span>
+                        <span className="block text-[11px] text-muted-foreground">السعر</span>
+                        <span className="text-primary font-bold text-xl tracking-tight">{selectedProduct.price}</span>
                       </div>
                       
                       <a 
                         href={`https://wa.me/201019715490?text=أريد طلب: ${selectedProduct.name}`}
                         target="_blank" rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-3 md:py-3.5 rounded-xl transition-all font-bold text-sm md:text-base w-full sm:w-auto shadow-lg"
+                        className="flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl transition-colors font-medium text-sm shadow-sm"
                       >
-                        <MessageCircle className="w-4 h-4 md:w-5 md:h-5" /> اطلب الآن
+                        <MessageCircle className="w-4 h-4" /> اطلب عبر واتساب
                       </a>
                     </div>
-
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             )}
           </AnimatePresence>
 
