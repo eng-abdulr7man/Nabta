@@ -95,10 +95,10 @@ const TestimonialsWall = () => {
         <div className="max-w-2xl mx-auto text-center mb-16">
          
           <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
-            إيه بيقوله طلابنا عن <span className="text-primary">نبتة</span>؟
+           بعض آراء طلاب <span className="text-primary">نبتة</span>؟
           </h2>
           <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-            نجاحكم في الغيط ومعيار الجودة اللي بنقدمه هو انعكاس لثقتكم.
+            نجاحكم ومعيار الجودة اللي بنقدمه هو انعكاس لثقتكم.
           </p>
         </div>
 
